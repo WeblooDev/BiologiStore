@@ -1,5 +1,5 @@
 import {redirect, type LoaderFunctionArgs} from '@shopify/remix-oxygen';
-import {useLoaderData, type MetaFunction} from 'react-router';
+import {Await, useLoaderData, type MetaFunction} from 'react-router';
 import {
   getSelectedProductOptions,
   Analytics,
@@ -12,6 +12,14 @@ import {ProductPrice} from '~/components/ProductPrice';
 import {ProductImage} from '~/components/ProductImage';
 import {ProductForm} from '~/components/ProductForm';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
+import { ProductBenefits } from '../components/ProductBenefits';
+import { ProductSiblings } from '../components/ProductSiblings'; 
+import { DiscoverRegimenSection } from '~/components/DiscoverRegimen';
+import discoverImage from '~/assets/images/discover.png';
+import { ProductUsage } from '~/components/ProductUsage';
+import { ProductExpectation } from '~/components/ProductExpectation';
+import { BestSellers } from '~/components/BestSellers';
+import { Suspense } from 'react';
 
 export const meta: MetaFunction<typeof loader> = ({data}) => {
   return [
@@ -24,19 +32,11 @@ export const meta: MetaFunction<typeof loader> = ({data}) => {
 };
 
 export async function loader(args: LoaderFunctionArgs) {
-  // Start fetching non-critical data without blocking time to first byte
   const deferredData = loadDeferredData(args);
-
-  // Await the critical data required to render initial state of the page
   const criticalData = await loadCriticalData(args);
-
   return {...deferredData, ...criticalData};
 }
 
-/**
- * Load data necessary for rendering content above the fold. This is the critical data
- * needed to render the page. If it's unavailable, the whole page should 400 or 500 error.
- */
 async function loadCriticalData({
   context,
   params,
@@ -53,93 +53,148 @@ async function loadCriticalData({
     storefront.query(PRODUCT_QUERY, {
       variables: {handle, selectedOptions: getSelectedProductOptions(request)},
     }),
-    // Add other queries here, so that they are loaded in parallel
   ]);
 
   if (!product?.id) {
     throw new Response(null, {status: 404});
   }
 
-  // The API handle might be localized, so redirect to the localized handle
   redirectIfHandleIsLocalized(request, {handle, data: product});
 
+  return {product};
+}
+
+function loadDeferredData({ context }: LoaderFunctionArgs) {
+  const bestSellers = context.storefront
+    .query(RECOMMENDED_PRODUCTS_QUERY)
+    .catch((err) => {
+      console.error("Error fetching best sellers:", err);
+      return null;
+    });
+
   return {
-    product,
+    bestSellers,
   };
 }
 
-/**
- * Load data for rendering content below the fold. This data is deferred and will be
- * fetched after the initial page load. If it's unavailable, the page should still 200.
- * Make sure to not throw any errors here, as it will cause the page to 500.
- */
-function loadDeferredData({context, params}: LoaderFunctionArgs) {
-  // Put any API calls that is not critical to be available on first page render
-  // For example: product reviews, product recommendations, social feeds.
 
-  return {};
-}
+
 
 export default function Product() {
-  const {product} = useLoaderData<typeof loader>();
-
-  // Optimistically selects a variant with given available variant information
+const { product, bestSellers } = useLoaderData<typeof loader>();
+  
   const selectedVariant = useOptimisticVariant(
     product.selectedOrFirstAvailableVariant,
     getAdjacentAndFirstAvailableVariants(product),
   );
 
-  // Sets the search param to the selected variant without navigation
-  // only when no search params are set in the url
   useSelectedOptionInUrlParam(selectedVariant.selectedOptions);
-
-  // Get the product options array
   const productOptions = getProductOptions({
     ...product,
     selectedOrFirstAvailableVariant: selectedVariant,
   });
 
-  const {title, descriptionHtml} = product;
+  const { title, tags, descriptionHtml } = product;
+  const siblings = product?.siblings?.referenceList?.nodes || [];
 
   return (
-    <div className="product">
-      <ProductImage image={selectedVariant?.image} />
-      <div className="product-main">
-        <h1>{title}</h1>
-        <ProductPrice
-          price={selectedVariant?.price}
-          compareAtPrice={selectedVariant?.compareAtPrice}
+    <>
+      <div className="product">
+        <ProductImage image={selectedVariant?.image} />
+        <div className="product-main bg-white p-6 max-w-[600px]">
+          <h1 className="text-[#2B8C57] !m-0">{title}</h1>
+
+          {tags?.length > 0 && (
+            <div className="mb-4 flex flex-wrap gap-2">
+              {tags.map((tag: string) => (
+                <span key={tag} className="text-[#4F4F4F] underline">
+                  #{tag}
+                </span>
+              ))}
+            </div>
+          )}
+
+          <ProductPrice
+            price={selectedVariant?.price}
+            compareAtPrice={selectedVariant?.compareAtPrice}
+          />
+
+          <div dangerouslySetInnerHTML={{ __html: descriptionHtml }} />
+
+          <p className="text-sm mt-2">
+            {selectedVariant.selectedOptions.find(opt => opt.name.toLowerCase() === 'size')?.value}
+          </p>
+
+          <ProductForm
+            productOptions={productOptions}
+            selectedVariant={selectedVariant}
+          />
+
+          <p className="text-sm !mt-8 font-normal">Pair it With</p>
+          <ProductSiblings products={siblings} />
+        </div>
+
+        <Analytics.ProductView
+          data={{
+            products: [
+              {
+                id: product.id,
+                title: product.title,
+                price: selectedVariant?.price.amount || '0',
+                vendor: product.vendor,
+                variantId: selectedVariant?.id || '',
+                variantTitle: selectedVariant?.title || '',
+                quantity: 1,
+              },
+            ],
+          }}
         />
-        <br />
-        <ProductForm
-          productOptions={productOptions}
-          selectedVariant={selectedVariant}
-        />
-        <br />
-        <br />
-        <p>
-          <strong>Description</strong>
-        </p>
-        <br />
-        <div dangerouslySetInnerHTML={{__html: descriptionHtml}} />
-        <br />
       </div>
-      <Analytics.ProductView
-        data={{
-          products: [
-            {
-              id: product.id,
-              title: product.title,
-              price: selectedVariant?.price.amount || '0',
-              vendor: product.vendor,
-              variantId: selectedVariant?.id || '',
-              variantTitle: selectedVariant?.title || '',
-              quantity: 1,
-            },
-          ],
-        }}
+
+      <ProductBenefits
+        json={product.metafield?.value || '[]'}
+        images={product.images?.nodes || []}
       />
-    </div>
+
+    <ProductExpectation
+      json={product.expectation?.value || '[]'}
+      beforeAfter={
+        product.beforeAfter?.references?.nodes?.map((ref: any) => ref.image?.url) || []
+      }
+      expectImage={
+        product.expectImage?.references?.nodes?.map((node: any) => ({
+          title: node.title,
+          featuredImage: node.featuredImage,
+        })) || []
+      }
+    />
+
+
+
+
+
+      <ProductUsage
+        json={product.usage?.value || '[]'}
+        image={product.usagePicture?.reference?.image}
+      />
+
+      <DiscoverRegimenSection
+        image={{
+          url: discoverImage,
+          altText: 'Welcome to our store',
+        }}
+        title="Discover Your Regimen"
+        text="Find the skincare products best suited for your skin health goals."
+        buttonText="Discover My Regimen"
+        buttonLink="/collections"
+      />
+
+      <Suspense fallback={<div>Loading Best Sellers...</div>}>
+      <Await resolve={bestSellers}>
+        {(data) => data && <BestSellers title='Recently Viewed' products={data} />}
+      </Await>
+    </Suspense>
+    </>
   );
 }
 
@@ -188,6 +243,85 @@ const PRODUCT_FRAGMENT = `#graphql
     handle
     descriptionHtml
     description
+    tags
+    metafield(namespace: "custom", key: "benefits") {
+      value
+    }
+    expectation: metafield(namespace: "custom", key: "expectation") {
+      value
+    }
+    usage: metafield(namespace: "custom", key: "usage") {
+      value
+    }
+      expectImage: metafield(namespace: "custom", key: "expectImage") {
+  references(first: 10) {
+    nodes {
+      ... on Product {
+        id
+        title
+        featuredImage {
+          url
+          altText
+          width
+          height
+        }
+      }
+    }
+  }
+}
+
+    usagePicture: metafield(namespace: "custom", key: "usagePicture") {
+      reference {
+        ... on MediaImage {
+          image {
+            url
+            altText
+            width
+            height
+          }
+        }
+      }
+    }
+    beforeAfter: metafield(namespace: "custom", key: "beforeafter") {
+      references(first: 2) {
+        nodes {
+          ... on MediaImage {
+            image {
+              url
+              altText
+              width
+              height
+            }
+          }
+        }
+      }
+    }
+    images(first: 5) {
+      nodes {
+        url
+        altText
+        width
+        height
+      }
+    }
+    siblings: metafield(namespace: "custom", key: "siblings") {
+      type
+      referenceList: references(first: 10) {
+        nodes {
+          ... on Product {
+            id
+            title
+            handle
+            featuredImage {
+              url
+              altText
+              width
+              height
+            }
+          }
+        }
+      }
+    }
     encodedVariantExistence
     encodedVariantAvailability
     options {
@@ -210,7 +344,7 @@ const PRODUCT_FRAGMENT = `#graphql
     selectedOrFirstAvailableVariant(selectedOptions: $selectedOptions, ignoreUnknownOptions: true, caseInsensitiveMatch: true) {
       ...ProductVariant
     }
-    adjacentVariants (selectedOptions: $selectedOptions) {
+    adjacentVariants(selectedOptions: $selectedOptions) {
       ...ProductVariant
     }
     seo {
@@ -219,7 +353,8 @@ const PRODUCT_FRAGMENT = `#graphql
     }
   }
   ${PRODUCT_VARIANT_FRAGMENT}
-` as const;
+`;
+
 
 const PRODUCT_QUERY = `#graphql
   query Product(
@@ -233,4 +368,36 @@ const PRODUCT_QUERY = `#graphql
     }
   }
   ${PRODUCT_FRAGMENT}
+` as const;
+
+
+const RECOMMENDED_PRODUCTS_QUERY = `#graphql
+  fragment RecommendedProduct on Product {
+    id
+    title
+    handle
+    priceRange {
+      minVariantPrice {
+        amount
+        currencyCode
+      }
+    }
+    featuredImage {
+      id
+      url
+      altText
+      width
+      height
+    }
+    tags
+  }
+
+  query RecommendedProducts($country: CountryCode, $language: LanguageCode)
+  @inContext(country: $country, language: $language) {
+    products(first: 4, sortKey: BEST_SELLING) {
+      nodes {
+        ...RecommendedProduct
+      }
+    }
+  }
 ` as const;

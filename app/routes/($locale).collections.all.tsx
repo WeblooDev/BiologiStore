@@ -1,70 +1,106 @@
 import {type LoaderFunctionArgs} from '@shopify/remix-oxygen';
-import {useLoaderData, type MetaFunction} from 'react-router';
+import {Await, useLoaderData, type MetaFunction} from 'react-router';
 import {getPaginationVariables, Image, Money} from '@shopify/hydrogen';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 import {ProductItem} from '~/components/ProductItem';
+import {Suspense} from 'react';
+import {HeroProductSection} from '~/components/HeroProduct';
+import {BestSellers} from '~/components/BestSellers';
+import {AllCollections} from '~/components/AllCollections';
+import productHero from '~/assets/images/producthero.png';
 
 export const meta: MetaFunction<typeof loader> = () => {
   return [{title: `Hydrogen | Products`}];
 };
 
 export async function loader(args: LoaderFunctionArgs) {
-  // Start fetching non-critical data without blocking time to first byte
   const deferredData = loadDeferredData(args);
-
-  // Await the critical data required to render initial state of the page
   const criticalData = await loadCriticalData(args);
-
   return {...deferredData, ...criticalData};
 }
 
-/**
- * Load data necessary for rendering content above the fold. This is the critical data
- * needed to render the page. If it's unavailable, the whole page should 400 or 500 error.
- */
 async function loadCriticalData({context, request}: LoaderFunctionArgs) {
   const {storefront} = context;
   const paginationVariables = getPaginationVariables(request, {
     pageBy: 8,
   });
 
-  const [{products}] = await Promise.all([
+  const [{products}, {collections}] = await Promise.all([
     storefront.query(CATALOG_QUERY, {
       variables: {...paginationVariables},
     }),
-    // Add other queries here, so that they are loaded in parallel
+    storefront.query(ALL_COLLECTIONS_QUERY),
   ]);
-  return {products};
+
+  return {
+    products,
+    allCollections: collections,
+  };
 }
 
-/**
- * Load data for rendering content below the fold. This data is deferred and will be
- * fetched after the initial page load. If it's unavailable, the page should still 200.
- * Make sure to not throw any errors here, as it will cause the page to 500.
- */
 function loadDeferredData({context}: LoaderFunctionArgs) {
-  return {};
+  const recommendedProducts = context.storefront
+    .query(RECOMMENDED_PRODUCTS_QUERY)
+    .catch((error) => {
+      console.error(error);
+      return null;
+    });
+
+  const productTypes = context.storefront
+    .query(PRODUCT_TYPES_WITH_SAMPLE_PRODUCTS_QUERY)
+    .catch((error) => {
+      console.error(error);
+      return null;
+    });
+
+  return {
+    recommendedProducts,
+    productTypes,
+  };
 }
 
 export default function Collection() {
-  const {products} = useLoaderData<typeof loader>();
+  const data = useLoaderData<typeof loader>();
 
   return (
-    <div className="collection">
-      <h1>Products</h1>
-      <PaginatedResourceSection
-        connection={products}
-        resourcesClassName="products-grid"
-      >
-        {({node: product, index}) => (
-          <ProductItem
-            key={product.id}
-            product={product}
-            loading={index < 8 ? 'eager' : undefined}
-          />
-        )}
-      </PaginatedResourceSection>
-    </div>
+    <>
+      <HeroProductSection
+        image={{
+          url: productHero,
+          altText: 'Welcome to our store',
+        }}
+        title="Shop All"
+        links={[
+          {label: 'Shop Medical Grade Skin Care', href: '/collections/cleansers'},
+          {label: 'Shop Bundles', href: '/collections/moisturizers'},
+          {label: 'Shop Best Sellers', href: '/collections/treatments'},
+        ]}
+      />
+
+      <div className="container m-auto collection">
+        {/* ✅ AllCollections added above the PaginatedResourceSection */}
+        <AllCollections collections={data.allCollections} />
+
+        <PaginatedResourceSection
+          connection={data.products}
+          resourcesClassName="products-grid"
+        >
+          {({node: product, index}) => (
+            <ProductItem
+              key={product.id}
+              product={product}
+              loading={index < 8 ? 'eager' : undefined}
+            />
+          )}
+        </PaginatedResourceSection>
+
+        <Suspense fallback={<div>Loading Best Sellers...</div>}>
+          <Await resolve={data.recommendedProducts}>
+            {(response) => <BestSellers products={response} />}
+          </Await>
+        </Suspense>
+      </div>
+    </>
   );
 }
 
@@ -73,6 +109,7 @@ const COLLECTION_ITEM_FRAGMENT = `#graphql
     amount
     currencyCode
   }
+
   fragment CollectionItem on Product {
     id
     handle
@@ -84,6 +121,7 @@ const COLLECTION_ITEM_FRAGMENT = `#graphql
       width
       height
     }
+    tags
     priceRange {
       minVariantPrice {
         ...MoneyCollectionItem
@@ -95,7 +133,6 @@ const COLLECTION_ITEM_FRAGMENT = `#graphql
   }
 ` as const;
 
-// NOTE: https://shopify.dev/docs/api/storefront/latest/objects/product
 const CATALOG_QUERY = `#graphql
   query Catalog(
     $country: CountryCode
@@ -118,4 +155,83 @@ const CATALOG_QUERY = `#graphql
     }
   }
   ${COLLECTION_ITEM_FRAGMENT}
+` as const;
+
+const ALL_COLLECTIONS_QUERY = `#graphql
+  fragment CollectionFields on Collection {
+    id
+    title
+    handle
+    image {
+      id
+      url
+      altText
+      width
+      height
+    }
+  }
+
+  query AllCollections($country: CountryCode, $language: LanguageCode)
+    @inContext(country: $country, language: $language) {
+    collections(first: 20, sortKey: UPDATED_AT, reverse: true) {
+      nodes {
+        ...CollectionFields
+      }
+    }
+  }
+` as const;
+
+const PRODUCT_TYPES_WITH_SAMPLE_PRODUCTS_QUERY = `#graphql
+  query ProductTypesWithSampleProducts($country: CountryCode, $language: LanguageCode)
+    @inContext(country: $country, language: $language) {
+    productTypes(first: 20) {
+      edges {
+        node
+      }
+    }
+    products(first: 100, sortKey: UPDATED_AT, reverse: true) {
+      nodes {
+        title
+        productType
+        handle
+        images(first: 2) {
+          nodes {
+            url
+            altText
+          }
+        }
+      }
+    }
+  }
+` as const;
+
+const RECOMMENDED_PRODUCTS_QUERY = `#graphql
+  fragment RecommendedProduct on Product {
+    id
+    title
+    handle
+    priceRange {
+      minVariantPrice {
+        amount
+        currencyCode
+      }
+    }
+    featuredImage {
+      id
+      url
+      altText
+      width
+      height
+    }
+    tags
+  }
+
+  query RecommendedProducts($country: CountryCode, $language: LanguageCode)
+    @inContext(country: $country, language: $language) {
+    products(first: 4, sortKey: UPDATED_AT, reverse: true) {
+      nodes {
+        ...RecommendedProduct
+      }
+    }
+  }
 ` as const;

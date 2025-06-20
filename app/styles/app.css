@@ -410,12 +410,13 @@ button.reset:hover:not(:has(> *)) {
 .products-grid {
   display: grid;
   grid-gap: 1.5rem;
-  grid-template-columns: repeat(auto-fit, minmax(var(--grid-item-width), 1fr));
+  grid-template-columns: repeat(3, 1fr);
   margin-bottom: 2rem;
 }
 
 .product-item img {
-  height: auto;
+  height: 560px;
+  object-fit: cover;
   width: 100%;
 }
 
@@ -425,12 +426,16 @@ button.reset:hover:not(:has(> *)) {
 * --------------------------------------------------
 */
 .product {
-  display: grid;
-  @media (min-width: 45em) {
-    grid-template-columns: 1fr 1fr;
-    grid-gap: 4rem;
-  }
+  display: flex;
+  background: url("../assets/images/productbg.webp");
+  background-position: center;
+  background-size: cover;
+  padding: 20px; /* adjust as needed */ 
+  gap: 2rem;
+  justify-content: space-around;
 }
+
+
 
 .product h1 {
   margin-top: 0;
@@ -439,12 +444,13 @@ button.reset:hover:not(:has(> *)) {
 .product-image img {
   height: auto;
   width: 100%;
+  max-height: 700px;
 }
 
 .product-main {
-  align-self: start;
-  position: sticky;
-  top: 6rem;
+ display: flex;
+ flex-direction: column;
+ gap: 1rem;
 }
 
 .product-price-on-sale {
@@ -492,10 +498,7 @@ button.reset:hover:not(:has(> *)) {
   margin-bottom: 2rem;
 }
 
-.blog-article-image {
-  aspect-ratio: 3/2;
-  display: block;
-}
+
 
 .blog-article-image img {
   height: 100%;
@@ -519,4 +522,50 @@ button.reset:hover:not(:has(> *)) {
 
 .account-logout {
   display: inline-block;
+}
+
+
+
+.header-menu-desktop ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-menu-desktop .menu-item {
+  position: relative;
+}
+
+.header-menu-desktop .menu-depth-0 {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.header-menu-desktop .menu-depth-1,
+.header-menu-desktop .menu-depth-2 {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: white;
+  min-width: 220px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  z-index: 999;
+}
+
+.header-menu-desktop .menu-item:hover > .menu-depth-1,
+.header-menu-desktop .menu-depth-1 .menu-item:hover > .menu-depth-2 {
+  display: block;
+}
+
+.menu-link {
+  display: block;
+  padding: 0.75rem 1rem;
+  text-decoration: none;
+  color: black;
+  white-space: nowrap;
+}
+
+.menu-link:hover {
+  background-color: #f9f9f9;
 }

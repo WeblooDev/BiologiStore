@@ -1,4 +1,4 @@
-import {Link} from 'react-router';
+import {Link, useFetcher} from 'react-router';
 import {Image, Money} from '@shopify/hydrogen';
 import type {
   ProductItemFragment,
@@ -17,28 +17,73 @@ export function ProductItem({
     | RecommendedProductFragment;
   loading?: 'eager' | 'lazy';
 }) {
+  const fetcher = useFetcher();
   const variantUrl = useVariantUrl(product.handle);
   const image = product.featuredImage;
+
+  const firstVariantId = product?.variants?.nodes?.[0]?.id;
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault(); // prevent link navigation
+    if (!firstVariantId) return;
+    fetcher.submit(
+      {
+        variantId: firstVariantId,
+        quantity: 1,
+      },
+      {
+        method: 'post',
+        action: '/cart', // make sure this route exists
+      }
+    );
+  };
+
   return (
-    <Link
-      className="product-item"
-      key={product.id}
-      prefetch="intent"
-      to={variantUrl}
-    >
-      {image && (
-        <Image
-          alt={image.altText || product.title}
-          aspectRatio="1/1"
-          data={image}
-          loading={loading}
-          sizes="(min-width: 45em) 400px, 100vw"
-        />
-      )}
-      <h4>{product.title}</h4>
-      <small>
-        <Money data={product.priceRange.minVariantPrice} />
-      </small>
-    </Link>
+    <div className="product-item flex flex-col items-center justify-between">
+      <Link
+        prefetch="intent"
+        to={variantUrl}
+        className="flex flex-col items-center gap-2"
+      >
+        {image && (
+          <Image
+            alt={image.altText || product.title}
+            data={image}
+            loading={loading}
+                className=" h-[500px] object-cover mb-6"          />
+        )}
+         </Link>
+        
+        <div className='flex flex-col items-center gap-4'>
+          <h4 className="text-lg font-semibold text-[#2B8C57]">{product.title}</h4>
+              
+
+                {product.tags?.length > 0 && (
+                  <div className="flex flex-wrap gap-2 items-center justify-center">
+                    {product.tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="text-base "
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                <small className="block text-base">
+                  <Money data={product.priceRange.minVariantPrice} />
+                </small>
+                <div>
+                <button
+                onClick={handleAddToCart}
+                className="mt-2 w-full border border-[#2B8C57] text-[#2B8C57] text-sm py-4 px-10 uppercase  hover:bg-[#2B8C57] hover:text-white transition"
+              >
+                Add to Cart
+              </button>
+              </div>
+        </div>
+     
+    </div>
   );
 }
