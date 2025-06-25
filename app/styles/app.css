@@ -194,7 +194,6 @@ button.reset:hover:not(:has(> *)) {
 .header-ctas {
   align-items: center;
   display: flex;
- gap: 1rem;
 }
 
 .header-ctas > * {
@@ -417,6 +416,7 @@ button.reset:hover:not(:has(> *)) {
 * --------------------------------------------------
 */
 .product {
+  height: 100vh;
   display: flex;
   background: url("../assets/images/productbg.webp");
   background-position: center;
@@ -521,6 +521,8 @@ button.reset:hover:not(:has(> *)) {
   list-style: none;
   margin: 0;
   padding: 0;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
 }
 
 .header-menu-desktop .menu-item {

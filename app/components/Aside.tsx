@@ -33,7 +33,14 @@ export function Aside({
   heading: React.ReactNode;
 }) {
   const {type: activeType, close} = useAside();
-  const expanded = type === activeType;
+const expanded = type === activeType;
+
+// ✅ ADD THIS HERE
+useEffect(() => {
+  console.log(`[ASIDE] type="${type}" | activeType="${activeType}" | expanded=${expanded}`);
+}, [activeType, expanded]);
+
+  
 
   useEffect(() => {
     const abortController = new AbortController();
@@ -81,14 +88,21 @@ Aside.Provider = function AsideProvider({children}: {children: ReactNode}) {
     <AsideContext.Provider
       value={{
         type,
-        open: setType,
-        close: () => setType('closed'),
+        open: (mode) => {
+          console.log('opening:', mode); // ✅ this line is the key
+          setType(mode);
+        },
+        close: () => {
+          console.log('closing aside');
+          setType('closed');
+        },
       }}
     >
       {children}
     </AsideContext.Provider>
   );
 };
+
 
 export function useAside() {
   const aside = useContext(AsideContext);
