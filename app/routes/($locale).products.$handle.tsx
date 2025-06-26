@@ -20,6 +20,7 @@ import { ProductUsage } from '~/components/ProductUsage';
 import { ProductExpectation } from '~/components/ProductExpectation';
 import { BestSellers } from '~/components/BestSellers';
 import { Suspense } from 'react';
+import bullet from '~/assets/images/bulle.svg';
 
 export const meta: MetaFunction<typeof loader> = ({data}) => {
   return [
@@ -99,57 +100,69 @@ const { product, bestSellers } = useLoaderData<typeof loader>();
 
   return (
     <>
-      <div className="product">
-        <ProductImage image={selectedVariant?.image} />
-        <div className="product-main bg-white p-6 max-w-[600px]">
-          <h1 className="text-[#2B8C57] !m-0">{title}</h1>
+ <div
+  className="product bg-cover bg-center bg-no-repeat"
+  style={{
+    backgroundImage: `url(${product?.imgBackground?.reference?.image?.url})`,
+  }}
+>
 
-          {tags?.length > 0 && (
-            <div className="mb-4 flex flex-wrap gap-2">
-              {tags.map((tag: string) => (
-                <span key={tag} className="text-[#4F4F4F] underline">
-                  #{tag}
-                </span>
-              ))}
-            </div>
-          )}
+  <div className="product-main bg-white p-6 max-w-[600px]">
+    <h1 className="!text-[32px] text-[#2B8C57] !m-0">{title}</h1>
 
-          <ProductPrice
-            price={selectedVariant?.price}
-            compareAtPrice={selectedVariant?.compareAtPrice}
-          />
-
-          <div dangerouslySetInnerHTML={{ __html: descriptionHtml }} />
-
-          <p className="text-sm mt-2">
-            {selectedVariant.selectedOptions.find(opt => opt.name.toLowerCase() === 'size')?.value}
-          </p>
-
-          <ProductForm
-            productOptions={productOptions}
-            selectedVariant={selectedVariant}
-          />
-
-          <p className="text-sm !mt-8 font-normal">Pair it With</p>
-          <ProductSiblings products={siblings} />
-        </div>
-
-        <Analytics.ProductView
-          data={{
-            products: [
-              {
-                id: product.id,
-                title: product.title,
-                price: selectedVariant?.price.amount || '0',
-                vendor: product.vendor,
-                variantId: selectedVariant?.id || '',
-                variantTitle: selectedVariant?.title || '',
-                quantity: 1,
-              },
-            ],
-          }}
-        />
+    {tags?.length > 0 && (
+      <div className="mb-4 flex flex-wrap gap-2">
+       {tags.map((tag: string, index: number) => (
+      <div key={tag} className="flex items-center gap-1">
+        <span className="!text-sm text-[#4F4F4F] underline">{tag}</span>
+        {index < tags.length - 1 && (
+          <img src={bullet} alt="" className="w-[6px] h-[6px]" />
+        )}
       </div>
+    ))}
+
+      </div>
+    )}
+
+    <ProductPrice
+      price={selectedVariant?.price}
+      compareAtPrice={selectedVariant?.compareAtPrice}
+    />
+
+    <div className="!text-sm" dangerouslySetInnerHTML={{ __html: descriptionHtml }} />
+
+    <p className="!text-sm mt-2">
+      {selectedVariant.selectedOptions.find(
+        (opt) => opt.name.toLowerCase() === 'size'
+      )?.value}
+    </p>
+
+    <ProductForm
+      productOptions={productOptions}
+      selectedVariant={selectedVariant}
+    />
+
+    <p className="!text-sm !mt-8 font-normal">Pair it With</p>
+    <ProductSiblings products={siblings} />
+  </div>
+
+  <Analytics.ProductView
+    data={{
+      products: [
+        {
+          id: product.id,
+          title: product.title,
+          price: selectedVariant?.price.amount || '0',
+          vendor: product.vendor,
+          variantId: selectedVariant?.id || '',
+          variantTitle: selectedVariant?.title || '',
+          quantity: 1,
+        },
+      ],
+    }}
+  />
+</div>
+
 
       <ProductBenefits
         json={product.metafield?.value || '[]'}
@@ -282,6 +295,19 @@ const PRODUCT_FRAGMENT = `#graphql
         }
       }
     }
+      imgBackground: metafield(namespace: "custom", key: "imgBackground") {
+  reference {
+    ... on MediaImage {
+      image {
+        url
+        altText
+        width
+        height
+      }
+    }
+  }
+}
+
     beforeAfter: metafield(namespace: "custom", key: "beforeafter") {
       references(first: 2) {
         nodes {

@@ -23,14 +23,14 @@ export function ProductSiblings({ products }: { products: SiblingProduct[] }) {
               <img
                 src={product.featuredImage.url}
                 alt={product.featuredImage.altText || product.title}
-                className="object-cover w-full h-48"
+                className="object-cover w-full h-[130px]"
               />
             </a>
           )}
-          <h3 className="mt-2 text-sm ">{product.title}</h3>
+          <h3 className=" text-sm ">{product.title}</h3>
           <a
             href={`/products/${product.handle}`}
-            className="mt-2  border uppercase border-[#2B8C57] !text-[#2B8C57] px-4 py-2 text-sm"
+            className="border uppercase border-[#2B8C57] !text-[#2B8C57] px-2 py-1 text-[12px]"
           >
             Shop now
           </a>

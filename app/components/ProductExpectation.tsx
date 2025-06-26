@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import slider from '~/assets/images/slider.svg';
 
 interface ExpectationBlock {
   title: string;
@@ -158,7 +159,7 @@ function BeforeAfterSlider({ before, after }: { before: string; after: string })
           border-radius: 50%;
           background-color: #fff;
           box-shadow: 0px 0px 8px 2px rgba(0, 0, 0, 0.1);
-          background-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24px' viewBox='0 -960 960 960' width='24px' fill='%23000'%3E%3Cpath d='M286.15-293.85 100-479.62l185.77-185.76 42.15 41.76-113 113.62h530.16l-113-113.62 42.15-41.76L860-479.62 674.23-293.85l-42.54-41.77 113.39-114H214.54l113.38 114-41.77 41.77Z'/%3E%3C/svg%3E");
+    background-image: url(${slider});
           background-size: cover;
           cursor: grab;
         }

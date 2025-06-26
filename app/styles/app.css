@@ -102,7 +102,7 @@ aside li {
   transition: opacity 400ms ease-in-out;
   transition: opacity 400ms;
   visibility: hidden;
-  z-index: 10;
+  z-index: 50;
 }
 
 .overlay .close-outside {
@@ -416,14 +416,15 @@ button.reset:hover:not(:has(> *)) {
 * --------------------------------------------------
 */
 .product {
-  height: 100vh;
+  /* height: 100vh; */
   display: flex;
-  background: url("../assets/images/productbg.webp");
   background-position: center;
   background-size: cover;
-  padding: 20px; /* adjust as needed */ 
+  padding: 2rem 10%;
+  padding-top: 200px;
   gap: 2rem;
-  justify-content: space-around;
+  
+  justify-content: flex-end;
 }
 
 

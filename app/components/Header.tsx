@@ -12,6 +12,7 @@ import {
   useAnalytics,
   useOptimisticCart,
 } from '@shopify/hydrogen';
+import {useLocation} from 'react-router';
 
 interface HeaderProps {
   header: HeaderQuery;
@@ -21,22 +22,33 @@ interface HeaderProps {
 
 type Viewport = 'desktop';
 
-export function Header({header,  isLoggedIn,
-  cart}: HeaderProps) {
+export function Header({header, isLoggedIn, cart}: HeaderProps) {
   const {shop, menu} = header;
+  const location = useLocation();
 
-  return (
-    <div className="w-full">
+  // Check if the path starts with /products/
+  const isProductPage = location.pathname.startsWith('/products/');
+
+   return (
+
+    
+    <div
+      className={`w-full absolute top-0 z-10 transition-all duration-300 ${
+        isProductPage ? 'bg-transparent hover:bg-white' : 'bg-white'
+      }`}
+    >
+
+      <div className='border border-b-[#BDBDBD] flex justify-center p-2'>
+        <p className='text-[13px] text-center text-[#4F4F4F] uppercase'>FREE STANDARD SHIPPING ON ORDERS OF $175+</p>
+      </div>
       {/* Top Logo Section */}
       <header className="w-full flex justify-between items-center p-6">
-        <div></div>
+        <div className='w-[10%]'></div>
         <a href="/" className="block">
           <img src={logoBiologi} alt="BiologiMD" className="h-10 w-auto" />
         </a>
-        
 
-       <HeaderCtas isLoggedIn={isLoggedIn} cart={cart} />
-
+        <HeaderCtas isLoggedIn={isLoggedIn} cart={cart} />
       </header>
 
       <HeaderMenu
@@ -45,8 +57,6 @@ export function Header({header,  isLoggedIn,
         isLoggedIn={isLoggedIn}
         cart={cart}
       />
-
-
     </div>
   );
 }
@@ -95,15 +105,15 @@ export function HeaderMenu({
   return (
     <>
      <div style={{height: isSticky ? menuHeight : undefined}} />
-<div
-  ref={menuRef}
-  className={`w-full transition-all duration-300 ${
-    isSticky ? 'fixed top-0 left-0 z-50 bg-white' : 'relative'
-  }`}
->
+      <div
+        ref={menuRef}
+        className={`w-full transition-all duration-300 ${
+          isSticky ? 'fixed top-0 left-0 z-50 bg-white' : 'relative'
+        }`}
+      >
 
         <div
-          className="bg-white shadow-sm border-b border-gray-200"
+          
           role="navigation"
           >
           <RenderMenuItems
@@ -168,7 +178,7 @@ function RenderMenuItems({
   return (
     <div>
       <div className="relative w-full px-2" onMouseLeave={() => setActiveIndex(null)}>
-        <div className="w-full flex items-center justify-between px-4 bg-white">
+        <div className="w-full flex items-center justify-between px-4 ">
           <div>
                   <img
           src={logoBiologi}
@@ -331,7 +341,7 @@ function CartBadge({count}: {count: number | null}) {
       }}
       className="relative inline-block"
     >
-      <img src={cartIcon} alt="Cart"  />
+      <img src={cartIcon} alt="Cart" className='h-6 w-6' />
       {typeof count === 'number' && count > 0 && (
         <span className="absolute -top-2 -right-3 text-xs bg-[#2B8C57] flex items-center justify-center p-2 text-white w-2 h-2 rounded-full text-[10px]">
           {count}

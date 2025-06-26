@@ -46,7 +46,7 @@ export function ProductBenefits({
             <img
               src={displayedImage.url}
               alt={displayedImage.altText || 'Product image'}
-              className="w-full max-h-[544px] object-cover rounded transition duration-300"
+              className="w-full h-[544px] object-cover rounded transition duration-300"
             />
           )}
           <div className="flex gap-2 mt-2">
