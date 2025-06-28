@@ -7,6 +7,8 @@ import {Await} from 'react-router';
 import cartIcon from '~/assets/images/cart.svg';
 import search from '~/assets/images/search.svg';
 import signin from '~/assets/images/signin.svg';
+import burger from '~/assets/images/burger.svg';
+
 import {
   type CartViewPayload,
   useAnalytics,
@@ -23,6 +25,8 @@ interface HeaderProps {
 type Viewport = 'desktop';
 
 export function Header({header, isLoggedIn, cart}: HeaderProps) {
+    const { open } = useAside(); // ✅ ADD THIS LINE
+
   const {shop, menu} = header;
   const location = useLocation();
 
@@ -33,19 +37,27 @@ export function Header({header, isLoggedIn, cart}: HeaderProps) {
 
     
     <div
-      className={`w-full absolute top-0 z-10 transition-all duration-300 ${
+      className={` w-full absolute top-0 z-10 transition-all duration-300 ${
         isProductPage ? 'bg-transparent hover:bg-white' : 'bg-white'
       }`}
     >
 
-      <div className='border border-b-[#BDBDBD] flex justify-center p-2'>
+      <div className='border-b border-b-[#BDBDBD] flex justify-center p-2'>
         <p className='text-[13px] text-center text-[#4F4F4F] uppercase'>FREE STANDARD SHIPPING ON ORDERS OF $175+</p>
       </div>
       {/* Top Logo Section */}
-      <header className="w-full flex justify-between items-center p-6">
-        <div className='w-[10%]'></div>
+        <header className="container m-auto w-full flex justify-between items-center p-4 md:p-6">
+         <div className="w-[10%] md:hidden">
+            <button onClick={() => open('mobile')} aria-label="Open menu">
+              <img
+                src={burger}
+                alt="Open menu"
+                className="w-7 h-7 object-contain cursor-pointer"
+              />
+            </button>
+          </div>
         <a href="/" className="block">
-          <img src={logoBiologi} alt="BiologiMD" className="h-10 w-auto" />
+          <img src={logoBiologi} alt="BiologiMD" className=" h-10 w-[200px] md:w-auto" />
         </a>
 
         <HeaderCtas isLoggedIn={isLoggedIn} cart={cart} />
@@ -66,14 +78,38 @@ export function HeaderMenu({
   viewport,
   isLoggedIn,
   cart,
+  primaryDomainUrl,
+  publicStoreDomain,
 }: {
   menu: HeaderProps['header']['menu'];
-  viewport: Viewport;
+  viewport: 'desktop' | 'mobile';
   isLoggedIn: HeaderProps['isLoggedIn'];
   cart: HeaderProps['cart'];
+  primaryDomainUrl?: string;
+  publicStoreDomain?: string;
 }) {
-
   const {close} = useAside();
+
+if (viewport === 'mobile') {
+  return (
+    <nav className="flex flex-col w-full">
+      {menu.items.map((item) => (
+        <MobileMenuItem key={item.id} item={item} />
+      ))}
+
+      {/* Sign In block after all links */}
+      <div className="flex items-center gap-3 px-4 py-6  bg-[#f6f6f6]">
+        <img src={signin} alt="Sign in" className="w-6 h-6" />
+        <a href="/account" className="text-base  text-[#2B8C57]">
+          Sign In
+        </a>
+      </div>
+    </nav>
+  );
+}
+
+
+  // Desktop view logic with sticky behavior
   const menuRef = useRef<HTMLDivElement>(null);
   const [isSticky, setIsSticky] = useState(false);
   const [offsetTop, setOffsetTop] = useState(0);
@@ -98,24 +134,20 @@ export function HeaderMenu({
       setIsSticky(scrollTop >= offsetTop);
     };
 
-    window.addEventListener('scroll', handleScroll, {passive: true});
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, [offsetTop]);
 
   return (
     <>
-     <div style={{height: isSticky ? menuHeight : undefined}} />
+      <div style={{ height: isSticky ? menuHeight : undefined }} />
       <div
         ref={menuRef}
         className={`w-full transition-all duration-300 ${
           isSticky ? 'fixed top-0 left-0 z-50 bg-white' : 'relative'
         }`}
       >
-
-        <div
-          
-          role="navigation"
-          >
+<div role="navigation" className="hidden md:block">
           <RenderMenuItems
             items={(menu || FALLBACK_HEADER_MENU).items}
             isSticky={isSticky}
@@ -127,6 +159,7 @@ export function HeaderMenu({
     </>
   );
 }
+
 
 function RenderMenuItems({
   items,
@@ -178,15 +211,18 @@ function RenderMenuItems({
   return (
     <div>
       <div className="relative w-full px-2" onMouseLeave={() => setActiveIndex(null)}>
-        <div className="w-full flex items-center justify-between px-4 ">
+        <div className="container m-auto w-full flex items-center justify-between px-4 ">
           <div>
+                    <a href="/" className="block">
+
                   <img
           src={logoBiologi}
           alt="Logo"
-          className={` transform transition-all duration-200 ease-in ${
+          className={` transform duration-0  ${
             isSticky ? 'opacity-100 ' : 'opacity-0 '
           }`}
         />
+        </a>
 
           </div>
 
@@ -216,7 +252,7 @@ function RenderMenuItems({
             />
           </div>
 
-          <div  className={`transform transition-all duration-200 ease-in ${
+          <div  className={`transform  ${
             isSticky ? 'opacity-100 ' : 'opacity-0 '
           }`}>
                    <HeaderCtas isLoggedIn={isLoggedIn} cart={cart} />
@@ -270,12 +306,115 @@ function NestedMenuItems({items}: {items: any[]}) {
 }
 
 
+
+function MobileMenuItem({ item }: { item: any }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [openSubmenus, setOpenSubmenus] = useState<{ [key: string]: boolean }>({});
+
+  const toggleSubmenu = (id: string) => {
+    setOpenSubmenus((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
+  };
+
+  return (
+    <div className="border-b border-gray-400">
+      {/* Top-level item toggle */}
+      <button
+        onClick={() => setIsOpen((prev) => !prev)}
+        className="w-full text-left p-4 flex justify-between items-center text-lg "
+      >
+        {item.title}
+        {item.items?.length > 0 && (
+          <svg
+            className={`w-6 h-6 transition-transform duration-300 cursor-pointer ${
+              isOpen ? 'rotate-180' : ''
+            }`}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14" />
+            {!isOpen && (
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 5v14" />
+            )}
+          </svg>
+        )}
+      </button>
+
+      {/* Submenu list */}
+      <div
+        className={`transition-all duration-300 ease-in-out overflow-hidden ${
+          isOpen ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'
+        }`}
+      >
+        <div className="mt-2 flex flex-col bg-[#f6f6f6]">
+          {item.items.map((subItem: any) => (
+            <div key={subItem.id} className="flex flex-col px-4 py-3 gap-3">
+              {/* Sub-item toggle */}
+              <button
+                onClick={() => toggleSubmenu(subItem.id)}
+                className="text-base text-[#2B8C57] text-left flex justify-between items-center"
+              >
+                {subItem.title}
+                {subItem.items?.length > 0 && (
+                  <svg
+                    className={`w-6 h-6 transition-transform duration-300 cursor-pointer${
+                      openSubmenus[subItem.id] ? 'rotate-180' : ''
+                    }`}
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14" />
+                    {!openSubmenus[subItem.id] && (
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 5v14" />
+                    )}
+                  </svg>
+                )}
+              </button>
+
+              {/* Sub-sub-items */}
+              <div
+                className={`transition-all duration-300 ease-in-out overflow-hidden ${
+                  openSubmenus[subItem.id]
+                    ? 'max-h-[500px] opacity-100 mt-1'
+                    : 'max-h-0 opacity-0'
+                } flex flex-col gap-3`}
+              >
+                {subItem.items?.map((subSubItem: any) => (
+                  <a
+                    key={subSubItem.id}
+                    href={subSubItem.url}
+                    className="text-base cursor-pointer"
+                  >
+                    {subSubItem.title}
+                  </a>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default MobileMenuItem;
+
+
+
+
+
 function HeaderCtas({
   isLoggedIn,
   cart,
 }: Pick<HeaderProps, 'isLoggedIn' | 'cart'>) {
   return (
-    <nav className="header-ctas flex items-center gap-6" role="navigation">
+    <nav className="header-ctas flex items-center gap-2 md:gap-6" role="navigation">
       <Suspense
         fallback={
           <a href="/account">

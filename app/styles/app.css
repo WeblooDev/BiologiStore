@@ -34,6 +34,7 @@ img {
 }
 
 aside {
+  overflow: auto;
   background: var(--color-light);
   box-shadow: 0 0 50px rgba(0, 0, 0, 0.3);
   height: 100vh;
@@ -46,16 +47,21 @@ aside {
 
 aside header {
   align-items: center;
-  border-bottom: 1px solid var(--color-dark);
+  border-bottom: 1px solid #bdbdbd;
   display: flex;
-  height: var(--header-height);
   justify-content: space-between;
-  padding: 0 20px;
+  padding: 1rems;
 }
 
 aside header h3 {
   margin: 0;
+  text-transform: lowercase;
 }
+
+aside header h3::first-letter {
+  text-transform: uppercase;
+}
+
 
 aside header .close {
   font-weight: bold;
@@ -74,9 +80,7 @@ aside header h2 {
   margin-top: 0;
 }
 
-aside main {
-  margin: 1rem;
-}
+
 
 aside p {
   margin: 0 0 0.25rem;
@@ -231,7 +235,6 @@ button.reset:hover:not(:has(> *)) {
 */
 .cart-main {
   height: 100%;
-  max-height: calc(100vh - var(--cart-aside-summary-height));
   overflow-y: auto;
   width: auto;
 }
@@ -242,7 +245,7 @@ button.reset:hover:not(:has(> *)) {
 
 .cart-line {
   display: flex;
-  padding: 0.75rem 0;
+  padding: 1rem;
 }
 
 .cart-line img {
@@ -259,9 +262,7 @@ button.reset:hover:not(:has(> *)) {
   background: white;
   border-top: 1px solid var(--color-dark);
   bottom: 0;
-  padding-top: 0.75rem;
-  position: absolute;
-  width: calc(var(--aside-width) - 40px);
+  padding:1rem;
 }
 
 .cart-line-quantity {
@@ -398,6 +399,7 @@ button.reset:hover:not(:has(> *)) {
 }
 
 .products-grid {
+  padding: 1rem;
   display: grid;
   grid-gap: 1.5rem;
   grid-template-columns: repeat(3, 1fr);
@@ -405,11 +407,17 @@ button.reset:hover:not(:has(> *)) {
 }
 
 .product-item img {
-  height: 560px;
   object-fit: cover;
   width: 100%;
 }
 
+@media (max-width: 700px) {
+
+.products-grid {
+    grid-gap: 1rem;
+  grid-template-columns: repeat(2, 1fr);
+}
+}
 /*
 * --------------------------------------------------
 * routes/products.$handle.tsx

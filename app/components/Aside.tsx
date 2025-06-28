@@ -7,22 +7,13 @@ import {
 } from 'react';
 
 type AsideType = 'search' | 'cart' | 'mobile' | 'closed';
+
 type AsideContextValue = {
   type: AsideType;
   open: (mode: AsideType) => void;
   close: () => void;
 };
 
-/**
- * A side bar component with Overlay
- * @example
- * ```jsx
- * <Aside type="search" heading="SEARCH">
- *  <input type="search" />
- *  ...
- * </Aside>
- * ```
- */
 export function Aside({
   children,
   heading,
@@ -33,14 +24,7 @@ export function Aside({
   heading: React.ReactNode;
 }) {
   const {type: activeType, close} = useAside();
-const expanded = type === activeType;
-
-// ✅ ADD THIS HERE
-useEffect(() => {
-  console.log(`[ASIDE] type="${type}" | activeType="${activeType}" | expanded=${expanded}`);
-}, [activeType, expanded]);
-
-  
+  const expanded = type === activeType;
 
   useEffect(() => {
     const abortController = new AbortController();
@@ -59,6 +43,8 @@ useEffect(() => {
     return () => abortController.abort();
   }, [close, expanded]);
 
+  const isMobile = type === 'mobile';
+
   return (
     <div
       aria-modal
@@ -67,13 +53,37 @@ useEffect(() => {
     >
       <button className="close-outside" onClick={close} />
       <aside>
-        <header>
-          <h3>{heading}</h3>
-          <button className="close reset" onClick={close} aria-label="Close">
-            &times;
-          </button>
+        <header
+          className={`sticky top-0 w-full flex items-center justify-between !px-3 py-3 border-b ${
+            isMobile ? 'bg-[#2B8C57]' : 'bg-white'
+          }`}
+        >
+          <h3
+            className={`text-xl  ${
+              isMobile ? 'text-white uppercase tracking-widest' : 'text-black'
+            }`}
+          >
+            {heading}
+          </h3>
+         <button
+          onClick={close}
+          aria-label="Close"
+          
+        >
+          <svg
+            className="w-7 h-7 transition-transform duration-300 cursor-pointer rotate-45"
+            fill="none"
+            stroke={isMobile ? 'white' : 'black'}
+            strokeWidth={2}
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14" />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 5v14" />
+          </svg>
+        </button>
+
         </header>
-        <main>{children}</main>
+        <main className="h-full">{children}</main>
       </aside>
     </div>
   );
@@ -88,21 +98,14 @@ Aside.Provider = function AsideProvider({children}: {children: ReactNode}) {
     <AsideContext.Provider
       value={{
         type,
-        open: (mode) => {
-          console.log('opening:', mode); // ✅ this line is the key
-          setType(mode);
-        },
-        close: () => {
-          console.log('closing aside');
-          setType('closed');
-        },
+        open: setType,
+        close: () => setType('closed'),
       }}
     >
       {children}
     </AsideContext.Provider>
   );
 };
-
 
 export function useAside() {
   const aside = useContext(AsideContext);

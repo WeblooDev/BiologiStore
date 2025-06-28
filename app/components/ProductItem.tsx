@@ -6,6 +6,7 @@ import type {
   RecommendedProductFragment,
 } from 'storefrontapi.generated';
 import {useVariantUrl} from '~/lib/variants';
+import bullet from '~/assets/images/bulle.svg';
 
 export function ProductItem({
   product,
@@ -50,7 +51,7 @@ export function ProductItem({
             alt={image.altText || product.title}
             data={image}
             loading={loading}
-                className=" h-[500px] object-cover mb-6"          />
+                className="h-[300px] md:h-[400px] lg:h-[500px] object-cover mb-6"          />
         )}
          </Link>
         
@@ -58,18 +59,20 @@ export function ProductItem({
           <h4 className="text-lg font-semibold text-[#2B8C57]">{product.title}</h4>
               
 
-                {product.tags?.length > 0 && (
-                  <div className="flex flex-wrap gap-2 items-center justify-center">
-                    {product.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="text-base "
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                )}
+      {product.tags?.length > 0 && (
+        <div className="flex flex-wrap gap-2 items-center justify-center">
+          {product.tags.map((tag, index) => (
+            <div key={tag} className="flex items-center gap-2">
+              <span className="text-base">{tag}</span>
+              {index < product.tags.length - 1 && (
+                <img src={bullet} alt="bullet" className="!w-auto h-2" />
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
+
 
                 <small className="block text-base">
                   <Money data={product.priceRange.minVariantPrice} />

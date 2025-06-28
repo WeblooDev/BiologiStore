@@ -22,7 +22,7 @@ export function HeroSection({
 }: HeroSectionProps) {
   return (
     <div
-      className="relative w-full h-[600px] bg-cover bg-center flex items-center"
+      className="mt-[190px] relative w-full h-[600px] bg-cover bg-center flex items-center"
       style={{ backgroundImage: `url(${image.url})` }}
     >
       <div className="flex flex-col gap-6 items-start p-8">
