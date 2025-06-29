@@ -59,6 +59,7 @@ export function BestSellers({products, title = 'Best Sellers'}: BestSellersProps
                 console.log(`Add to cart: ${product.id}`);
               }}
             >
+              
               Add to Bag
             </button>
           </div>
