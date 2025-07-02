@@ -1,12 +1,12 @@
 import {type LoaderFunctionArgs} from '@shopify/remix-oxygen';
 import {Await, useLoaderData, type MetaFunction} from 'react-router';
 import {getPaginationVariables, Image, Money} from '@shopify/hydrogen';
-import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 import {ProductItem} from '~/components/ProductItem';
-import {Suspense} from 'react';
+import {Suspense, useState, useMemo} from 'react';
 import {HeroProductSection} from '~/components/HeroProduct';
 import {BestSellers} from '~/components/BestSellers';
 import {AllCollections} from '~/components/AllCollections';
+import {ProductFilter, type FilterState} from '~/components/ProductFilter';
 import productHero from '~/assets/images/producthero.png';
 
 export const meta: MetaFunction<typeof loader> = () => {
@@ -62,13 +62,73 @@ function loadDeferredData({context}: LoaderFunctionArgs) {
 export default function Collection() {
   const data = useLoaderData<typeof loader>();
 
+  const [filters, setFilters] = useState<FilterState>({
+    category: '',
+    skinType: '',
+    sort: 'RELEVANCE',
+    price: '',
+  });
+
+ const filteredProducts = useMemo(() => {
+  return data.products.nodes
+    .filter((product) => {
+      const {category, skinType, price} = filters;
+
+      const tagMatch =
+        !skinType || product.tags.includes(skinType.toLowerCase());
+
+      console.log({
+        productType: product.productType,
+        selectedCategory: category,
+      });
+
+     const normalize = (str: string | undefined) =>
+  str?.trim().toLowerCase().replace(/\s+/g, '');
+
+const categoryMatch =
+  !category || normalize(product.productType) === normalize(category);
+
+
+      const priceAmount = parseFloat(
+        product.priceRange.minVariantPrice.amount,
+      );
+      const priceMatch = !price
+        ? true
+        : (() => {
+            const [min, max] = price.split('-').map(Number);
+            return priceAmount >= min && priceAmount <= max;
+          })();
+
+      return tagMatch && categoryMatch && priceMatch;
+    })
+  .sort((a, b) => {
+  if (filters.sort === 'PRICE_ASC') {
+    return (
+      parseFloat(a.priceRange.minVariantPrice.amount) -
+      parseFloat(b.priceRange.minVariantPrice.amount)
+    );
+  }
+  if (filters.sort === 'PRICE_DESC') {
+    return (
+      parseFloat(b.priceRange.minVariantPrice.amount) -
+      parseFloat(a.priceRange.minVariantPrice.amount)
+    );
+  }
+  if (filters.sort === 'UPDATED_AT') {
+    const aIsNew = a.metafield?.value === 'true' ? 1 : 0;
+    const bIsNew = b.metafield?.value === 'true' ? 1 : 0;
+    return bIsNew - aIsNew; 
+  }
+  return 0;
+});
+
+}, [data.products.nodes, filters]);
+
+
   return (
     <>
       <HeroProductSection
-        image={{
-          url: productHero,
-          altText: 'Welcome to our store',
-        }}
+        image={{url: productHero, altText: 'Welcome to our store'}}
         title="Shop All"
         links={[
           {label: 'Shop Medical Grade Skin Care', href: '/collections/cleansers'},
@@ -78,21 +138,23 @@ export default function Collection() {
       />
 
       <div className="container m-auto collection">
-        {/* ✅ AllCollections added above the PaginatedResourceSection */}
         <AllCollections collections={data.allCollections} />
 
-        <PaginatedResourceSection
-          connection={data.products}
-          resourcesClassName="products-grid"
-        >
-          {({node: product, index}) => (
+      <ProductFilter
+        filters={filters}
+        onFilterChange={setFilters}
+        categories={data.allCollections.nodes}
+      />
+
+        <div className="container products-grid grid grid-cols-2 md:grid-cols-4 gap-6">
+          {filteredProducts.map((product, index) => (
             <ProductItem
               key={product.id}
               product={product}
               loading={index < 8 ? 'eager' : undefined}
             />
-          )}
-        </PaginatedResourceSection>
+          ))}
+        </div>
 
         <Suspense fallback={<div>Loading Best Sellers...</div>}>
           <Await resolve={data.recommendedProducts}>
@@ -110,27 +172,33 @@ const COLLECTION_ITEM_FRAGMENT = `#graphql
     currencyCode
   }
 
-  fragment CollectionItem on Product {
+ fragment CollectionItem on Product {
+  id
+  handle
+  title
+  productType
+  featuredImage {
     id
-    handle
-    title
-    featuredImage {
-      id
-      altText
-      url
-      width
-      height
+    altText
+    url
+    width
+    height
+  }
+    metafield(namespace: "custom", key: "new") {
+  value
+}
+
+  tags
+  priceRange {
+    minVariantPrice {
+      ...MoneyCollectionItem
     }
-    tags
-    priceRange {
-      minVariantPrice {
-        ...MoneyCollectionItem
-      }
-      maxVariantPrice {
-        ...MoneyCollectionItem
-      }
+    maxVariantPrice {
+      ...MoneyCollectionItem
     }
   }
+}
+
 ` as const;
 
 const CATALOG_QUERY = `#graphql
@@ -235,3 +303,5 @@ const RECOMMENDED_PRODUCTS_QUERY = `#graphql
     }
   }
 ` as const;
+
+

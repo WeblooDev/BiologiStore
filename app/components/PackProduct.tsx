@@ -31,13 +31,13 @@ export function PackProduct({product}: {product: ProductNode}) {
       <h2 className="!text-4xl font-bold mb-6">Best-Selling Bundles</h2>
     <p>Discover our complete routines designed by skin experts to support healthy skin with medical-grade care.</p>
     </div>
-      <div className="flex justify-center gap-4 items-start">
+      <div className="flex flex-col lg:flex-row justify-center gap-4 items-start">
 
-<div className='w-[50%]'>
+<div className='w-[100%] lg:w-[50%]'>
         <img src={packhero} alt=""               className="w-full h-[850px] object-cover"/>
 </div>
-        <div className='flex flex-col gap-2 w-[50%] items-center'>
-        <a href={`/products/${product.handle}`}>
+        <div className='flex flex-col gap-2 w-[100%] lg:w-[50%] items-center'>
+        <a href={`/products/${product.handle}`} className='w-[100%]'>
           {product.featuredImage && (
             <Image
               data={product.featuredImage}

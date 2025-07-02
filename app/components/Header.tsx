@@ -16,6 +16,8 @@ import {
 } from '@shopify/hydrogen';
 import {useLocation} from 'react-router';
 
+
+
 interface HeaderProps {
   header: HeaderQuery;
   cart: Promise<CartApiQueryFragment | null>;
@@ -23,6 +25,21 @@ interface HeaderProps {
 }
 
 type Viewport = 'desktop';
+
+
+function sanitizeUrl(url: string): string {
+  if (url?.startsWith('/')) return url;
+
+  const domainsToStrip = ['https://shop.biologimd.com', 'https://checkout.biologimd.com'];
+  for (const domain of domainsToStrip) {
+    if (url?.startsWith(domain)) {
+      return url.replace(domain, '');
+    }
+  }
+
+  return url;
+}
+
 
 export function Header({header, isLoggedIn, cart}: HeaderProps) {
     const { open } = useAside(); // ✅ ADD THIS LINE
@@ -47,15 +64,16 @@ export function Header({header, isLoggedIn, cart}: HeaderProps) {
       </div>
       {/* Top Logo Section */}
         <header className="container m-auto w-full flex justify-between items-center p-4 md:p-6">
-         <div className="w-[10%] md:hidden">
-            <button onClick={() => open('mobile')} aria-label="Open menu">
-              <img
-                src={burger}
-                alt="Open menu"
-                className="w-7 h-7 object-contain cursor-pointer"
-              />
-            </button>
-          </div>
+        <div className="w-[10%] opacity-100 md:opacity-0 md:pointer-events-none transition-opacity duration-300">
+  <button onClick={() => open('mobile')} aria-label="Open menu">
+    <img
+      src={burger}
+      alt="Open menu"
+      className="w-7 h-7 object-contain cursor-pointer"
+    />
+  </button>
+</div>
+
         <a href="/" className="block">
           <img src={logoBiologi} alt="BiologiMD" className=" h-10 w-[200px] md:w-auto" />
         </a>
@@ -235,8 +253,7 @@ function RenderMenuItems({
                   onMouseEnter={() => setActiveIndex(index)}
                   ref={(el) => (itemRefs.current[index] = el)}
                 >
-                  <a
-                    href={item.url}
+                  <a href={sanitizeUrl(item.url)}
                     className={`text-base px-2 py-1 transition-colors duration-200 !no-underline ${
                       index === activeIndex ? '!text-[#2B8C57]' : 'text-black'
                     }`}
@@ -295,7 +312,7 @@ function NestedMenuItems({items}: {items: any[]}) {
     <ul className="flex flex-col gap-2">
       {items.map((item) => (
         <li key={item.id}>
-          <a href={item.url} className="!text-sm text-[#3F3F3F]">
+         <a href={sanitizeUrl(item.url)} className="!text-sm text-[#3F3F3F]">
             {item.title}
           </a>
           {item.items?.length > 0 && <NestedMenuItems items={item.items} />}
@@ -386,9 +403,9 @@ function MobileMenuItem({ item }: { item: any }) {
                 } flex flex-col gap-3`}
               >
                 {subItem.items?.map((subSubItem: any) => (
-                  <a
+                 <a
                     key={subSubItem.id}
-                    href={subSubItem.url}
+                    href={sanitizeUrl(subSubItem.url)}
                     className="text-base cursor-pointer"
                   >
                     {subSubItem.title}

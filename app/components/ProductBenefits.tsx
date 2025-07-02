@@ -43,11 +43,13 @@ export function ProductBenefits({
         {/* Left: Product images */}
         <div>
           {displayedImage && (
+            <div className='bg-[#F6F6F6]'>
             <img
               src={displayedImage.url}
               alt={displayedImage.altText || 'Product image'}
               className="w-full h-[544px] object-cover rounded transition duration-300"
             />
+            </div>
           )}
           <div className="flex gap-2 mt-2">
             {rest.slice(0, 2).map((img, i) => (

@@ -41,19 +41,24 @@ export function ProductItem({
 
   return (
     <div className="product-item flex flex-col items-center justify-between">
-      <Link
-        prefetch="intent"
-        to={variantUrl}
-        className="flex flex-col items-center gap-2"
-      >
-        {image && (
-          <Image
-            alt={image.altText || product.title}
-            data={image}
-            loading={loading}
-                className="h-[300px] md:h-[400px] lg:h-[500px] object-cover mb-6"          />
-        )}
-         </Link>
+    <Link to={variantUrl} className="relative block w-full bg-[#F6F6F6] group">
+  {product.metafield?.value === 'true' && (
+    <div className="absolute top-3 left-3 h-[80px] w-[80px] border border-[#2B8C57] text-[#2B8C57] rounded-full flex items-center justify-center">
+      NEW
+    </div>
+  )}
+  {image && (
+    <div className="overflow-hidden">
+      <Image
+        alt={image.altText || product.title}
+        data={image}
+        loading={loading}
+        className="h-[300px] md:h-[400px] lg:h-[560px] object-cover mb-6 transition-transform duration-300 ease-in-out group-hover:scale-105"
+      />
+    </div>
+  )}
+</Link>
+
         
         <div className='flex flex-col items-center gap-4'>
           <h4 className="text-lg font-semibold text-[#2B8C57]">{product.title}</h4>

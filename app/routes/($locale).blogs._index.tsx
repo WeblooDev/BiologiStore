@@ -79,7 +79,7 @@ export default function Blogs() {
     : allBlogNodes;
 
   return (
-    <div className="blogs container mx-auto p-8">
+    <div className="blogs container mx-auto p-8 pt-[190px]">
       <HeroBlogSection
         image={{
           url: bloghero,
