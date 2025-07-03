@@ -64,18 +64,18 @@ export function ProductItem({
           <h4 className="font-gayathri text-xl text-[#2B8C57]">{product.title}</h4>
               
 
-      {product.tags?.length > 0 && (
-        <div className="flex flex-wrap gap-2 items-center justify-center">
-          {product.tags.map((tag, index) => (
-            <div key={tag} className="flex items-center gap-1">
-              <span className="text-sm">{tag}</span>
-              {index < product.tags.length - 1 && (
-                <img src={bullet} alt="bullet" className="!w-auto h-[7px]" />
-              )}
-            </div>
-          ))}
-        </div>
-      )}
+            {product.tags?.length > 0 && (
+              <div className="flex flex-wrap gap-2 items-center justify-center">
+                {product.tags.map((tag, index) => (
+                  <div key={tag} className="flex items-center gap-1">
+                    <span className="text-sm">{tag}</span>
+                    {index < product.tags.length - 1 && (
+                      <img src={bullet} alt="bullet" className="!w-auto h-[7px]" />
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
 
 
 
@@ -83,7 +83,7 @@ export function ProductItem({
                   <Money data={product.priceRange.minVariantPrice} />
                 </small>
                 <div className='w-full m-auto flex items-ce'>
-                  
+
                 <button
                 onClick={handleAddToCart}
 className='w-[90%] m-auto border border-[#2B8C57] uppercase bg-white px-14 py-2 text-[#2B8C57] cursor-pointer hover:text-white hover:bg-[#2B8C57] !text-sm '              >
