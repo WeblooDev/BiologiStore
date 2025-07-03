@@ -41,7 +41,7 @@ export function BestSellers({products, title = 'Best Sellers'}: BestSellersProps
   return (
     <section className="container mx-auto py-10">
       <div className="flex justify-center mb-6">
-        <h2 className="!text-4xl">{title}</h2>
+        <h2 className="font-gayathri !text-4xl !font-normal">{title}</h2>
       </div>
 
       <div className="relative">
@@ -79,22 +79,12 @@ export function BestSellers({products, title = 'Best Sellers'}: BestSellersProps
                     />
                   </div>
                 )}
-                <h3 className="text-lg text-[#2B8C57]">{product.title}</h3>
+                <h3 className="font-gayathri text-xl text-[#2B8C57]">{product.title}</h3>
 
-                {product.tags?.length > 0 && (
-                  <div className="flex flex-wrap gap-2 items-center justify-center">
-                    {product.tags.map((tag, index) => (
-                      <div key={tag} className="flex items-center gap-2">
-                        <span className="text-sm">{tag}</span>
-                        {index < product.tags.length - 1 && (
-                          <img src={bullet} alt="bullet" className="!w-auto h-2" />
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
+             
 
-                <div className="mt-2 font-medium text-gray-900">
+                <div className="mt-2 !font-light
+ text-gray-900">
                   <Money data={product.priceRange.minVariantPrice} />
                 </div>
 

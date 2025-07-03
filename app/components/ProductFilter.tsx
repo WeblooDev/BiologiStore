@@ -11,6 +11,9 @@ export type FilterState = {
 
 interface ProductFilterProps {
   filters: FilterState;
+  skinTypes: string[];
+  skinTypeCounts: Record<string, number>;
+  categoryCounts: Record<string, number>;
   onFilterChange: (updated: FilterState) => void;
   categories: {
     id: string;
@@ -19,11 +22,16 @@ interface ProductFilterProps {
   }[];
 }
 
+
 export function ProductFilter({
   filters,
   onFilterChange,
   categories,
+  skinTypes,
+  skinTypeCounts,
+  categoryCounts,
 }: ProductFilterProps) {
+
   const handleChange = (field: keyof FilterState, value: string) => {
     onFilterChange({...filters, [field]: value});
   };
@@ -36,31 +44,41 @@ export function ProductFilter({
       <div className="flex justify-between gap-4 mb-6">
         {/* Category & Skin Type */}
         <div className="flex gap-4 items-center">
-         <select
-            value={filters.category}
-            onChange={(e) => handleChange('category', e.target.value)}
-            className="border-b py-2 w-[200px]"
-            >
-            <option value="">Category</option>
-            {categories.map((collection) => (
-                <option key={collection.id} value={collection.title}>
-                {collection.title}
-                </option>
-            ))}
-            </select>
+       <select
+  value={filters.category}
+  onChange={(e) => handleChange('category', e.target.value)}
+  className="border-b py-2 w-[200px]"
+>
+  <option value="">Category</option>
+  {categories.map((collection) => {
+    const count = categoryCounts[collection.title] || 0;
+    return (
+      <option key={collection.id} value={collection.title}>
+        {collection.title} ({count})
+      </option>
+    );
+  })}
+</select>
 
 
-          <select
-            value={filters.skinType}
-            onChange={(e) => handleChange('skinType', e.target.value)}
-            className="border-b py-2 w-[200px]"
-          >
-            <option value="">Skin Type</option>
-            <option value="dry">Dry</option>
-            <option value="oily">Oily</option>
-            <option value="sensitive">Sensitive</option>
-            <option value="combination">Combination</option>
-          </select>
+
+<select
+  value={filters.skinType}
+  onChange={(e) => handleChange('skinType', e.target.value)}
+  className="border-b py-2 w-[200px]"
+>
+  <option value="">Skin Type</option>
+  {skinTypes.map((type) => {
+    const count = skinTypeCounts[type] || 0;
+    return (
+      <option key={type} value={type.toLowerCase().replace(/\s+/g, '_')}>
+        {type} ({count})
+      </option>
+    );
+  })}
+</select>
+
+
         </div>
 
         {/* Sort Option */}

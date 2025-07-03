@@ -60,7 +60,7 @@ export function Header({header, isLoggedIn, cart}: HeaderProps) {
     >
 
       <div className='border-b border-b-[#BDBDBD] flex justify-center p-2'>
-        <p className='text-[13px] text-center text-[#4F4F4F] uppercase'>FREE STANDARD SHIPPING ON ORDERS OF $175+</p>
+        <p className='font-gayathri text-[13px] text-center text-[#4F4F4F] uppercase'>FREE STANDARD SHIPPING ON ORDERS OF $175+</p>
       </div>
       {/* Top Logo Section */}
         <header className="container m-auto w-full flex justify-between items-center p-4 md:p-6">
@@ -245,7 +245,7 @@ function RenderMenuItems({
           </div>
 
           <div className="relative">
-            <ul ref={containerRef} className="flex gap-8 justify-center relative !py-4">
+            <ul ref={containerRef} className="font-gayathri flex gap-8 justify-center relative !py-4">
               {items.map((item, index) => (
                 <li
                   key={item.id}
@@ -291,7 +291,7 @@ function RenderMenuItems({
                   key={subItem.id}
                   className="flex flex-col gap-3 overflow-y-auto pr-4"
                 >
-                  <p className="text-base font-semibold !text-[#2B8C57]">
+                  <p className="text-base font-semibold font-gayathri !text-[#2B8C57]">
                     {subItem.title}
                   </p>
                   <NestedMenuItems items={subItem.items} />
@@ -309,10 +309,10 @@ function NestedMenuItems({items}: {items: any[]}) {
   if (!items?.length) return null;
 
   return (
-    <ul className="flex flex-col gap-2">
+    <ul className="flex flex-col gap-1">
       {items.map((item) => (
         <li key={item.id}>
-         <a href={sanitizeUrl(item.url)} className="!text-sm text-[#3F3F3F]">
+         <a href={sanitizeUrl(item.url)} className="!text-sm text-[#3F3F3F] font-gayathri">
             {item.title}
           </a>
           {item.items?.length > 0 && <NestedMenuItems items={item.items} />}

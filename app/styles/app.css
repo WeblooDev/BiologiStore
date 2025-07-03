@@ -1,3 +1,24 @@
+
+.container {
+    @media (width >= 70rem) {
+        max-width: 75rem;
+    }
+}
+
+@font-face {
+  font-family: 'gayathri';
+  src: url('/fonts/gayathri.otf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+.font-gayathri {
+  font-family: 'gayathri', sans-serif;
+}
+
+
+
+
 :root {
   --aside-width: 400px;
   --cart-aside-summary-height-with-discount: 300px;
@@ -11,6 +32,14 @@
 img {
   border-radius: 4px;
 }
+
+@font-face {
+  font-family: 'raleway';
+  src: url('/fonts/Raleway-VariableFont_wght.ttf') format('truetype');
+
+}
+
+
 
 /*
 * --------------------------------------------------

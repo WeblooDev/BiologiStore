@@ -18,13 +18,7 @@ export function Footer({
       <Await resolve={footerPromise}>
         {(footer) => (
           <footer className=" mt-16">
-            {/* Top Bar */}
-            <div className="bg-white py-8 w-full flex flex-col md:flex-row justify-between items-center gap-4 container m-auto border-b border-gray-200">
-              <p className="text-sm ">Customer Service</p>
-              <p className="text-sm flex gap-6">
-                Need Help? Use our Live Chat feature or call: 888.893.1375<div>|</div> Monday - Friday 8AM - 5PM CST
-              </p>
-            </div>
+           
 
             {/* Middle Section */}
             <div className="  py-8 bg-[#F6F6F6]  justify-between items-start  gap-8 border-b border-gray-300">
@@ -33,18 +27,18 @@ export function Footer({
               {/* Left: Paragraph + Input */}
 
               <div className="flex flex-col gap-6">
-                <p className="text-base text-[#2B8C57]">Keep In Touch With BiologiMd®</p>
+                <p className="text-base !text-lg text-[#2B8C57] font-gayathri">Keep In Touch With BiologiMd®</p>
                 <p>Join the BiologiMD® newsletter. Sign up to be the first to access new skincare launches, expert tips, and exclusive offers.</p>
                 <form className="flex items-center gap-6">
                   <input
-              type="email"
-              placeholder="Enter your email"
-              className="!border-0 !border-b !border-black focus:outline-none !rounded-none !p-0 !py-3 !m-0 "
-            />
+                  type="email"
+                  placeholder="Enter your email"
+                  className="!border-0 !border-b !border-black focus:outline-none !rounded-none !p-0 !py-3 !m-0 "
+                />
  
                   <button
                     type="submit"
-                    className="inline-block bg-[#2B8C57] text-white px-6 py-3 ">
+                    className="inline-block bg-[#2B8C57] font-gayathri text-white px-6 py-3 ">
                   
                     Sign up
                   </button>
@@ -54,20 +48,25 @@ export function Footer({
                   <p>This site is protected by reCAPTCHA Enterprise and the Google <a href=''>Privacy Policy</a>and <a href="">Terms of Service</a> apply.</p>
                 </div>
                 <div>
-                  <h1 className='text-[#2B8C57]'>Follow BiologiMD®</h1>
+                  <p className='text-[#2B8C57] font-gayathri !m-0 !text-lg'>Follow BiologiMD®</p>
                   <p>Enhance your natural beauty™</p>
                 </div>
               </div>
 
               {/* Right: Footer Menu */}
-              <div className="md:w-1/2">
-                {footer?.menu && header.shop.primaryDomain?.url && (
-                  <FooterMenu
-                    menu={footer.menu}
-                    primaryDomainUrl={header.shop.primaryDomain.url}
-                    publicStoreDomain={publicStoreDomain}
-                  />
-                )}
+              <div className="md:w-1/2 flex justify-between">
+
+             <div>
+               <h1>home</h1>
+               <a href="">about</a>
+             </div> 
+
+               <div>
+               <h1>home</h1>
+               <a href="">about</a>
+             </div> 
+
+
               </div>
               </div>
             </div>
@@ -109,7 +108,7 @@ function FooterMenu({
             key={item.id}
             rel="noopener noreferrer"
             target="_blank"
-            className="text-sm hover:underline"
+            className="text-sm hover:underline "
           >
             {item.title}
           </a>
@@ -120,7 +119,7 @@ function FooterMenu({
             prefetch="intent"
             style={activeLinkStyle}
             to={url}
-            className="text-sm hover:underline"
+            className="text-sm hover:underline font-gayathri"
           >
             {item.title}
           </NavLink>

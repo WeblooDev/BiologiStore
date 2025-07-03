@@ -1,12 +1,12 @@
 // app/components/HeroSection.tsx
 
-import { Image } from '@shopify/hydrogen';
+import { useEffect, useState } from 'react';
 
 interface HeroSectionProps {
-  image: {
+  images: {
     url: string;
     altText?: string;
-  };
+  }[];
   title: string;
   text: string;
   buttonText: string;
@@ -14,24 +14,37 @@ interface HeroSectionProps {
 }
 
 export function HeroSection({
-  image,
+  images,
   title,
   text,
   buttonText,
   buttonLink,
 }: HeroSectionProps) {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
+    }, 4000); // Change image every 4 seconds
+
+    return () => clearInterval(interval);
+  }, [images.length]);
+
+  const backgroundImage = images[currentImageIndex]?.url;
+
   return (
     <div
-      className="mt-[190px] relative w-full h-[600px] bg-cover bg-center flex items-center"
-      style={{ backgroundImage: `url(${image.url})` }}
+      className="mt-[190px] relative w-full h-[600px] bg-cover bg-center flex items-center transition-all duration-1000 ease-in-out"
+      style={{ backgroundImage: `url(${backgroundImage})` }}
     >
-      <div className="flex flex-col gap-6 items-start p-8">
-        <h1 className="text-4xl text-[#2B8C57] !m-0">{title}</h1>
+      <div className="flex flex-col gap-4 items-start p-8  max-w-xl">
+        <h1 className="font-gayathri text-7xl text-[#2B8C57] !m-0">{title}</h1>
         <p className="text-lg mb-6">{text}</p>
-        <button
-          className="inline-block bg-[#2B8C57] text-white px-6 py-3 ">
-          {buttonText}
-        </button>
+        <a href={buttonLink}>
+          <button className="inline-block bg-[#2B8C57] text-white px-6 py-3 font-light">
+            {buttonText}
+          </button>
+        </a>
       </div>
     </div>
   );

@@ -21,9 +21,7 @@ export async function loader(args: LoaderFunctionArgs) {
 
 async function loadCriticalData({context, request}: LoaderFunctionArgs) {
   const {storefront} = context;
-  const paginationVariables = getPaginationVariables(request, {
-    pageBy: 8,
-  });
+  const paginationVariables = getPaginationVariables(request, {pageBy: 8});
 
   const [{products}, {collections}] = await Promise.all([
     storefront.query(CATALOG_QUERY, {
@@ -32,11 +30,42 @@ async function loadCriticalData({context, request}: LoaderFunctionArgs) {
     storefront.query(ALL_COLLECTIONS_QUERY),
   ]);
 
+  // 🧠 Count skin types and categories
+  const skinTypeSet = new Set<string>();
+  const skinTypeCounts: Record<string, number> = {};
+  const categoryCounts: Record<string, number> = {};
+
+  products.nodes.forEach((product) => {
+    // Count categories (productType)
+    const category = product.productType?.trim();
+    if (category) {
+      categoryCounts[category] = (categoryCounts[category] || 0) + 1;
+    }
+
+    // Count skin types from variant options
+    product.variants?.nodes?.forEach((variant) => {
+      variant.selectedOptions?.forEach((opt) => {
+        if (opt.name.toLowerCase() === 'suitable for skin type') {
+          const value = opt.value.trim();
+          skinTypeSet.add(value);
+          skinTypeCounts[value] = (skinTypeCounts[value] || 0) + 1;
+        }
+      });
+    });
+  });
+
+  const skinTypes = Array.from(skinTypeSet);
+
   return {
     products,
     allCollections: collections,
+    skinTypes,
+    skinTypeCounts,
+    categoryCounts,
   };
 }
+
+
 
 function loadDeferredData({context}: LoaderFunctionArgs) {
   const recommendedProducts = context.storefront
@@ -71,36 +100,36 @@ export default function Collection() {
 
  const filteredProducts = useMemo(() => {
   return data.products.nodes
-    .filter((product) => {
-      const {category, skinType, price} = filters;
+   .filter((product) => {
+  const {category, skinType, price} = filters;
 
-      const tagMatch =
-        !skinType || product.tags.includes(skinType.toLowerCase());
+  const normalize = (str: string | undefined) =>
+    str?.trim().toLowerCase().replace(/\s+/g, '');
 
-      console.log({
-        productType: product.productType,
-        selectedCategory: category,
-      });
+  const categoryMatch =
+    !category || normalize(product.productType) === normalize(category);
 
-     const normalize = (str: string | undefined) =>
-  str?.trim().toLowerCase().replace(/\s+/g, '');
+  const skinTypeMatch =
+    !skinType ||
+    product.variants.nodes.some((variant) =>
+      variant.selectedOptions.some(
+        (opt) =>
+          normalize(opt.name) === 'suitableforskintype' &&
+          normalize(opt.value) === skinType
+      )
+    );
 
-const categoryMatch =
-  !category || normalize(product.productType) === normalize(category);
+  const priceAmount = parseFloat(product.priceRange.minVariantPrice.amount);
+  const priceMatch = !price
+    ? true
+    : (() => {
+        const [min, max] = price.split('-').map(Number);
+        return priceAmount >= min && priceAmount <= max;
+      })();
 
+  return skinTypeMatch && categoryMatch && priceMatch;
+})
 
-      const priceAmount = parseFloat(
-        product.priceRange.minVariantPrice.amount,
-      );
-      const priceMatch = !price
-        ? true
-        : (() => {
-            const [min, max] = price.split('-').map(Number);
-            return priceAmount >= min && priceAmount <= max;
-          })();
-
-      return tagMatch && categoryMatch && priceMatch;
-    })
   .sort((a, b) => {
   if (filters.sort === 'PRICE_ASC') {
     return (
@@ -144,7 +173,12 @@ const categoryMatch =
         filters={filters}
         onFilterChange={setFilters}
         categories={data.allCollections.nodes}
+        skinTypes={data.skinTypes}
+        skinTypeCounts={data.skinTypeCounts}
+        categoryCounts={data.categoryCounts}
       />
+
+
 
         <div className="container products-grid grid grid-cols-2 md:grid-cols-4 gap-6">
           {filteredProducts.map((product, index) => (
@@ -172,11 +206,12 @@ const COLLECTION_ITEM_FRAGMENT = `#graphql
     currencyCode
   }
 
- fragment CollectionItem on Product {
+fragment CollectionItem on Product {
   id
   handle
   title
   productType
+  tags
   featuredImage {
     id
     altText
@@ -184,11 +219,9 @@ const COLLECTION_ITEM_FRAGMENT = `#graphql
     width
     height
   }
-    metafield(namespace: "custom", key: "new") {
-  value
-}
-
-  tags
+  metafield(namespace: "custom", key: "new") {
+    value
+  }
   priceRange {
     minVariantPrice {
       ...MoneyCollectionItem
@@ -197,7 +230,16 @@ const COLLECTION_ITEM_FRAGMENT = `#graphql
       ...MoneyCollectionItem
     }
   }
+  variants(first: 10) {
+    nodes {
+      selectedOptions {
+        name
+        value
+      }
+    }
+  }
 }
+
 
 ` as const;
 

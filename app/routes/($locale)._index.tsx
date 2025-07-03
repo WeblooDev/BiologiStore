@@ -16,6 +16,8 @@ import {AllCollections} from '~/components/AllCollections';
 import {PackProduct} from '~/components/PackProduct';
 
 import heroImage from '~/assets/images/hero.png';
+import homepage from '~/assets/images/homepage.webp';
+
 import discoverImage from '~/assets/images/discover.png';
 
 export const meta: MetaFunction = () => {
@@ -74,17 +76,16 @@ export default function Homepage() {
 
   return (
     <div className="home">
-      <HeroSection
-        image={{
-          url: heroImage,
-          altText: 'Welcome to our store',
-        }}
+       <HeroSection
+        images={[
+          { url: heroImage, altText: 'Holiday Hero 1' },
+          { url: homepage, altText: 'Holiday Hero 2' },
+        ]}
         title="Holiday Gift Guide"
         text="Unwrap the Gift of Luxury Skincare."
         buttonText="SHOP GIFTS"
         buttonLink="/collections"
       />
-
       <AllCollections collections={data.allCollections} />
 
       <Suspense fallback={<div>Loading Best Sellers...</div>}>
@@ -107,14 +108,13 @@ export default function Homepage() {
           {(blogsData) => (
             <section className="container mx-auto px-4 py-12">
               <div className="flex flex-col gap-4 my-6">
-                <h2 className="text-3xl font-bold !m-0">The BiologiMD® Blogs</h2>
-                <p>Stay informed with the latest in medical-grade skincare.</p>
+                <h2 className="font-gayathri text-3xl font-bold !m-0">The BiologiMD® Blogs</h2>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {blogsData?.blogs?.nodes.map((blog) => {
                   const article = blog.articles?.nodes?.[0];
                   return (
-                    <div key={blog.handle} className="blog-card flex flex-col gap-4 justify-between">
+                    <div key={blog.handle} className="blog-card flex flex-col gap-2 justify-between">
                       <Link to={`/blogs/${blog.handle}`} prefetch="intent">
                         {article?.image?.url && (
                           <img
@@ -123,12 +123,12 @@ export default function Homepage() {
                             className="w-full h-48 object-cover rounded-md"
                           />
                         )}
-                        <h3 className="text-base font-semibold mt-2">{article?.title}</h3>
+                        <h3 className="font-gayathri text-base !font-bold mt-6">{article?.title}</h3>
                       </Link>
                       {article?.excerpt && (
-                        <p className="text-sm line-clamp-3">{article.excerpt}</p>
+                        <p className="!text-[14px] line-clamp-3">{article.excerpt}</p>
                       )}
-                      <a href={`/blogs/${blog.handle}`} className="!underline">
+                      <a href={`/blogs/${blog.handle}`} className="font-gayathri !underline">
                         Read More
                       </a>
                     </div>

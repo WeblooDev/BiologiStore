@@ -28,7 +28,7 @@ export function PackProduct({product}: {product: ProductNode}) {
   return (
     <section className="container m-auto my-12">
         <div className='flex flex-col justify-center items-center p-8'>
-      <h2 className="!text-4xl font-bold mb-6">Best-Selling Bundles</h2>
+      <h2 className="font-gayathri !text-4xl !font-normal mb-6">Best-Selling Bundles</h2>
     <p>Discover our complete routines designed by skin experts to support healthy skin with medical-grade care.</p>
     </div>
       <div className="flex flex-col lg:flex-row justify-center gap-4 items-start">
@@ -46,7 +46,7 @@ export function PackProduct({product}: {product: ProductNode}) {
             />
           )}
         </a>
-        <h2 className="text-xl font-semibold mt-4 text-[#2B8C57]">{product.title}</h2>
+        <h2 className="font-gayathri text-2xl font-semibold mt-4 text-[#2B8C57]">{product.title}</h2>
         <Money data={product.priceRange.minVariantPrice} />
         <button className='w-full border border-[#2B8C57] py-4 text-[#2B8C57] uppercase'>Add to Bag</button>
       </div>
