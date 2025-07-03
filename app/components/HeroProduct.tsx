@@ -17,11 +17,11 @@ export function HeroProductSection({
 }: HeroProductSectionProps) {
   return (
     <div
-      className="relative w-full h-[500px] bg-cover bg-center flex items-center pt-[190px]"
+      className="relative w-full h-[600px] bg-cover bg-center flex items-center pt-[190px]"
       style={{ backgroundImage: `url(${image.url})` }}
     >
-      <div className="flex flex-col gap-6 items-start p-12">
-        <h1 className="text-4xl !m-0">{title}</h1>
+      <div className=" flex flex-col gap-6 items-start p-12">
+        <h1 className="font-gayathri !text-4xl !m-0 	">{title}</h1>
         <div className="flex gap-4">
           {links.map((link, index) => (
             <a

@@ -180,7 +180,7 @@ export default function Collection() {
 
 
 
-        <div className="container products-grid grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div className="container products-grid grid grid-cols-2 md:grid-cols-4 gap-8 ">
           {filteredProducts.map((product, index) => (
             <ProductItem
               key={product.id}

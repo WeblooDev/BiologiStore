@@ -39,26 +39,26 @@ export function ProductFilter({
   return (
     <div className="container flex flex-col gap-2">
       <div>
-        <p className="font-semibold">Filter By:</p>
+        <p className="font-semibold font-gayathri !text-xl">Filter By:</p>
       </div>
       <div className="flex justify-between gap-4 mb-6">
         {/* Category & Skin Type */}
         <div className="flex gap-4 items-center">
        <select
-  value={filters.category}
-  onChange={(e) => handleChange('category', e.target.value)}
-  className="border-b py-2 w-[200px]"
->
-  <option value="">Category</option>
-  {categories.map((collection) => {
-    const count = categoryCounts[collection.title] || 0;
-    return (
-      <option key={collection.id} value={collection.title}>
-        {collection.title} ({count})
-      </option>
-    );
-  })}
-</select>
+            value={filters.category}
+            onChange={(e) => handleChange('category', e.target.value)}
+            className="border-b py-2 w-[200px]"
+            >
+            <option value="">Category</option>
+            {categories.map((collection) => {
+                const count = categoryCounts[collection.title] || 0;
+                return (
+                <option key={collection.id} value={collection.title}>
+                    {collection.title} ({count})
+                </option>
+                );
+            })}
+            </select>
 
 
 

@@ -33,18 +33,18 @@ export function ImageTextSection({
         />
       </div>
 
-      <div className="w-full md:w-1/2 text-left space-y-6">
+      <div className="w-full md:w-1/2 text-left flex flex-col items-start">
         {content.map((item, index) => (
-          <div key={index} className="w-[70%]">
-            <h2 className="text-2xl text-[#2B8C57] mb-2">{item.title}</h2>
-            <p className="text-base">{item.description}</p>
+          <div key={index} className="w-[80%] flex flex-col items-start">
+            <h2 className="!text-2xl text-[#2B8C57] !mb-8">{item.title}</h2>
+            <p className="!text-base">{item.description}</p>
           </div>
         ))}
 
         {buttonText && buttonLink && (
           <a
             href={buttonLink}
-            className="inline-block mt-4 px-6 py-3 bg-[#2B8C57] !text-white hover:bg-gray-800 transition"
+            className="inline-block px-6 py-3 mt-8 bg-[#2B8C57] !text-white hover:bg-gray-800 transition"
           >
             {buttonText}
           </a>

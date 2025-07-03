@@ -131,7 +131,7 @@ export default function Blogs() {
                       className="w-full h-48 object-cover rounded-md mb-4"
                     />
                   )}
-                  <h2 className="!text-base font-semibold mb-1">{blog.title}</h2>
+                  <h2 className="!text-base  mb-1">{blog.title}</h2>
                 </Link>
                 {article?.excerpt && (
                   <p className="text-sm mb-2 line-clamp-3">
@@ -143,7 +143,7 @@ export default function Blogs() {
                 )}
                 <Link
                   to={`/blogs/${blog.handle}`}
-                  className="font-medium !underline"
+                  className=" !underline"
                 >
                   Read More 
                 </Link>

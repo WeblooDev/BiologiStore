@@ -23,17 +23,17 @@ export function Footer({
             {/* Middle Section */}
             <div className="  py-8 bg-[#F6F6F6]  justify-between items-start  gap-8 border-b border-gray-300">
 
-              <div className='container m-auto flex flex-col md:flex-row'>
+              <div className='container m-auto flex flex-col md:flex-row gap-6'>
               {/* Left: Paragraph + Input */}
 
               <div className="flex flex-col gap-6">
                 <p className="text-base !text-lg text-[#2B8C57] font-gayathri">Keep In Touch With BiologiMd®</p>
-                <p>Join the BiologiMD® newsletter. Sign up to be the first to access new skincare launches, expert tips, and exclusive offers.</p>
+                <p className='!text-sm'>Join the BiologiMD® newsletter. Sign up to be the first to access new skincare launches, expert tips, and exclusive offers.</p>
                 <form className="flex items-center gap-6">
                   <input
                   type="email"
                   placeholder="Enter your email"
-                  className="!border-0 !border-b !border-black focus:outline-none !rounded-none !p-0 !py-3 !m-0 "
+                  className="!border-0 !border-b !border-black focus:outline-none !rounded-none !p-0 !py-3 !m-0 w-[60%]"
                 />
  
                   <button
@@ -45,25 +45,27 @@ export function Footer({
                 </form>
 
                 <div>
-                  <p>This site is protected by reCAPTCHA Enterprise and the Google <a href=''>Privacy Policy</a>and <a href="">Terms of Service</a> apply.</p>
+                  <p className='!text-sm'>This site is protected by reCAPTCHA Enterprise and the Google <a href=''>Privacy Policy</a>and <a href="">Terms of Service</a> apply.</p>
                 </div>
                 <div>
                   <p className='text-[#2B8C57] font-gayathri !m-0 !text-lg'>Follow BiologiMD®</p>
-                  <p>Enhance your natural beauty™</p>
+                  <p className='!text-sm'>Enhance your natural beauty™</p>
                 </div>
               </div>
 
               {/* Right: Footer Menu */}
-              <div className="md:w-1/2 flex justify-between">
+              <div className="md:w-1/2 flex justify-around gap-5">
 
-             <div>
-               <h1>home</h1>
-               <a href="">about</a>
+             <div className='flex flex-col gap-3'>
+               <h1 className='text-[#2B8C57] font-gayathri !m-0 !text-lg'>About</h1>
+               <a className='font-gayathri' href="">Home</a>
+               <a className='font-gayathri' href="">The BiologiMD Story</a>
+               <a className='font-gayathri' href="/Blog">Blog</a>
              </div> 
 
                <div>
-               <h1>home</h1>
-               <a href="">about</a>
+               <h1 className='text-[#2B8C57] font-gayathri !m-0 !text-lg'>Support</h1>
+               <a className='font-gayathri' href="">Contact Us</a>
              </div> 
 
 

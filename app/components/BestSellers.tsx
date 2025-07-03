@@ -69,13 +69,13 @@ export function BestSellers({products, title = 'Best Sellers'}: BestSellersProps
               key={product.id}
               className="flex-shrink-0 w-[calc(100%/3-1rem)] min-w-[calc(100%/3-1rem)]"
             >
-              <div className="flex flex-col items-center gap-4 justify-between">
+              <div className="flex flex-col items-center gap-3 justify-between">
                 {product.featuredImage && (
                   <div className="bg-[#F6F6F6] w-full">
                     <Image
                       data={product.featuredImage}
                       sizes="(min-width: 768px) 33vw, 100vw"
-                      className="h-[300px] md:h-[400px] lg:h-[500px] object-cover mb-6"
+                className="h-[300px] md:h-[400px] lg:h-[500px] object-cover mb-6 transition-transform duration-300  hover:scale-105"
                     />
                   </div>
                 )}
@@ -83,17 +83,18 @@ export function BestSellers({products, title = 'Best Sellers'}: BestSellersProps
 
              
 
-                <div className="mt-2 !font-light
- text-gray-900">
-                  <Money data={product.priceRange.minVariantPrice} />
+                <div className="!font-light text-gray-900">
+                  <Money data={product.priceRange.minVariantPrice} className='text-sm'/>
                 </div>
 
+            <div className='w-full m-auto flex items-center justify-center'>
                 <button
-                  className="border border-[#2B8C57] uppercase bg-white px-12 py-3 text-[#2B8C57] cursor-pointer hover:text-white hover:bg-[#2B8C57]"
+                  className="w-[90%] border border-[#2B8C57] uppercase bg-white px-12 py-2 text-[#2B8C57] cursor-pointer hover:text-white hover:bg-[#2B8C57] !text-sm"
                   onClick={() => console.log(`Add to cart: ${product.id}`)}
                 >
                   Add to Bag
                 </button>
+                </div>
               </div>
             </div>
           ))}

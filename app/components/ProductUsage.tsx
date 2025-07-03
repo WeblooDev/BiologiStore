@@ -39,18 +39,18 @@ export function ProductUsage({
   return (
     <section className="container m-auto !py-16">
         <div className="h-[2px] w-full bg-[#E7E7E7] mt-[2rem] mb-[60px]"></div>
-      <h2 className="text-2xl font-semibold mb-6">Usage</h2>
+      <h2 className="font-gayathri !text-2xl font-semibold mb-6">Usage</h2>
 
       <div className="flex flex-row gap-6 justify-between w-full">
         {/* Left: Grouped usage blocks */}
         <div className="flex flex-col gap-4 w-[50%]">
           {Object.entries(grouped).map(([title, blocks], index) => (
             <div key={index}>
-              <h3 className="text-lg font-bold ">{title}</h3>
+              <h3 className=" text-lg underline ">{title}</h3>
               {blocks.map((block, i) => (
                 <div key={i} className="mt-2">
                   {block.subtitle && (
-                    <h4 className="text-base font-semibold text-[#2B8C57]">{block.subtitle}</h4>
+                    <h4 className="font-gayathri text-base font-semibold text-[#2B8C57]">{block.subtitle}</h4>
                   )}
                   <p className="text-sm">{block.description}</p>
                 </div>

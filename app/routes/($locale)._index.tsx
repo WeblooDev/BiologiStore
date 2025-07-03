@@ -111,29 +111,42 @@ export default function Homepage() {
                 <h2 className="font-gayathri text-3xl font-bold !m-0">The BiologiMD® Blogs</h2>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {blogsData?.blogs?.nodes.map((blog) => {
-                  const article = blog.articles?.nodes?.[0];
-                  return (
-                    <div key={blog.handle} className="blog-card flex flex-col gap-2 justify-between">
-                      <Link to={`/blogs/${blog.handle}`} prefetch="intent">
-                        {article?.image?.url && (
-                          <img
-                            src={article.image.url}
-                            alt={article.image.altText || article.title}
-                            className="w-full h-48 object-cover rounded-md"
-                          />
-                        )}
-                        <h3 className="font-gayathri text-base !font-bold mt-6">{article?.title}</h3>
-                      </Link>
-                      {article?.excerpt && (
-                        <p className="!text-[14px] line-clamp-3">{article.excerpt}</p>
-                      )}
-                      <a href={`/blogs/${blog.handle}`} className="font-gayathri !underline">
-                        Read More
-                      </a>
-                    </div>
-                  );
-                })}
+               {blogsData?.blogs?.nodes.map((blog) => {
+  const article = blog.articles?.nodes?.[0];
+  return (
+    <div key={blog.handle} className="blog-card flex flex-col gap-2 justify-between">
+      <Link
+        to={`/blogs/${blog.handle}`}
+        prefetch="intent"
+        className="group overflow-hidden "
+      >
+        {article?.image?.url && (
+          <img
+            src={article.image.url}
+            alt={article.image.altText || article.title}
+            className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
+          />
+        )}
+      </Link>
+
+<Link
+        to={`/blogs/${blog.handle}`}>
+        <h3 className="font-gayathri text-base !font-bold mt-6">{article?.title}</h3>
+  </Link>
+      {article?.excerpt && (
+        <p className="!text-[14px] line-clamp-3">{article.excerpt}</p>
+      )}
+
+      <a
+        href={`/blogs/${blog.handle}`}
+        className="!underline mt-4"
+      >
+        Read More
+      </a>
+    </div>
+  );
+})}
+
               </div>
             </section>
           )}

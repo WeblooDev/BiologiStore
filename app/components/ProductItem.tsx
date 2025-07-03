@@ -40,7 +40,7 @@ export function ProductItem({
   };
 
   return (
-    <div className="product-item flex flex-col items-center justify-between">
+    <div className="product-item flex flex-col items-center justify-between mt-8 w-full">
     <Link to={variantUrl} className="relative block w-full bg-[#F6F6F6] group">
   {product.metafield?.value === 'true' && (
     <div className="absolute top-3 left-3 h-[80px] w-[80px] border border-[#2B8C57] text-[#2B8C57] rounded-full flex items-center justify-center">
@@ -48,7 +48,7 @@ export function ProductItem({
     </div>
   )}
   {image && (
-    <div className="overflow-hidden">
+    <div className="overflow-hidden ">
       <Image
         alt={image.altText || product.title}
         data={image}
@@ -60,17 +60,17 @@ export function ProductItem({
 </Link>
 
         
-        <div className='flex flex-col items-center gap-4'>
-          <h4 className="text-lg font-semibold text-[#2B8C57]">{product.title}</h4>
+        <div className='flex flex-col items-center gap-2 mt-4 w-full'>
+          <h4 className="font-gayathri text-xl text-[#2B8C57]">{product.title}</h4>
               
 
       {product.tags?.length > 0 && (
         <div className="flex flex-wrap gap-2 items-center justify-center">
           {product.tags.map((tag, index) => (
-            <div key={tag} className="flex items-center gap-2">
-              <span className="text-base">{tag}</span>
+            <div key={tag} className="flex items-center gap-1">
+              <span className="text-sm">{tag}</span>
               {index < product.tags.length - 1 && (
-                <img src={bullet} alt="bullet" className="!w-auto h-2" />
+                <img src={bullet} alt="bullet" className="!w-auto h-[7px]" />
               )}
             </div>
           ))}
@@ -79,14 +79,14 @@ export function ProductItem({
 
 
 
-                <small className="block text-base">
+                <small className="block text-sm">
                   <Money data={product.priceRange.minVariantPrice} />
                 </small>
-                <div>
+                <div className='w-full m-auto flex items-ce'>
+                  
                 <button
                 onClick={handleAddToCart}
-                className="mt-2 w-full border border-[#2B8C57] text-[#2B8C57] text-sm py-4 px-10 uppercase  hover:bg-[#2B8C57] hover:text-white transition"
-              >
+className='w-[90%] m-auto border border-[#2B8C57] uppercase bg-white px-14 py-2 text-[#2B8C57] cursor-pointer hover:text-white hover:bg-[#2B8C57] !text-sm '              >
                 Add to Cart
               </button>
               </div>

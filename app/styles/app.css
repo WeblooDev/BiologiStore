@@ -19,6 +19,19 @@
 
 
 
+@font-face {
+  font-family: 'Roboto';
+  src: url('/fonts/Roboto-VariableFont_wdth,wght.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+.font-roboto {
+  font-family: 'Roboto', sans-serif;
+}
+
+
+
 :root {
   --aside-width: 400px;
   --cart-aside-summary-height-with-discount: 300px;

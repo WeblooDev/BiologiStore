@@ -34,7 +34,7 @@ export function AllCollections({ collections }: AllCollectionsProps) {
           className="w-full h-[194px] object-cover !rounded-none"
         />
         <div className="p-4 border border-[#2B8C57]">
-          <p className="font-gayathri  text-center p-2 text-[#2B8C57] transition-colors duration-300 group-hover:text-white">
+          <p className="font-gayathri uppercase text-center p-2 text-[#2B8C57] transition-colors duration-300 group-hover:text-white">
             {collection.title}
           </p>
         </div>

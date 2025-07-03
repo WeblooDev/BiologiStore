@@ -127,6 +127,7 @@ const { product, bestSellers } = useLoaderData<typeof loader>();
     <ProductPrice
       price={selectedVariant?.price}
       compareAtPrice={selectedVariant?.compareAtPrice}
+      
     />
 
     <div className="!text-sm" dangerouslySetInnerHTML={{ __html: descriptionHtml }} />
@@ -142,7 +143,11 @@ const { product, bestSellers } = useLoaderData<typeof loader>();
       selectedVariant={selectedVariant}
     />
 
-    <p className="!text-sm !mt-8 font-normal">Pair it With</p>
+  <div>
+      <p className="font-gayathri !text-xl !mt-8 font-normal">Pair it With</p>
+      <p>Our products are designed to work better together</p>
+  </div>
+
     <ProductSiblings products={siblings} />
   </div>
 
