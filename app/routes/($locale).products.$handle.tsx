@@ -131,7 +131,10 @@ const { product, bestSellers } = useLoaderData<typeof loader>();
       
     />
 
-    <div className="!text-sm" dangerouslySetInnerHTML={{ __html: descriptionHtml }} />
+<div
+  className="prose prose-p:!text-sm max-w-none"
+  dangerouslySetInnerHTML={{ __html: descriptionHtml }}
+/>
 
     <p className="!text-sm mt-2">
       {selectedVariant.selectedOptions.find(
