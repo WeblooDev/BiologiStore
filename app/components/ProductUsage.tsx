@@ -37,13 +37,13 @@ export function ProductUsage({
   });
 
   return (
-    <section className="container m-auto !py-16">
+    <section className="container m-auto !py-16 !px-5">
         <div className="h-[2px] w-full bg-[#E7E7E7] mt-[2rem] mb-[60px]"></div>
       <h2 className="font-gayathri !text-2xl font-semibold mb-6">Usage</h2>
 
-      <div className="flex flex-row gap-6 justify-between w-full">
+      <div className="flex flex-col lg:flex-row gap-10 justify-between w-full p5">
         {/* Left: Grouped usage blocks */}
-        <div className="flex flex-col gap-4 w-[50%]">
+        <div className="flex flex-col gap-4 w-full lg:w-[50%] ">
           {Object.entries(grouped).map(([title, blocks], index) => (
             <div key={index}>
               <h3 className=" text-lg underline ">{title}</h3>
@@ -61,7 +61,7 @@ export function ProductUsage({
 
         {/* Right: Usage image */}
         {image?.url && (
-          <div className="w-[50%] flex items-center justify-center">
+          <div className="w-full lg:w-[50%] flex items-center justify-center">
             <img
               src={image.url}
               alt={image.alt || 'Usage image'}

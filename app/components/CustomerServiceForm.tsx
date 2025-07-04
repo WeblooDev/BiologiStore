@@ -7,38 +7,38 @@ export function CustomerServiceForm() {
 
   return (
     <div className="w-full lg:w-[50%] mx-auto p-6 pt-[220px] flex flex-col gap-4">
-      <h2 className="text-lg font-bold mb-4">Customer Service</h2>
+      <h2 className="!text-2xl font-bold mb-4">Customer Service</h2>
       <p>For any questions or assistance, please use the form below to contact our customer service team:</p>
 
       <div className="flex flex-col gap-5">
         <div>
-          <label className="block text-sm mb-1 font-semibold" htmlFor="name">Your Name</label>
+          <label className="block text-sm mb-1  " htmlFor="name">Your Name</label>
           <input
             id="name"
             type="text"
             placeholder="First Name*"
-            className="w-full border-b !rounded-none "
+            className="w-full border-b !rounded-none !px-0"
           />
         </div>
 
         <div>
-          <label className="block text-sm mb-1 font-semibold" htmlFor="email">Email</label>
+          <label className="block text-sm mb-1 " htmlFor="email">Email</label>
           <input
             id="email"
             type="email"
             placeholder="Email"
-            className="w-full border-b p-2 !rounded-none"
+            className="w-full border-b p-2 !rounded-none !px-0"
           />
         </div>
 
         <div>
-          <label className="block text-sm mb-1  font-semibold" htmlFor="phone">Phone* (optional)</label>
+          <label className="block text-sm mb-1 " htmlFor="phone">Phone* (optional)</label>
           <div className="flex items-center  border-b ">
             <input
               id="phone"
               type="tel"
               placeholder="Phone*"
-              className="w-full "
+              className="w-full !px-0"
             />
             <span className="pr-2">🇺🇸</span>
 
@@ -46,7 +46,7 @@ export function CustomerServiceForm() {
         </div>
 
         <div>
-          <label className="block text-sm mb-1  font-semibold" htmlFor="order">Order Number (optional)</label>
+          <label className="block text-sm mb-1  " htmlFor="order">Order Number (optional)</label>
           <input
             id="order"
             type="text"
@@ -55,7 +55,7 @@ export function CustomerServiceForm() {
         </div>
 
         <div className="flex flex-col gap-2">
-  <p className="text-sm font-semibold">Question Type</p>
+  <p className="text-sm ">Question Type</p>
   <div className="space-y-2">
     {[
       { label: 'General Questions and Comments', value: 'general' },
@@ -101,10 +101,10 @@ export function CustomerServiceForm() {
         Send Message
        </button>
 
-        <p className="text-xs text-gray-500 mt-2">
+        <p className="text-xs mt-2">
           This site is protected by reCAPTCHA Enterprise and the Google{' '}
-          <a href="#" className="underline">Privacy Policy</a> and{' '}
-          <a href="#" className="underline">Terms of Service</a> apply.
+          <a href="#" className="underline text-[#2B8C57]">Privacy Policy</a> and{' '}
+          <a href="#" className="underline text-[#2B8C57]">Terms of Service</a> apply.
         </p>
       </div>
     </div>

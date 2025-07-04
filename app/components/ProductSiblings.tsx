@@ -19,7 +19,7 @@ export function ProductSiblings({ products }: { products: SiblingProduct[] }) {
       {products.map((product) => (
         <div key={product.id} className="flex flex-col justify-between items-center text-center gap-2">
           {product.featuredImage?.url && (
-            <a href={`/products/${product.handle}`}>
+            <a href={`/products/${product.handle}`} className="bg-[#F6F6F6]">
               <img
                 src={product.featuredImage.url}
                 alt={product.featuredImage.altText || product.title}
@@ -27,7 +27,7 @@ export function ProductSiblings({ products }: { products: SiblingProduct[] }) {
               />
             </a>
           )}
-          <h3 className=" text-sm ">{product.title}</h3>
+          <h3 className="font-gayathri text-sm ">{product.title}</h3>
           <a
             href={`/products/${product.handle}`}
             className="border uppercase border-[#2B8C57] !text-[#2B8C57] px-2 py-1 text-[12px]"

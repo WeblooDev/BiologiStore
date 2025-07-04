@@ -33,16 +33,16 @@ export function ProductExpectation({ json, beforeAfter, expectImage }: ProductEx
 
   return (
     <section className="mt-12 bg-[#F2F2F2] w-full !py-16">
-      <div className="container m-auto flex flex-col justify-between md:flex-row gap-12 items-start">
+      <div className="container !p-5 m-auto flex flex-col justify-between lg:flex-row gap-12 ">
         {beforeAfter && beforeAfter.length === 2 && (
           <BeforeAfterSlider before={beforeAfter[0]} after={beforeAfter[1]} />
         )}
 
-        <div className="flex flex-col gap-5">
+        <div className="flex flex-col gap-5 justify-between">
                   <h2 className="text-2xl font-semibold mb-6">What to Expect</h2>
 
           {expectations.map((item, index) => (
-            <div key={index} className="flex flex-col gap-4">
+            <div key={index} className="flex flex-col gap-1 ">
               <h3 className="font-semibold text-black">{item.title}</h3>
               <p >{item.description}</p>
             </div>

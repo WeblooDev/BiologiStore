@@ -74,7 +74,6 @@ export function Header({header, isLoggedIn, cart}: HeaderProps) {
           alt="Open menu"
           className="w-7 h-7 object-contain cursor-pointer"
         /> 
-         \\
       </button>
     </div>
 

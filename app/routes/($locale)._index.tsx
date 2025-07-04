@@ -1,23 +1,13 @@
 import {type LoaderFunctionArgs} from '@shopify/remix-oxygen';
 import {Await, useLoaderData, Link, type MetaFunction} from 'react-router';
 import {Suspense} from 'react';
-import {Image, Money} from '@shopify/hydrogen';
-
-import type {
-  FeaturedCollectionFragment,
-  RecommendedProductsQuery,
-} from 'storefrontapi.generated';
-
-import {ProductItem} from '~/components/ProductItem';
 import {HeroSection} from '~/components/HeroSection';
 import {BestSellers} from '~/components/BestSellers';
 import {DiscoverRegimenSection} from '~/components/DiscoverRegimen';
 import {AllCollections} from '~/components/AllCollections';
 import {PackProduct} from '~/components/PackProduct';
-
 import heroImage from '~/assets/images/hero.png';
 import homepage from '~/assets/images/homepage.webp';
-
 import discoverImage from '~/assets/images/discover.png';
 
 export const meta: MetaFunction = () => {

@@ -35,8 +35,8 @@ export function ImageTextSection({
 
       <div className="w-full md:w-1/2 text-left flex flex-col items-start">
         {content.map((item, index) => (
-          <div key={index} className="w-[80%] flex flex-col items-start">
-            <h2 className="!text-2xl text-[#2B8C57] !mb-8">{item.title}</h2>
+          <div key={index} className="w-[80%] flex flex-col items-start mb-">
+            <h2 className="!text-2xl text-[#2B8C57] ">{item.title}</h2>
             <p className="!text-base">{item.description}</p>
           </div>
         ))}

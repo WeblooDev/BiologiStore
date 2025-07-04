@@ -91,12 +91,18 @@ function loadDeferredData({context}: LoaderFunctionArgs) {
 export default function Collection() {
   const data = useLoaderData<typeof loader>();
 
-  const [filters, setFilters] = useState<FilterState>({
-    category: '',
-    skinType: '',
-    sort: 'RELEVANCE',
-    price: '',
-  });
+  const getInitialFilter = (): FilterState => {
+  const params = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
+  return {
+    category: params.get('category') || '',
+    skinType: params.get('skinType') || '',
+    sort: params.get('sort') || 'RELEVANCE',
+    price: params.get('price') || '',
+  };
+};
+
+const [filters, setFilters] = useState<FilterState>(getInitialFilter);
+
 
  const filteredProducts = useMemo(() => {
   return data.products.nodes
