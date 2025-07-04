@@ -17,6 +17,8 @@ import resetStyles from '~/styles/reset.css?url';
 import appStyles from '~/styles/app.css?url';
 import tailwindCss from './styles/tailwind.css?url';
 import {PageLayout} from './components/PageLayout';
+import arrowup from '~/assets/images/arrowup.svg';
+import {ScrollToTopButton} from '~/components/ScrollToTopButton';
 
 export type RootLoader = typeof loader;
 
@@ -159,21 +161,25 @@ export function Layout({children}: {children?: React.ReactNode}) {
         <Meta />
         <Links />
       </head>
-      <body>
-        {data ? (
-          <Analytics.Provider
-            cart={data.cart}
-            shop={data.shop}
-            consent={data.consent}
-          >
-            <PageLayout {...data}>{children}</PageLayout>
-          </Analytics.Provider>
-        ) : (
-          children
-        )}
-        <ScrollRestoration nonce={nonce} />
-        <Scripts nonce={nonce} />
-      </body>
+     <body>
+  {data ? (
+    <Analytics.Provider
+      cart={data.cart}
+      shop={data.shop}
+      consent={data.consent}
+    >
+      <PageLayout {...data}>{children}</PageLayout>
+    </Analytics.Provider>
+  ) : (
+    children
+  )}
+
+  <ScrollToTopButton />
+
+  <ScrollRestoration nonce={nonce} />
+  <Scripts nonce={nonce} />
+</body>
+
     </html>
   );
 }

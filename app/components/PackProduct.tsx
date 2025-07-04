@@ -34,21 +34,23 @@ export function PackProduct({product}: {product: ProductNode}) {
       <div className="flex flex-col lg:flex-row justify-center gap-4 items-start">
 
 <div className='w-[100%] lg:w-[50%]'>
-        <img src={packhero} alt=""               className="w-full h-[850px] object-cover"/>
+        <img src={packhero} alt=""               className="w-full h-[700px] object-cover"/>
 </div>
         <div className='flex flex-col gap-2 w-[100%] lg:w-[50%] items-center'>
         <a href={`/products/${product.handle}`} className='w-[100%]'>
           {product.featuredImage && (
             <Image
               data={product.featuredImage}
-              className="w-full h-[850px] object-cover"
+              className="w-full h-[700px] object-cover"
               alt={product.featuredImage.altText || product.title}
             />
           )}
         </a>
-        <h2 className="font-gayathri text-2xl font-semibold mt-4 text-[#2B8C57]">{product.title}</h2>
+        <h2 className="font-gayathri text-2xl font-semibold !mt-4 text-[#2B8C57]">{product.title}</h2>
         <Money data={product.priceRange.minVariantPrice} />
-        <button className='w-full border border-[#2B8C57] py-4 text-[#2B8C57] uppercase'>Add to Bag</button>
+        <button className="cursor-pointer w-full border border-[#2B8C57] py-3 text-[#2B8C57] uppercase text-sm transition-colors duration-300 hover:bg-[#2B8C57] hover:text-white">
+          Add to Bag
+        </button>
       </div>
       </div>
     </section>

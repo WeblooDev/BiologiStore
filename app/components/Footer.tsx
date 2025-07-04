@@ -1,6 +1,8 @@
 import {Suspense} from 'react';
 import {Await, NavLink} from 'react-router';
 import type {FooterQuery, HeaderQuery} from 'storefrontapi.generated';
+import facebook from '~/assets/images/facebook.svg';
+import instagram from '~/assets/images/instagram.svg';
 
 interface FooterProps {
   footer: Promise<FooterQuery | null>;
@@ -21,7 +23,7 @@ export function Footer({
            
 
             {/* Middle Section */}
-            <div className="  py-8 bg-[#F6F6F6]  justify-between items-start  gap-8 border-b border-gray-300">
+            <div className="  py-12 px-6 bg-[#F6F6F6]  justify-between items-start  gap-8 border-b border-gray-300">
 
               <div className='container m-auto flex flex-col md:flex-row gap-6'>
               {/* Left: Paragraph + Input */}
@@ -38,7 +40,7 @@ export function Footer({
  
                   <button
                     type="submit"
-                    className="inline-block bg-[#2B8C57] font-gayathri text-white px-6 py-3 ">
+                    className=" bg-[#2B8C57] font-gayathri text-white px-6 py-3 uppercase">
                   
                     Sign up
                   </button>
@@ -49,8 +51,17 @@ export function Footer({
                 </div>
                 <div>
                   <p className='text-[#2B8C57] font-gayathri !m-0 !text-lg'>Follow BiologiMD®</p>
-                  <p className='!text-sm'>Enhance your natural beauty™</p>
+                  <p className='!text-sm !m-0'>Enhance your natural beauty™</p>
+                   <div className='flex items-center gap-6 mt-6'>
+                    <a href="https://www.facebook.com/thebiologimd">
+                    <img src={instagram} alt="" className="w-5 h-5 hover:scale-110 transition-transform"/>
+                    </a>
+                    <a href="https://www.instagram.com/biologimdclinic/#">
+                  <img src={facebook} alt="" className="w-5 h-5 hover:scale-110 transition-transform"/>
+                  </a>
                 </div>
+                </div>
+               
               </div>
 
               {/* Right: Footer Menu */}

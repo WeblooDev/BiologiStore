@@ -33,7 +33,7 @@ export function ProductExpectation({ json, beforeAfter, expectImage }: ProductEx
 
   return (
     <section className="mt-12 bg-[#F2F2F2] w-full !py-16">
-      <div className="container m-auto flex flex-col md:flex-row gap-12 items-start">
+      <div className="container m-auto flex flex-col justify-between md:flex-row gap-12 items-start">
         {beforeAfter && beforeAfter.length === 2 && (
           <BeforeAfterSlider before={beforeAfter[0]} after={beforeAfter[1]} />
         )}
@@ -50,20 +50,23 @@ export function ProductExpectation({ json, beforeAfter, expectImage }: ProductEx
           <div>
   {expectImage?.length > 0 && (
   
-    <div className="flex flex-col gap-6">
-          <h1 className="!text-base !m-0">PRODUCT REGIMEN</h1>
+    <div className="flex flex-col gap-2">
+          <p className="!text-base font-semibold !m-0">PRODUCT REGIMEN</p>
           <div className="flex gap-6">
       {expectImage.map((product, index) => (
         <div key={index} className="flex flex-col">
+          
           {product.featuredImage?.url && (
+            <div className="bg-white">
             <img
               src={product.featuredImage.url}
               alt={product.featuredImage.altText || product.title}
               className="w-[100px] h-[130px] object-cover"
             />
+            </div>
             
           )}
-                      <h4 className="text-sm text-[#4F4F4F]">{product.title}</h4>
+                      <h4 className="font-gayathri mt-2 !text-base text-[#2B8C57]">{product.title}</h4>
 
           
         </div>
@@ -121,8 +124,8 @@ function BeforeAfterSlider({ before, after }: { before: string; after: string })
       className="relative flex w-[clamp(20rem,75vw,40rem)] max-h-[95vh] aspect-[3/3]"
     >
 
-        <p className="absolute bottom-[-2rem] left-[20%] text-sm">Baseline</p>
-        <p className="absolute bottom-[-2rem] right-[20%] text-sm">Week 4</p>
+        <p className="font-gayathri absolute bottom-[-2rem] left-[20%] text-sm">Baseline</p>
+        <p className="font-gayathri absolute bottom-[-2rem] right-[20%] text-sm">Week 4</p>
 
       <div className="img-wrapper absolute w-full h-full overflow-hidden">
         <img src={before} alt="Before" className="w-full h-full object-cover" />

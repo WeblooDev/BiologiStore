@@ -24,16 +24,17 @@ export function DiscoverRegimenSection({
 
     <section className='p-6'>
     <div
-      className="container m-auto relative  p-12 bg-cover bg-center flex items-center justify-center "
+      className="container m-auto relative  p-16 bg-cover bg-center flex items-center justify-center "
       style={{ backgroundImage: `url(${image.url})` }}
     >
-      <div className="flex flex-col gap-6 items-center p-3 ">
-        <h1 className="font-gayathri !text-4xl !m-0">{title}</h1>
-        <p className="text-lg !mb-6">{text}</p>
-        <button
-          className="inline-block bg-[#2B8C57] text-white px-6 py-3 uppercase ">
-          {buttonText}
-        </button>
+      <div className="flex flex-col gap-3 items-center p-3 ">
+        <h1 className="font-gayathri !text-2xl !m-0">{title}</h1>
+        <p className="text-lg !mb-8">{text}</p>
+      <button
+  className="inline-block bg-[#2B8C57] text-white px-8 py-2 uppercase text-sm cursor-pointer border border-transparent transition-all duration-300 hover:bg-white hover:text-[#2B8C57] hover:border-[#2B8C57]">
+  {buttonText}
+</button>
+
       </div>
     </div>
     </section>

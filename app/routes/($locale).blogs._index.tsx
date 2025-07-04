@@ -90,26 +90,31 @@ export default function Blogs() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
         {/* Sidebar */}
         <div className="md:col-span-1">
-          <div className="sticky top-20">
+          <div className="sticky top-20 mt-6">
             <ul className="space-y-2">
               <li>
                 <button
-                  onClick={() => setSelectedTag(null)}
-                  className="w-full text-left py-4 border-b cursor-pointer"
-                  style={{borderBottomColor: '#E7E7E7'}}
-                >
-                  All Categories
-                </button>
+                    onClick={() => setSelectedTag(null)}
+                    className={`font-gayathri w-full text-left py-2 border-b cursor-pointer transition-colors duration-200 ${
+                      selectedTag === null ? 'text-green-600 font-semibold' : 'text-black'
+                    }`}
+                    style={{borderBottomColor: '#E7E7E7'}} >
+                    All Categories
+              </button>
+
               </li>
               {allTags.map((tag) => (
                 <li key={tag}>
-                  <button
-                    onClick={() => setSelectedTag(tag)}
-                    className="block w-full text-left py-4 border-b cursor-pointer"
-                    style={{borderBottomColor: '#E7E7E7'}}
-                  >
-                    {tag}
-                  </button>
+              <button
+                onClick={() => setSelectedTag(tag)}
+                className={`font-gayathri block w-full text-left py-2 border-b cursor-pointer transition-colors duration-200 ${
+                  selectedTag === tag ? 'text-green-600 font-semibold' : 'text-black'
+                }`}
+                style={{borderBottomColor: '#E7E7E7'}}
+              >
+                {tag}
+              </button>
+
                 </li>
               ))}
             </ul>
@@ -122,13 +127,13 @@ export default function Blogs() {
             const article = blog.articles?.nodes?.[0];
 
             return (
-              <div className="blog-card flex flex-col gap-4 justify-between" key={blog.handle}>
+              <div className="blog-card flex flex-col gap-4 justify-between mb-6" key={blog.handle}>
                 <Link to={`/blogs/${blog.handle}`} prefetch="intent">
                   {article?.image?.url && (
                     <img
                       src={article.image.url}
                       alt={article.image.altText || article.title}
-                      className="w-full h-48 object-cover rounded-md mb-4"
+                      className="w-full h-38 object-cover mb-4"
                     />
                   )}
                   <h2 className="!text-base  mb-1">{blog.title}</h2>

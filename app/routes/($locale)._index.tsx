@@ -103,12 +103,32 @@ export default function Homepage() {
         </Await>
       </Suspense>
 
-      <Suspense fallback={<div>Loading Blogs...</div>}>
+     
+
+      <DiscoverRegimenSection
+        image={{
+          url: discoverImage,
+          altText: 'Welcome to our store',
+        }}
+        title="Discover Your Regimen"
+        text="Find the skincare products best suited for your skin health goals."
+        buttonText="Discover My Regimen"
+        buttonLink="/collections"
+      />
+
+       <Suspense fallback={<div>Loading Blogs...</div>}>
         <Await resolve={data.latestBlogs}>
           {(blogsData) => (
             <section className="container mx-auto px-4 py-12">
-              <div className="flex flex-col gap-4 my-6">
+              <div className="flex justify-between gap-4 my-6">
                 <h2 className="font-gayathri text-3xl font-bold !m-0">The BiologiMD® Blogs</h2>
+                   <a
+  href="/blogs"
+  className="!no-underline inline-block bg-white border border-[#2B8C57] px-8 py-2 uppercase text-sm cursor-pointer transition-all duration-300 text-[#2B8C57] hover:bg-[#2B8C57] hover:!text-white hover:border-[#2B8C57]"
+>
+  View All
+</a>
+
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                {blogsData?.blogs?.nodes.map((blog) => {
@@ -152,17 +172,6 @@ export default function Homepage() {
           )}
         </Await>
       </Suspense>
-
-      <DiscoverRegimenSection
-        image={{
-          url: discoverImage,
-          altText: 'Welcome to our store',
-        }}
-        title="Discover Your Regimen"
-        text="Find the skincare products best suited for your skin health goals."
-        buttonText="Discover My Regimen"
-        buttonLink="/collections"
-      />
     </div>
   );
 }
@@ -212,7 +221,7 @@ const RECOMMENDED_PRODUCTS_QUERY = `#graphql
   }
   query RecommendedProducts ($country: CountryCode, $language: LanguageCode)
     @inContext(country: $country, language: $language) {
-    products(first: 4, sortKey: UPDATED_AT, reverse: true) {
+    products(first: 6, sortKey: UPDATED_AT, reverse: true) {
       nodes {
         ...RecommendedProduct
       }

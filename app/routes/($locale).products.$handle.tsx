@@ -21,6 +21,7 @@ import { ProductExpectation } from '~/components/ProductExpectation';
 import { BestSellers } from '~/components/BestSellers';
 import { Suspense } from 'react';
 import bullet from '~/assets/images/bulle.svg';
+import {BundleProducts} from '~/components/BundleProducts';
 
 export const meta: MetaFunction<typeof loader> = ({data}) => {
   return [
@@ -169,6 +170,8 @@ const { product, bestSellers } = useLoaderData<typeof loader>();
 </div>
 
 
+
+
       <ProductBenefits
         json={product.metafield?.value || '[]'}
         images={product.images?.nodes || []}
@@ -186,10 +189,6 @@ const { product, bestSellers } = useLoaderData<typeof loader>();
         })) || []
       }
     />
-
-
-
-
 
       <ProductUsage
         json={product.usage?.value || '[]'}
@@ -300,6 +299,32 @@ const PRODUCT_FRAGMENT = `#graphql
         }
       }
     }
+
+    bundleProducts: metafield(namespace: "custom", key: "bundle_products") {
+  references(first: 10) {
+    nodes {
+      ... on Product {
+        id
+        title
+        handle
+        description
+        featuredImage {
+          url
+          altText
+          width
+          height
+        }
+        priceRange {
+          minVariantPrice {
+            amount
+            currencyCode
+          }
+        }
+      }
+    }
+  }
+}
+
       imgBackground: metafield(namespace: "custom", key: "imgBackground") {
   reference {
     ... on MediaImage {

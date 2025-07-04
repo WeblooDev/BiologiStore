@@ -15,6 +15,8 @@ import {
   useOptimisticCart,
 } from '@shopify/hydrogen';
 import {useLocation} from 'react-router';
+import right from '~/assets/images/right-arrow.svg';
+import left from '~/assets/images/left-arrow.svg';
 
 
 
@@ -59,20 +61,22 @@ export function Header({header, isLoggedIn, cart}: HeaderProps) {
       }`}
     >
 
-      <div className='border-b border-b-[#BDBDBD] flex justify-center p-2'>
-        <p className='font-gayathri text-[13px] text-center text-[#4F4F4F] uppercase'>FREE STANDARD SHIPPING ON ORDERS OF $175+</p>
+      <div className='border-b border-b-[#BDBDBD] flex justify-center p-2 w-full'>
+  <PromoCarousel />
+
       </div>
       {/* Top Logo Section */}
         <header className="container m-auto w-full flex justify-between items-center p-4 md:p-6">
         <div className="w-[10%] opacity-100 md:opacity-0 md:pointer-events-none transition-opacity duration-300">
-  <button onClick={() => open('mobile')} aria-label="Open menu">
-    <img
-      src={burger}
-      alt="Open menu"
-      className="w-7 h-7 object-contain cursor-pointer"
-    />
-  </button>
-</div>
+      <button onClick={() => open('mobile')} aria-label="Open menu">
+        <img
+          src={burger}
+          alt="Open menu"
+          className="w-7 h-7 object-contain cursor-pointer"
+        /> 
+         \\
+      </button>
+    </div>
 
         <a href="/" className="block">
           <img src={logoBiologi} alt="BiologiMD" className=" h-10 w-[200px] md:w-auto" />
@@ -117,7 +121,7 @@ if (viewport === 'mobile') {
 
       {/* Sign In block after all links */}
       <div className="flex items-center gap-3 px-4 py-6  bg-[#f6f6f6]">
-        <img src={signin} alt="Sign in" className="w-6 h-6" />
+        <img src={signin} alt="Sign in" className="w-5 h-5" />
         <a href="/account" className="text-base  text-[#2B8C57]">
           Sign In
         </a>
@@ -345,7 +349,7 @@ function MobileMenuItem({ item }: { item: any }) {
         {item.title}
         {item.items?.length > 0 && (
           <svg
-            className={`w-6 h-6 transition-transform duration-300 cursor-pointer ${
+            className={`w-5 h-5 transition-transform duration-300 cursor-pointer ${
               isOpen ? 'rotate-180' : ''
             }`}
             fill="none"
@@ -378,7 +382,7 @@ function MobileMenuItem({ item }: { item: any }) {
                 {subItem.title}
                 {subItem.items?.length > 0 && (
                   <svg
-                    className={`w-6 h-6 transition-transform duration-300 cursor-pointer${
+                    className={`w-5 h-5 transition-transform duration-300 cursor-pointer${
                       openSubmenus[subItem.id] ? 'rotate-180' : ''
                     }`}
                     fill="none"
@@ -435,7 +439,7 @@ function HeaderCtas({
       <Suspense
         fallback={
           <a href="/account">
-            <img src={signin} alt="Sign in" className="w-6 h-6" />
+            <img src={signin} alt="Sign in" className="w-5 h-5" />
           </a>
         }
       >
@@ -443,7 +447,7 @@ function HeaderCtas({
           resolve={isLoggedIn}
           errorElement={
             <a href="/account">
-              <img src={signin} alt="Sign in" className="w-6 h-6" />
+              <img src={signin} alt="Sign in" className="w-5 h-5" />
             </a>
           }
         >
@@ -452,7 +456,7 @@ function HeaderCtas({
               <img
                 src={signin}
                 alt={loggedIn ? 'Account' : 'Sign in'}
-                className="w-6 h-6"
+                className="w-5 h-5"
               />
             </a>
           )}
@@ -469,7 +473,7 @@ function SearchToggle() {
   const {open} = useAside();
   return (
     <button className="reset" onClick={() => open('search')}>
-      <img src={search} alt="Search" className="w-6 h-6" />
+      <img src={search} alt="Search" className="w-5 h-5" />
     </button>
   );
 }
@@ -497,9 +501,9 @@ function CartBadge({count}: {count: number | null}) {
       }}
       className="relative inline-block"
     >
-      <img src={cartIcon} alt="Cart" className='h-6 w-6' />
+      <img src={cartIcon} alt="Cart" className='h-5 w-6' />
       {typeof count === 'number' && count > 0 && (
-        <span className="absolute -top-2 -right-3 text-xs bg-[#2B8C57] flex items-center justify-center p-2 text-white w-2 h-2 rounded-full text-[10px]">
+        <span className="absolute -top-[7px] -right-[8px] text-xs bg-[#2B8C57] flex items-center justify-center p-2 text-white w-2 h-2 rounded-full text-[10px]">
           {count}
         </span>
       )}
@@ -530,3 +534,79 @@ const FALLBACK_HEADER_MENU = {
   id: 'gid://shopify/Menu/199655587896',
   items: [],
 };
+
+
+
+export function PromoCarousel() {
+  const messages = [
+    'FREE STANDARD SHIPPING ON ORDERS OF $175+',
+    'BUY ONE GET ONE FREE ON SELECT ITEMS',
+    'JOIN OUR VIP CLUB AND SAVE 10%',
+  ];
+
+  const [index, setIndex] = useState(0);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    timeoutRef.current = setTimeout(() => {
+      handleNext();
+    }, 5000);
+
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, [index]);
+
+  const handlePrev = () => {
+    setIndex((prev) => (prev - 1 + messages.length) % messages.length);
+  };
+
+  const handleNext = () => {
+    setIndex((prev) => (prev + 1) % messages.length);
+  };
+
+  return (
+    <div className="relative w-full max-w-[800px] overflow-hidden px-6">
+      {/* Arrows */}
+      <button
+        onClick={handlePrev}
+        className="absolute left-0 top-1/2 -translate-y-1/2 px-2 py-1 z-10 cursor-pointer"
+        aria-label="Previous"
+      >
+        <img src={left} alt="Previous" className="w-4 h-4" />
+      </button>
+
+      <div className="overflow-hidden w-full">
+        <div
+          className="flex transition-transform duration-500 ease-in-out"
+          style={{
+            width: `${messages.length * 100}%`,
+            transform: `translateX(-${index * (100 / messages.length)}%)`,
+          }}
+        >
+          {messages.map((msg, i) => (
+            <div
+              key={i}
+              className="w-full flex-shrink-0 flex justify-center items-center"
+              style={{ width: `${100 / messages.length}%` }}
+            >
+              <p className="text-[13px] text-[#4F4F4F] uppercase text-center whitespace-nowrap">
+                {msg}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <button
+        onClick={handleNext}
+        className="absolute right-0 top-1/2 -translate-y-1/2 px-2 py-1 z-10 cursor-pointer"
+        aria-label="Next"
+      >
+        <img src={right} alt="Next" className="w-4 h-4" />
+      </button>
+    </div>
+  );
+}
+
+
