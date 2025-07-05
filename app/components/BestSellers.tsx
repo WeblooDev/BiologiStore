@@ -78,7 +78,7 @@ export function BestSellers({products, title = 'Best Sellers'}: BestSellersProps
         {visibleIndex > 0 && (
           <button
             onClick={scrollBack}
-            className="absolute -left-[2%] top-[40%] -translate-y-1/2 z-10 px-3 py-2 cursor-pointer"
+            className="absolute -left-[1%] top-[40%] -translate-y-1/2 z-10 px-3 py-2 cursor-pointer"
           >
             <img src={left} alt="Scroll left" className="h-[30px]" />
           </button>
@@ -86,7 +86,7 @@ export function BestSellers({products, title = 'Best Sellers'}: BestSellersProps
         {visibleIndex < productList.length - maxVisible && (
           <button
             onClick={scrollByProduct}
-            className="absolute -right-[2%] top-[40%] -translate-y-1/2 z-10 px-3 py-2 cursor-pointer"
+            className="absolute -right-[1%] top-[40%] -translate-y-1/2 z-10 px-3 py-2 cursor-pointer"
           >
             <img src={right} alt="Scroll right" className="h-[30px]" />
           </button>
@@ -94,7 +94,7 @@ export function BestSellers({products, title = 'Best Sellers'}: BestSellersProps
 
         <div
           ref={containerRef}
-          className="flex overflow-hidden scroll-smooth gap-6 no-scrollbar px-4"
+          className="flex overflow-hidden scroll-smooth gap-6 no-scrollbar px-4 w-[85%] m-auto"
         >
           {productList.map((product) => (
           <div key={product.id} className="relative flex-shrink-0 w-full sm:w-[calc(100%/2-1rem)] lg:w-[calc(100%/3-1rem)]">
