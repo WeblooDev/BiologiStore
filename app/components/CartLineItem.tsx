@@ -26,7 +26,8 @@ export function CartLineItem({
   const {close} = useAside();
 
   return (
-    <li key={id} className="cart-line">
+    <li key={id} className="cart-line gap-2 flex">
+      <div className='bg-[#F6F6F6]'>
       {image && (
         <Image
           alt={title}
@@ -37,8 +38,9 @@ export function CartLineItem({
           width={100}
         />
       )}
+      </div>
 
-      <div>
+      <div className='flex flex-col gap-2 justify-between'>
         <Link
           prefetch="intent"
           to={lineItemUrl}
@@ -52,16 +54,8 @@ export function CartLineItem({
             <strong>{product.title}</strong>
           </p>
         </Link>
-        <ProductPrice price={line?.cost?.totalAmount} />
-        <ul>
-          {selectedOptions.map((option) => (
-            <li key={option.name}>
-              <small>
-                {option.name}: {option.value}
-              </small>
-            </li>
-          ))}
-        </ul>
+        <ProductPrice price={line?.cost?.totalAmount}  />
+       
         <CartLineQuantity line={line} />
       </div>
     </li>
@@ -80,9 +74,10 @@ function CartLineQuantity({line}: {line: CartLine}) {
   const nextQuantity = Number((quantity + 1).toFixed(0));
 
   return (
-    <div className="cart-line-quantity">
-      <small>Quantity: {quantity} &nbsp;&nbsp;</small>
+    <div className="cart-line-quantity flex gap-2">
+      <small>Quantity</small>
       <CartLineUpdateButton lines={[{id: lineId, quantity: prevQuantity}]}>
+        <div className='bg-[#F6F6F6] flex items-center justify-center h-4 w-4 rounded-full p-1 cursor-pointer'>
         <button
           aria-label="Decrease quantity"
           disabled={quantity <= 1 || !!isOptimistic}
@@ -91,9 +86,13 @@ function CartLineQuantity({line}: {line: CartLine}) {
         >
           <span>&#8722; </span>
         </button>
+        </div>
       </CartLineUpdateButton>
-      &nbsp;
+            <p>{quantity}</p>
+
       <CartLineUpdateButton lines={[{id: lineId, quantity: nextQuantity}]}>
+        <div className='bg-[#F6F6F6] flex items-center justify-center h-4 w-4 rounded-full p-1 cursor-pointer'>
+
         <button
           aria-label="Increase quantity"
           name="increase-quantity"
@@ -102,6 +101,7 @@ function CartLineQuantity({line}: {line: CartLine}) {
         >
           <span>&#43;</span>
         </button>
+        </div>
       </CartLineUpdateButton>
       &nbsp;
       <CartLineRemoveButton lineIds={[lineId]} disabled={!!isOptimistic} />

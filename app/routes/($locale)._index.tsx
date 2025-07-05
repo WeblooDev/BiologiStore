@@ -194,12 +194,18 @@ const RECOMMENDED_PRODUCTS_QUERY = `#graphql
     id
     title
     handle
+    descriptionHtml
     priceRange {
       minVariantPrice {
         amount
         currencyCode
       }
     }
+      variants(first: 1) {
+    nodes {
+      title
+    }
+  }
     featuredImage {
       id
       url

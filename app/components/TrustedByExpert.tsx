@@ -33,12 +33,12 @@ export function TrustedByExpertSection({
 
   <div className="flex gap-8">
       <button
-          className="inline-block bg-[#2B8C57] text-white px-6 py-3 ">
+          className="inline-block bg-[#2B8C57] text-white px-6 py-2 uppercase text-sm">
           {buttonText}
         </button>
 
         <button
-          className="inline-block bg-[#2B8C57] text-white px-6 py-3 ">
+          className="inline-block bg-[#2B8C57] text-white px-6 py-2 uppercase text-sm">
           {buttonText1}
         </button>
         </div>

@@ -68,7 +68,7 @@ export function ProductFilter({
   };
 
   return (
-    <div className="container flex flex-col gap-2">
+    <div className="container flex flex-col gap-2 p-4">
       <div>
         <p className="font-semibold font-gayathri !text-xl">Filter By:</p>
       </div>

@@ -159,6 +159,15 @@ const [filters, setFilters] = useState<FilterState>(getInitialFilter);
 
 }, [data.products.nodes, filters]);
 
+const BATCH_SIZE = 6;
+const [visibleCount, setVisibleCount] = useState(BATCH_SIZE);
+
+const handleLoadMore = () => {
+  setVisibleCount((prev) => Math.min(prev + BATCH_SIZE, filteredProducts.length));
+};
+
+const progress = Math.min((visibleCount / filteredProducts.length) * 100, 100);
+
 
   return (
     <>
@@ -185,16 +194,46 @@ const [filters, setFilters] = useState<FilterState>(getInitialFilter);
       />
 
 
+{/* Product Grid */}
+<div className="container products-grid grid grid-cols-2 md:grid-cols-4 gap-8 p-4">
+  {filteredProducts.slice(0, visibleCount).map((product, index) => (
+    <ProductItem
+      key={product.id}
+      product={product}
+      loading={index < BATCH_SIZE ? 'eager' : undefined}
+    />
+  ))}
+</div>
 
-        <div className="container products-grid grid grid-cols-2 md:grid-cols-4 gap-8 ">
-          {filteredProducts.map((product, index) => (
-            <ProductItem
-              key={product.id}
-              product={product}
-              loading={index < 8 ? 'eager' : undefined}
-            />
-          ))}
-        </div>
+{/* Viewed Count */}
+<p className="text-center text-sm text-gray-600 !my-6">
+  You’ve viewed <span className="font-semibold">{visibleCount}</span> of{' '}
+  <span className="font-semibold">{filteredProducts.length}</span> products
+</p>
+
+{/* Progress Bar */}
+<div className="w-[30%] m-auto h-[2px] bg-gray-200 rounded overflow-hidden mt-2 mb-6">
+  <div
+    className="h-full bg-[#2B8C57] transition-all duration-300 ease-in-out"
+    style={{width: `${progress}%`}}
+  />
+</div>
+
+
+
+
+{/* Load More Button */}
+{visibleCount < filteredProducts.length && (
+  <div className="flex justify-center mt-4">
+    <button
+      onClick={handleLoadMore}
+      className="bg-white border border-[#2B8C57] text-[#2B8C57] px-6 py-3 uppercase text-sm hover:bg-[#2B8C57] hover:text-white stransition cursor-pointer"
+    >
+      Load More
+    </button>
+  </div>
+)}
+
 
         <Suspense fallback={<div>Loading Best Sellers...</div>}>
           <Await resolve={data.recommendedProducts}>
@@ -212,42 +251,43 @@ const COLLECTION_ITEM_FRAGMENT = `#graphql
     currencyCode
   }
 
-fragment CollectionItem on Product {
-  id
-  handle
-  title
-  productType
-  tags
-  featuredImage {
+  fragment CollectionItem on Product {
     id
-    altText
-    url
-    width
-    height
-  }
-  metafield(namespace: "custom", key: "new") {
-    value
-  }
-  priceRange {
-    minVariantPrice {
-      ...MoneyCollectionItem
+    handle
+    title
+    descriptionHtml  # ✅ Add this line
+    productType
+    tags
+    featuredImage {
+      id
+      altText
+      url
+      width
+      height
     }
-    maxVariantPrice {
-      ...MoneyCollectionItem
+    metafield(namespace: "custom", key: "new") {
+      value
     }
-  }
-  variants(first: 10) {
-    nodes {
-      selectedOptions {
-        name
-        value
+    priceRange {
+      minVariantPrice {
+        ...MoneyCollectionItem
+      }
+      maxVariantPrice {
+        ...MoneyCollectionItem
+      }
+    }
+    variants(first: 10) {
+      nodes {
+        title  # ✅ Add this line to get the variant size
+        selectedOptions {
+          name
+          value
+        }
       }
     }
   }
-}
-
-
 ` as const;
+
 
 const CATALOG_QUERY = `#graphql
   query Catalog(
@@ -321,17 +361,24 @@ const PRODUCT_TYPES_WITH_SAMPLE_PRODUCTS_QUERY = `#graphql
   }
 ` as const;
 
+
 const RECOMMENDED_PRODUCTS_QUERY = `#graphql
   fragment RecommendedProduct on Product {
     id
     title
     handle
+    descriptionHtml
     priceRange {
       minVariantPrice {
         amount
         currencyCode
       }
     }
+      variants(first: 1) {
+    nodes {
+      title
+    }
+  }
     featuredImage {
       id
       url
@@ -341,15 +388,13 @@ const RECOMMENDED_PRODUCTS_QUERY = `#graphql
     }
     tags
   }
-
-  query RecommendedProducts($country: CountryCode, $language: LanguageCode)
+  query RecommendedProducts ($country: CountryCode, $language: LanguageCode)
     @inContext(country: $country, language: $language) {
-    products(first: 4, sortKey: UPDATED_AT, reverse: true) {
+    products(first: 6, sortKey: UPDATED_AT, reverse: true) {
       nodes {
         ...RecommendedProduct
       }
     }
   }
 ` as const;
-
 
