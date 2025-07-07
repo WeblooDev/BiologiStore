@@ -8,6 +8,8 @@ import cartIcon from '~/assets/images/cart.svg';
 import search from '~/assets/images/search.svg';
 import signin from '~/assets/images/signin.svg';
 import burger from '~/assets/images/burger.svg';
+import facebook from '~/assets/images/facebook.svg';
+import instagram from '~/assets/images/instagram.svg';
 
 import {
   type CartViewPayload,
@@ -434,7 +436,7 @@ function HeaderCtas({
   cart,
 }: Pick<HeaderProps, 'isLoggedIn' | 'cart'>) {
   return (
-    <nav className="header-ctas flex items-center gap-2 md:gap-6" role="navigation">
+    <nav className="header-ctas flex items-center gap-2 md:gap-8" role="navigation">
       <Suspense
         fallback={
           <a href="/account">

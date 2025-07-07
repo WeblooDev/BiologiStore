@@ -110,14 +110,14 @@ export default function Homepage() {
         <Await resolve={data.latestBlogs}>
           {(blogsData) => (
             <section className="container mx-auto px-4 py-12">
-              <div className="flex justify-between gap-4 my-6">
+              <div className="flex justify-between gap-4 my-6 items-end">
                 <h2 className="font-gayathri text-3xl font-bold !m-0">The BiologiMD® Blogs</h2>
                    <a
-  href="/blogs"
-  className="!no-underline inline-block bg-white border border-[#2B8C57] px-8 py-2 uppercase text-sm cursor-pointer transition-all duration-300 text-[#2B8C57] hover:bg-[#2B8C57] hover:!text-white hover:border-[#2B8C57]"
->
-  View All
-</a>
+                    href="/blogs"
+                    className="!no-underline inline-block bg-white border border-[#2B8C57] px-8 py-2 uppercase text-sm cursor-pointer transition-all duration-300 text-[#2B8C57] hover:bg-[#2B8C57] hover:!text-white hover:border-[#2B8C57]"
+                  >
+                    View All
+                  </a>
 
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -134,7 +134,7 @@ export default function Homepage() {
           <img
             src={article.image.url}
             alt={article.image.altText || article.title}
-            className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
+            className="w-full h-[121px] object-cover transition-transform duration-300 group-hover:scale-105 rounded-none"
           />
         )}
       </Link>
@@ -149,9 +149,9 @@ export default function Homepage() {
 
       <a
         href={`/blogs/${blog.handle}`}
-        className="!underline mt-4"
+        className="!underline mt-4 text-[14px]"
       >
-        Read More
+        Read more
       </a>
     </div>
   );

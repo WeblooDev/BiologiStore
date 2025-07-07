@@ -49,7 +49,7 @@ export function ProductItem({
         <div className="relative w-full group">
           <Link to={variantUrl} className="block w-full bg-[#F6F6F6]">
             {product.metafield?.value === 'true' && (
-              <div className="absolute top-3 left-3 h-[80px] w-[80px] border border-[#2B8C57] text-[#2B8C57] rounded-full flex items-center justify-center z-10">
+              <div className="absolute top-3 left-3 bg-white h-[80px] w-[80px] border border-[#2B8C57] text-[#2B8C57] rounded-full flex items-center justify-center z-5 text-lg">
                 NEW
               </div>
             )}
@@ -103,7 +103,7 @@ export function ProductItem({
           <div className="w-full m-auto flex items-center justify-center">
             <button
               onClick={handleAddToCart}
-              className="w-[90%] border border-[#2B8C57] uppercase bg-white px-14 py-2 text-[#2B8C57] cursor-pointer hover:text-white hover:bg-[#2B8C57] !text-sm"
+              className="w-[90%] border border-[#2B8C57] uppercase bg-white px-14 py-2 text-[#2B8C57] cursor-pointer hover:text-white hover:bg-[#2B8C57]  !text-sm"
             >
               Add to Cart
             </button>
@@ -114,7 +114,7 @@ export function ProductItem({
       {/* Quick View Modal */}
       {showQuickView && (
         <div
-          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center transition-opacity duration-300 shadow-2xl"
+          className=" fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center transition-opacity duration-300 shadow-2xl"
           onClick={() => setShowQuickView(false)}
         >
           <AnimatePresence>
@@ -123,7 +123,7 @@ export function ProductItem({
           animate={{scale: 1, opacity: 1}}
           exit={{scale: 0.8, opacity: 0}}
           transition={{duration: 0.5, ease: 'easeOut'}}
-          className="bg-white w-[80%] relative flex flex-col md:flex-row shadow-2xl"
+          className="container bg-white  relative flex flex-col md:flex-row shadow-2xl"
           onClick={(e) => e.stopPropagation()}
 >
 
@@ -186,7 +186,7 @@ className='block text-center  mt-4 !underline text-sm px-4 py-2 transition-all' 
               className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-xl font-bold cursor-pointer"
               onClick={() => setShowQuickView(false)}
             >
-<img src={close} alt="Close" className="h-[20px]" />
+            <img src={close} className="h-[20px]" />
             </button>
           </motion.div>
           </AnimatePresence>

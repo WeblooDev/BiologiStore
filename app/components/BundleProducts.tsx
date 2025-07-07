@@ -1,37 +1,69 @@
-// components/BundleProducts.tsx
+import type {Product} from '@shopify/hydrogen/storefront-api-types';
+import bundleBackground from '~/assets/images/bundleBackground.webp';
 
-import {Link} from 'react-router-dom';
+type Props = {
+  products: Product[];
+};
 
-export function BundleProducts({products}: {products: any[]}) {
-  if (!products?.length) return null;
+function chunkArray<T>(arr: T[], size: number): T[][] {
+  return Array.from({length: Math.ceil(arr.length / size)}, (_, i) =>
+    arr.slice(i * size, i * size + size),
+  );
+}
+
+export function BundleProducts({products}: Props) {
+  if (!products || products.length === 0) return null;
+
+  const productRows = chunkArray(products, 2);
 
   return (
-    <section className="my-10 px-4">
-      <h2 className="text-2xl font-bold mb-4">What’s Inside the Bundle</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {products.map((product) => (
+    <div
+      className="bundle-products py-16 bg-cover bg-center"
+      style={{ backgroundImage: `url(${bundleBackground})` }}
+    >
+        <div className='flex justify-center'>
+      <h2 className="!text-3xl font-semibold mb-4">This Bundle Includes</h2>
+    </div>
+      <div>
+        {productRows.map((row, rowIndex) => (
           <div
-            key={product.id}
-            className="border border-gray-200 p-4 rounded-lg shadow-sm bg-white"
+            key={rowIndex}
+            className={`container m-auto grid grid-cols-1 sm:grid-cols-2 gap-6 pt-6 ${
+              rowIndex > 0 ? 'border-t border-gray-400' : ''
+            }`}
           >
-            <Link to={`/products/${product.handle}`}>
-              <img
-                src={product.featuredImage?.url}
-                alt={product.featuredImage?.altText || product.title}
-                className="w-full h-48 object-cover rounded-md mb-4"
-              />
-              <h3 className="text-lg font-semibold mb-2">{product.title}</h3>
-              <p className="text-sm text-gray-700 line-clamp-3 mb-2">
-                {product.description?.slice(0, 100)}...
-              </p>
-              <p className="text-sm font-medium text-green-700">
-                From {product.priceRange?.minVariantPrice?.amount}{' '}
-                {product.priceRange?.minVariantPrice?.currencyCode}
-              </p>
-            </Link>
+            {row.map((product) => {
+              const price = product.priceRange?.minVariantPrice;
+              return (
+                <a
+                  key={product.id}
+                  href={`/products/${product.handle}`}
+                  className=" overflow-hidden transition  bg-opacity-80"
+                >
+                    <div className='flex items-center py-6'>
+                  {product.featuredImage && (
+                    <div className='bg-[#F6F6F6] p-4'>
+                    <img
+                      src={product.featuredImage.url}
+                      alt={product.featuredImage.altText || product.title}
+                      className="w-full h-56 object-cover"
+                    />
+                    </div>
+                  )}
+                  <div className="p-4 w-[70%]">
+                    <h3 className="font-gayathri text-lg font-medium text-gray-800">{product.title}</h3>
+                    <p className="text-sm line-clamp-2 mt-1">
+                      {product.description}
+                    </p>
+                   
+                  </div>
+                  </div>
+                </a>
+              );
+            })}
           </div>
         ))}
       </div>
-    </section>
+    </div>
   );
 }

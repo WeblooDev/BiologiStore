@@ -78,7 +78,7 @@ export function BestSellers({products, title = 'Best Sellers'}: BestSellersProps
         {visibleIndex > 0 && (
           <button
             onClick={scrollBack}
-            className="absolute -left-[1%] top-[40%] -translate-y-1/2 z-10 px-3 py-2 cursor-pointer"
+            className="absolute -left-0 top-[40%] -translate-y-1/2 z-10 px-3 py-2 cursor-pointer"
           >
             <img src={left} alt="Scroll left" className="h-[30px]" />
           </button>
@@ -86,7 +86,7 @@ export function BestSellers({products, title = 'Best Sellers'}: BestSellersProps
         {visibleIndex < productList.length - maxVisible && (
           <button
             onClick={scrollByProduct}
-            className="absolute -right-[1%] top-[40%] -translate-y-1/2 z-10 px-3 py-2 cursor-pointer"
+            className="absolute -right-0 top-[40%] -translate-y-1/2 z-10 px-3 py-2 cursor-pointer"
           >
             <img src={right} alt="Scroll right" className="h-[30px]" />
           </button>
@@ -125,11 +125,13 @@ export function BestSellers({products, title = 'Best Sellers'}: BestSellersProps
 
                 <div className="w-full m-auto flex items-center justify-center">
                  <button
-  className="w-[90%] border border-[#2B8C57] uppercase bg-white px-12 py-2 text-[#2B8C57] cursor-pointer hover:text-white hover:bg-[#2B8C57] !text-sm"
-  onClick={() => addToCart(product)}
->
-  Add to Bag
-</button>
+                className="w-[90%] border border-[#2B8C57] uppercase
+                bg-white px-12 py-2 text-[#2B8C57] cursor-pointer hover:text-white
+                hover:bg-[#2B8C57] !text-xs md:!text-sm"
+                onClick={() => addToCart(product)}
+              >
+                Add to Bag
+              </button>
 
                 </div>
               </div>
@@ -141,7 +143,7 @@ export function BestSellers({products, title = 'Best Sellers'}: BestSellersProps
       {/* Overlay */}
       {selectedProduct && (
         <div
-          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center transition-opacity duration-300 shadow-2xl"
+          className=" fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center transition-opacity duration-300 shadow-2xl"
           onClick={() => setSelectedProduct(null)}
         >
           <motion.div
@@ -149,7 +151,7 @@ export function BestSellers({products, title = 'Best Sellers'}: BestSellersProps
             animate={{scale: 1, opacity: 1}}
             exit={{scale: 0.8, opacity: 0}}
             transition={{duration: 0.5, ease: 'easeOut'}}
-            className="bg-white w-[80%] relative flex shadow-2xl"
+            className=" container bg-white relative flex shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <button

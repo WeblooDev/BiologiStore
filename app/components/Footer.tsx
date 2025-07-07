@@ -3,6 +3,7 @@ import {Await, NavLink} from 'react-router';
 import type {FooterQuery, HeaderQuery} from 'storefrontapi.generated';
 import facebook from '~/assets/images/facebook.svg';
 import instagram from '~/assets/images/instagram.svg';
+import arrowup from '~/assets/images/arrowup.svg';
 
 interface FooterProps {
   footer: Promise<FooterQuery | null>;
@@ -21,6 +22,7 @@ export function Footer({
         {(footer) => (
           <footer className=" mt-16">
            
+          
 
             {/* Middle Section */}
             <div className="  py-12 px-6 bg-[#F6F6F6]  justify-between items-start  gap-8 border-b border-gray-300">

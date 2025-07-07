@@ -23,6 +23,7 @@ import { Suspense } from 'react';
 import bullet from '~/assets/images/bulle.svg';
 import {BundleProducts} from '~/components/BundleProducts';
 
+
 export const meta: MetaFunction<typeof loader> = ({data}) => {
   return [
     {title: `Hydrogen | ${data?.product.title ?? ''}`},
@@ -83,8 +84,10 @@ function loadDeferredData({ context }: LoaderFunctionArgs) {
 
 
 export default function Product() {
-const { product, bestSellers } = useLoaderData<typeof loader>();
-  
+  const { product, bestSellers } = useLoaderData<typeof loader>();
+
+
+
   const selectedVariant = useOptimisticVariant(
     product.selectedOrFirstAvailableVariant,
     getAdjacentAndFirstAvailableVariants(product),
@@ -98,6 +101,10 @@ const { product, bestSellers } = useLoaderData<typeof loader>();
 
   const { title, tags, descriptionHtml } = product;
   const siblings = product?.siblings?.referenceList?.nodes || [];
+
+
+const bundleProducts = product?.bundleProducts?.references?.nodes || [];
+console.log('🧾 Full bundleProducts metafield:', product?.bundleProducts);
 
   return (
     <>
@@ -172,7 +179,7 @@ const { product, bestSellers } = useLoaderData<typeof loader>();
   />
 </div>
 
-
+<BundleProducts products={bundleProducts} />
 
 
       <ProductBenefits
@@ -303,7 +310,7 @@ const PRODUCT_FRAGMENT = `#graphql
       }
     }
 
-    bundleProducts: metafield(namespace: "custom", key: "bundle_products") {
+ bundleProducts: metafield(namespace: "custom", key: "bundle_products") {
   references(first: 10) {
     nodes {
       ... on Product {
@@ -327,6 +334,7 @@ const PRODUCT_FRAGMENT = `#graphql
     }
   }
 }
+
 
       imgBackground: metafield(namespace: "custom", key: "imgBackground") {
   reference {
