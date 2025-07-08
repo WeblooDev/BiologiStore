@@ -1,5 +1,6 @@
 import type {Product} from '@shopify/hydrogen/storefront-api-types';
 import bundleBackground from '~/assets/images/bundleBackground.webp';
+import bullet from '~/assets/images/bulle.svg';
 
 type Props = {
   products: Product[];
@@ -38,7 +39,7 @@ export function BundleProducts({products}: Props) {
                 <a
                   key={product.id}
                   href={`/products/${product.handle}`}
-                  className=" overflow-hidden transition  bg-opacity-80"
+                  className=" overflow-hidden transition  bg-opacity-80 !no-underline"
                 >
                     <div className='flex items-center py-6'>
                   {product.featuredImage && (
@@ -50,13 +51,27 @@ export function BundleProducts({products}: Props) {
                     />
                     </div>
                   )}
-                  <div className="p-4 w-[70%]">
-                    <h3 className="font-gayathri text-lg font-medium text-gray-800">{product.title}</h3>
-                    <p className="text-sm line-clamp-2 mt-1">
-                      {product.description}
-                    </p>
-                   
-                  </div>
+                <div className="p-4 w-[70%] flex flex-col items-start gap-4">
+                  <h3 className="font-gayathri text-base font-medium underline text-gray-800">{product.title}</h3>
+                  <p className="text-xs w-[90%] mt-1">
+                    {product.description}
+                  </p>
+
+                  {/* Display tags if any */}
+                  {product.tags?.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {product.tags.map((tag: string, index: number) => (
+                        <div key={tag} className="flex items-center gap-1">
+                          <span className="text-sm text-[#4F4F4F] ">{tag}</span>
+                          {index < product.tags.length - 1 && (
+                            <img src={bullet} alt="" className="w-[6px] h-[6px]" />
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
                   </div>
                 </a>
               );

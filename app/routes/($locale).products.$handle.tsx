@@ -318,6 +318,7 @@ const PRODUCT_FRAGMENT = `#graphql
         title
         handle
         description
+        tags
         featuredImage {
           url
           altText
