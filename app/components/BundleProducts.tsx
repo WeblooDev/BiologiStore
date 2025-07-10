@@ -18,6 +18,7 @@ export function BundleProducts({products}: Props) {
 
   const productRows = chunkArray(products, 2);
 
+  
   return (
     <div
       className="bundle-products py-16 bg-cover bg-center"
