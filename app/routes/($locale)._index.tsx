@@ -110,7 +110,7 @@ export default function Homepage() {
         <Await resolve={data.latestBlogs}>
           {(blogsData) => (
             <section className="container mx-auto px-4 py-12">
-              <div className="flex justify-between gap-4 my-6 items-end">
+              <div className="flex justify-between gap-4 my-6 items-end px-4 ">
                 <h2 className="font-gayathri text-3xl font-bold !m-0">The BiologiMD® Blogs</h2>
                    <a
                     href="/blogs"
@@ -120,7 +120,7 @@ export default function Homepage() {
                   </a>
 
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 px-4 ">
                {blogsData?.blogs?.nodes.map((blog) => {
   const article = blog.articles?.nodes?.[0];
   return (
