@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import {useState} from 'react';
 
 export type FilterState = {
   category: string;
@@ -29,7 +29,7 @@ export function ProductFilter({
   categoryCounts,
 }: ProductFilterProps) {
   const handleChange = (field: keyof FilterState, value: string) => {
-    const updated = { ...filters, [field]: value };
+    const updated = {...filters, [field]: value};
     onFilterChange(updated);
     updateUrlParams(updated);
   };
@@ -70,7 +70,7 @@ export function ProductFilter({
   return (
     <div className="container flex flex-col gap-2 p-4">
       <div>
-        <p className="font-semibold font-gayathri !text-xl">Filter By:</p>
+        <p className="font-semibold font-poppins !text-xl">Filter By:</p>
       </div>
       <div className="flex justify-between gap-4 mb-6">
         {/* Category & Skin Type */}
@@ -100,7 +100,10 @@ export function ProductFilter({
             {skinTypes.map((type) => {
               const count = skinTypeCounts[type] || 0;
               return (
-                <option key={type} value={type.toLowerCase().replace(/\s+/g, '_')}>
+                <option
+                  key={type}
+                  value={type.toLowerCase().replace(/\s+/g, '_')}
+                >
                   {type} ({count})
                 </option>
               );

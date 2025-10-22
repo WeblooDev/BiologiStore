@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import {useState} from 'react';
 import right from '~/assets/images/right-arrow.svg';
 import left from '~/assets/images/left-arrow.svg';
 import check from '~/assets/images/check.svg';
@@ -26,7 +26,7 @@ export function ProductBenefits({
   try {
     benefits = JSON.parse(json);
   } catch (e) {
-    console.error("Invalid Benefits JSON", e);
+    console.error('Invalid Benefits JSON', e);
     return null;
   }
 
@@ -50,7 +50,10 @@ export function ProductBenefits({
           <div className="relative bg-[#F6F6F6] w-full h-[544px] overflow-hidden rounded">
             <div
               className="flex transition-transform duration-500 ease-in-out !w-full"
-              style={{ transform: `translateX(-${imageIndex * 100}%)`, width: `${images.length * 100}%` }}
+              style={{
+                transform: `translateX(-${imageIndex * 100}%)`,
+                width: `${images.length * 100}%`,
+              }}
             >
               {images.map((img, idx) => (
                 <img
@@ -63,25 +66,24 @@ export function ProductBenefits({
             </div>
 
             {/* Arrows */}
-           {/* Arrows */}
-{imageIndex > 0 && (
-  <button
-    onClick={handlePrev}
-    className="absolute top-1/2 left-6 transform -translate-y-1/2 z-10 cursor-pointer "
-  >
-    <img src={left} alt="Previous" className="w-6 h-6" />
-  </button>
-)}
+            {/* Arrows */}
+            {imageIndex > 0 && (
+              <button
+                onClick={handlePrev}
+                className="absolute top-1/2 left-6 transform -translate-y-1/2 z-10 cursor-pointer "
+              >
+                <img src={left} alt="Previous" className="w-6 h-6" />
+              </button>
+            )}
 
-{imageIndex < images.length - 1 && (
-  <button
-    onClick={handleNext}
-    className="absolute top-1/2 right-6 transform -translate-y-1/2 z-10 cursor-pointer 0"
-  >
-    <img src={right} alt="Next" className="w-6 h-6" />
-  </button>
-)}
-
+            {imageIndex < images.length - 1 && (
+              <button
+                onClick={handleNext}
+                className="absolute top-1/2 right-6 transform -translate-y-1/2 z-10 cursor-pointer 0"
+              >
+                <img src={right} alt="Next" className="w-6 h-6" />
+              </button>
+            )}
           </div>
 
           {/* Thumbnails */}
@@ -92,7 +94,9 @@ export function ProductBenefits({
                 src={img.url}
                 alt={img.altText || `Thumbnail ${i + 1}`}
                 className={`w-20 h-20 object-cover !rounded-none cursor-pointer border ${
-                  i === imageIndex ? 'border-2 border-[#2B8C57]' : 'border-transparent'
+                  i === imageIndex
+                    ? 'border-2 border-[#2B8C57]'
+                    : 'border-transparent'
                 }`}
                 onClick={() => setImageIndex(i)}
               />

@@ -66,21 +66,21 @@ export default function Homepage() {
 
   return (
     <div className="home">
-       <HeroSection
-        images={[
-          { url: heroImage, altText: 'Holiday Hero 1' },
-          { url: homepage, altText: 'Holiday Hero 2' },
-        ]}
-        title="Holiday Gift Guide"
-        text="Unwrap the Gift of Luxury Skincare."
-        buttonText="SHOP GIFTS"
+      <HeroSection
+        image={{url: heroImage, altText: 'Holiday Hero'}}
+        title="Gentle Cleanser "
+        text="This Gentle Foaming Cleanser Washes Away Impurities and Leaves the Skin Feeling Smooth and Refreshed"
+        buttonText="ADD TO BAG"
         buttonLink="/collections"
       />
+
       <AllCollections collections={data.allCollections} />
 
       <Suspense fallback={<div>Loading Best Sellers...</div>}>
         <Await resolve={data.recommendedProducts}>
-          {(response) => <BestSellers title="Best Sellers" products={response} />}
+          {(response) => (
+            <BestSellers title="Best Sellers" products={response} />
+          )}
         </Await>
       </Suspense>
 
@@ -93,8 +93,6 @@ export default function Homepage() {
         </Await>
       </Suspense>
 
-     
-
       <DiscoverRegimenSection
         image={{
           url: discoverImage,
@@ -106,57 +104,63 @@ export default function Homepage() {
         buttonLink="/collections"
       />
 
-       <Suspense fallback={<div>Loading Blogs...</div>}>
+      <Suspense fallback={<div>Loading Blogs...</div>}>
         <Await resolve={data.latestBlogs}>
           {(blogsData) => (
             <section className="container mx-auto px-4 py-12">
               <div className="flex justify-between gap-4 my-6 items-end px-4 ">
-                <h2 className="font-gayathri text-3xl font-bold !m-0">The BiologiMD® Blogs</h2>
-                   <a
-                    href="/blogs"
-                    className="!no-underline inline-block bg-white border border-[#2B8C57] px-8 py-2 uppercase text-sm cursor-pointer transition-all duration-300 text-[#2B8C57] hover:bg-[#2B8C57] hover:!text-white hover:border-[#2B8C57]"
-                  >
-                    View All
-                  </a>
-
+                <h2 className="font-poppins text-3xl font-bold !m-0">
+                  The BiologiMD® Blogs
+                </h2>
+                <a
+                  href="/blogs"
+                  className="!no-underline inline-block bg-white border border-[#2B8C57] px-8 py-2 uppercase text-sm cursor-pointer transition-all duration-300 text-[#2B8C57] hover:bg-[#2B8C57] hover:!text-white hover:border-[#2B8C57]"
+                >
+                  View All
+                </a>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 px-4 ">
-               {blogsData?.blogs?.nodes.map((blog) => {
-  const article = blog.articles?.nodes?.[0];
-  return (
-    <div key={blog.handle} className="blog-card flex flex-col gap-2 justify-between">
-      <Link
-        to={`/blogs/${blog.handle}`}
-        prefetch="intent"
-        className="group overflow-hidden "
-      >
-        {article?.image?.url && (
-          <img
-            src={article.image.url}
-            alt={article.image.altText || article.title}
-            className="w-full h-[121px] object-cover transition-transform duration-300 group-hover:scale-105 rounded-none"
-          />
-        )}
-      </Link>
+                {blogsData?.blogs?.nodes.map((blog) => {
+                  const article = blog.articles?.nodes?.[0];
+                  return (
+                    <div
+                      key={blog.handle}
+                      className="blog-card flex flex-col gap-2 justify-between"
+                    >
+                      <Link
+                        to={`/blogs/${blog.handle}`}
+                        prefetch="intent"
+                        className="group overflow-hidden "
+                      >
+                        {article?.image?.url && (
+                          <img
+                            src={article.image.url}
+                            alt={article.image.altText || article.title}
+                            className="w-full h-[121px] object-cover transition-transform duration-300 group-hover:scale-105 rounded-none"
+                          />
+                        )}
+                      </Link>
 
-<Link
-        to={`/blogs/${blog.handle}`}>
-        <h3 className="font-gayathri text-base !font-bold mt-6">{article?.title}</h3>
-  </Link>
-      {article?.excerpt && (
-        <p className="!text-[14px] line-clamp-3">{article.excerpt}</p>
-      )}
+                      <Link to={`/blogs/${blog.handle}`}>
+                        <h3 className="font-poppins text-base !font-bold mt-6">
+                          {article?.title}
+                        </h3>
+                      </Link>
+                      {article?.excerpt && (
+                        <p className="!text-[14px] line-clamp-3">
+                          {article.excerpt}
+                        </p>
+                      )}
 
-      <a
-        href={`/blogs/${blog.handle}`}
-        className="!underline mt-4 text-[14px]"
-      >
-        Read more
-      </a>
-    </div>
-  );
-})}
-
+                      <a
+                        href={`/blogs/${blog.handle}`}
+                        className="!underline mt-4 text-[14px]"
+                      >
+                        Read more
+                      </a>
+                    </div>
+                  );
+                })}
               </div>
             </section>
           )}

@@ -1,7 +1,7 @@
-import { type LoaderFunctionArgs } from '@shopify/remix-oxygen';
-import { type MetaFunction } from 'react-router';
-import { HeroAboutSection } from '~/components/HeroAboutSection';
-import { ImageTextSection } from '~/components/ImageTextSection'; // ✅ Import the component
+import {type LoaderFunctionArgs} from '@shopify/remix-oxygen';
+import {type MetaFunction} from 'react-router';
+import {HeroAboutSection} from '~/components/HeroAboutSection';
+import {ImageTextSection} from '~/components/ImageTextSection'; // ✅ Import the component
 import heroaboutImage from '~/assets/images/heroabout.png';
 import about1 from '~/assets/images/about1.webp';
 import about2 from '~/assets/images/abou2.webp';
@@ -9,14 +9,13 @@ import about3 from '~/assets/images/about3.webp';
 import about4 from '~/assets/images/about4.webp';
 import trustedbyexpert from '~/assets/images/trustedbyexpert.webp';
 
-import { TrustedByExpertSection } from '~/components/TrustedByExpert';
-
+import {TrustedByExpertSection} from '~/components/TrustedByExpert';
 
 export const meta: MetaFunction = () => {
-  return [{ title: 'About Us | Hydrogen' }];
+  return [{title: 'About Us | Hydrogen'}];
 };
 
-export async function loader({ context }: LoaderFunctionArgs) {
+export async function loader({context}: LoaderFunctionArgs) {
   return {};
 }
 
@@ -54,8 +53,7 @@ export default function AboutPage() {
         buttonLink="/our-story"
       />
 
-
-       <ImageTextSection
+      <ImageTextSection
         image={{
           url: about2,
           altText: 'Founders working',
@@ -73,7 +71,6 @@ export default function AboutPage() {
           },
         ]}
         reverse={true}
-      
       />
 
       <ImageTextSection
@@ -94,12 +91,11 @@ export default function AboutPage() {
           },
         ]}
         reverse={false}
-         buttonText="Visit Our Clinic"
+        buttonText="Visit Our Clinic"
         buttonLink="/our-story"
-      
       />
 
-       <ImageTextSection
+      <ImageTextSection
         image={{
           url: about4,
           altText: 'Founders working',
@@ -121,7 +117,7 @@ export default function AboutPage() {
         buttonLink="/our-story"
       />
 
-    <TrustedByExpertSection
+      <TrustedByExpertSection
         image={{
           url: trustedbyexpert,
           altText: 'Trusted by Experts. Chosen by You.',
@@ -131,7 +127,6 @@ export default function AboutPage() {
         buttonText="Shop Now"
         buttonText1="Learn More"
       />
-
     </div>
   );
 }

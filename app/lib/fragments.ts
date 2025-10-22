@@ -192,7 +192,6 @@ const MENU_FRAGMENT = `#graphql
   }
 ` as const;
 
-
 export const HEADER_QUERY = `#graphql
   fragment Shop on Shop {
     id

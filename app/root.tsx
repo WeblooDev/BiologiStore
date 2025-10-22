@@ -103,17 +103,16 @@ export async function loader(args: LoaderFunctionArgs) {
 async function loadCriticalData({context}: LoaderFunctionArgs) {
   const {storefront} = context;
 
- const [header] = await Promise.all([
-  storefront.query(HEADER_QUERY, {
-    cache: storefront.CacheLong(),
-    variables: {
-      headerMenuHandle: 'header-shop', // ✅ matches your actual menu handle
-      country: storefront.i18n.country,
-      language: storefront.i18n.language,
-    },
-  }),
-]);
-
+  const [header] = await Promise.all([
+    storefront.query(HEADER_QUERY, {
+      cache: storefront.CacheLong(),
+      variables: {
+        headerMenuHandle: 'header-shop', // ✅ matches your actual menu handle
+        country: storefront.i18n.country,
+        language: storefront.i18n.language,
+      },
+    }),
+  ]);
 
   return {header};
 }
@@ -161,25 +160,24 @@ export function Layout({children}: {children?: React.ReactNode}) {
         <Meta />
         <Links />
       </head>
-     <body>
-  {data ? (
-    <Analytics.Provider
-      cart={data.cart}
-      shop={data.shop}
-      consent={data.consent}
-    >
-      <PageLayout {...data}>{children}</PageLayout>
-    </Analytics.Provider>
-  ) : (
-    children
-  )}
+      <body>
+        {data ? (
+          <Analytics.Provider
+            cart={data.cart}
+            shop={data.shop}
+            consent={data.consent}
+          >
+            <PageLayout {...data}>{children}</PageLayout>
+          </Analytics.Provider>
+        ) : (
+          children
+        )}
 
-  <ScrollToTopButton />
+        <ScrollToTopButton />
 
-  <ScrollRestoration nonce={nonce} />
-  <Scripts nonce={nonce} />
-</body>
-
+        <ScrollRestoration nonce={nonce} />
+        <Scripts nonce={nonce} />
+      </body>
     </html>
   );
 }

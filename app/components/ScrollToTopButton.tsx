@@ -26,7 +26,7 @@ export function ScrollToTopButton() {
       className={`fixed bottom-24 right-12 z-10 bg-[#2B8C57] hover:bg-[black] p-3 cursor-pointer transition-all duration-500 ease-out 
         ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'}`}
       aria-label="Scroll to top"
-      style={{ transform: 'translateZ(0)' }} // GPU acceleration
+      style={{transform: 'translateZ(0)'}} // GPU acceleration
     >
       <img
         src={arrowup}

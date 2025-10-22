@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import {useEffect, useRef, useState} from 'react';
 import slider from '~/assets/images/slider.svg';
 
 interface ExpectationBlock {
@@ -18,14 +18,17 @@ interface ProductExpectationProps {
   }[];
 }
 
-export function ProductExpectation({ json, beforeAfter, expectImage }: ProductExpectationProps) {
-
+export function ProductExpectation({
+  json,
+  beforeAfter,
+  expectImage,
+}: ProductExpectationProps) {
   let expectations: ExpectationBlock[] = [];
 
   try {
     expectations = JSON.parse(json);
   } catch (e) {
-    console.error("Invalid expectations JSON", e);
+    console.error('Invalid expectations JSON', e);
     return null;
   }
 
@@ -39,52 +42,46 @@ export function ProductExpectation({ json, beforeAfter, expectImage }: ProductEx
         )}
 
         <div className="flex flex-col gap-5 justify-between">
-                  <h2 className="text-2xl font-semibold mb-6">What to Expect</h2>
+          <h2 className="text-2xl font-semibold mb-6">What to Expect</h2>
 
           {expectations.map((item, index) => (
             <div key={index} className="flex flex-col gap-1 ">
               <h3 className="font-semibold text-black">{item.title}</h3>
-              <p >{item.description}</p>
+              <p>{item.description}</p>
             </div>
           ))}
           <div>
-  {expectImage?.length > 0 && (
-  
-    <div className="flex flex-col gap-2">
-          <p className="!text-base font-semibold !m-0">PRODUCT REGIMEN</p>
-          <div className="flex gap-6">
-      {expectImage.map((product, index) => (
-        <div key={index} className="flex flex-col">
-          
-          {product.featuredImage?.url && (
-            <div className="bg-white">
-            <img
-              src={product.featuredImage.url}
-              alt={product.featuredImage.altText || product.title}
-              className="w-[100px] h-[130px] object-cover"
-            />
-            </div>
-            
-          )}
-                      <h4 className="font-gayathri mt-2 !text-base text-[#2B8C57]">{product.title}</h4>
-
-          
+            {expectImage?.length > 0 && (
+              <div className="flex flex-col gap-2">
+                <p className="!text-base font-semibold !m-0">PRODUCT REGIMEN</p>
+                <div className="flex gap-6">
+                  {expectImage.map((product, index) => (
+                    <div key={index} className="flex flex-col">
+                      {product.featuredImage?.url && (
+                        <div className="bg-white">
+                          <img
+                            src={product.featuredImage.url}
+                            alt={product.featuredImage.altText || product.title}
+                            className="w-[100px] h-[130px] object-cover"
+                          />
+                        </div>
+                      )}
+                      <h4 className="font-poppins mt-2 !text-base text-[#2B8C57]">
+                        {product.title}
+                      </h4>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
-      ))}
-      </div>
-    </div>
-  )}
-</div>
-
-        </div>
-        
-       
       </div>
     </section>
   );
 }
 
-function BeforeAfterSlider({ before, after }: { before: string; after: string }) {
+function BeforeAfterSlider({before, after}: {before: string; after: string}) {
   const sliderRef = useRef<HTMLInputElement>(null);
   const imgAfterRef = useRef<HTMLDivElement>(null);
   const lineRef = useRef<HTMLDivElement>(null);
@@ -103,17 +100,17 @@ function BeforeAfterSlider({ before, after }: { before: string; after: string })
     };
 
     const handleDoubleClick = () => {
-      slider.value = "50";
-      line.style.left = "50%";
-      imgAfter.style.clipPath = "inset(0px 0px 0px 50%)";
+      slider.value = '50';
+      line.style.left = '50%';
+      imgAfter.style.clipPath = 'inset(0px 0px 0px 50%)';
     };
 
-    slider.addEventListener("input", handleInput);
-    slider.addEventListener("dblclick", handleDoubleClick);
+    slider.addEventListener('input', handleInput);
+    slider.addEventListener('dblclick', handleDoubleClick);
 
     return () => {
-      slider.removeEventListener("input", handleInput);
-      slider.removeEventListener("dblclick", handleDoubleClick);
+      slider.removeEventListener('input', handleInput);
+      slider.removeEventListener('dblclick', handleDoubleClick);
     };
   }, []);
 
@@ -123,9 +120,12 @@ function BeforeAfterSlider({ before, after }: { before: string; after: string })
       aria-label="Before and after image slider"
       className="relative flex w-[clamp(20rem,75vw,40rem)] max-h-[95vh] aspect-[3/3]"
     >
-
-        <p className="font-gayathri absolute bottom-[-2rem] left-[20%] text-sm">Baseline</p>
-        <p className="font-gayathri absolute bottom-[-2rem] right-[20%] text-sm">Week 4</p>
+      <p className="font-poppins absolute bottom-[-2rem] left-[20%] text-sm">
+        Baseline
+      </p>
+      <p className="font-poppins absolute bottom-[-2rem] right-[20%] text-sm">
+        Week 4
+      </p>
 
       <div className="img-wrapper absolute w-full h-full overflow-hidden">
         <img src={before} alt="Before" className="w-full h-full object-cover" />
@@ -133,7 +133,7 @@ function BeforeAfterSlider({ before, after }: { before: string; after: string })
       <div
         ref={imgAfterRef}
         className="img-wrapper absolute w-full h-full overflow-hidden"
-        style={{ clipPath: "inset(0px 0px 0px 50%)" }}
+        style={{clipPath: 'inset(0px 0px 0px 50%)'}}
       >
         <img src={after} alt="After" className="w-full h-full object-cover" />
       </div>
@@ -141,7 +141,7 @@ function BeforeAfterSlider({ before, after }: { before: string; after: string })
         ref={lineRef}
         id="line"
         className="absolute h-full w-[0.2rem] bg-[#FAFAFA]"
-        style={{ left: "50%", transform: "translateX(-50%)" }}
+        style={{left: '50%', transform: 'translateX(-50%)'}}
       ></div>
       <input
         ref={sliderRef}
@@ -150,7 +150,7 @@ function BeforeAfterSlider({ before, after }: { before: string; after: string })
         max="100"
         defaultValue="50"
         className="absolute left-[-1.125rem] w-[calc(100%+2.25rem)] h-full bg-transparent appearance-none"
-        style={{ writingMode: "bt-lr" }}
+        style={{writingMode: 'bt-lr'}}
       />
       <style jsx>{`
         input::-webkit-slider-thumb {
@@ -162,7 +162,7 @@ function BeforeAfterSlider({ before, after }: { before: string; after: string })
           border-radius: 50%;
           background-color: #fff;
           box-shadow: 0px 0px 8px 2px rgba(0, 0, 0, 0.1);
-    background-image: url(${slider});
+          background-image: url(${slider});
           background-size: cover;
           cursor: grab;
         }

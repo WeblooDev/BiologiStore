@@ -4,8 +4,7 @@ import {Image, Money, getPaginationVariables} from '@shopify/hydrogen';
 import type {ArticleItemFragment} from 'storefrontapi.generated';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
-import { HeroBlogSection } from '~/components/HeroBlog';
-
+import {HeroBlogSection} from '~/components/HeroBlog';
 
 export const meta: MetaFunction<typeof loader> = ({data}) => {
   return [{title: `Hydrogen | ${data?.blog.title ?? ''} blog`}];
@@ -58,10 +57,10 @@ export default function Blog() {
 
   return (
     <div className="blog">
-      
-      
       <div className="flex items-center gap-4 p-6">
-        <a className="!underline text-[#4F4F4F]" href="/blogs">Blogs</a>
+        <a className="!underline text-[#4F4F4F]" href="/blogs">
+          Blogs
+        </a>
         <span>/</span>
         <p className="text-[#4F4F4F]">{blog.title}</p>
       </div>
@@ -112,7 +111,9 @@ function ArticleItem({
           {article.tags?.length > 0 && (
             <div>
               {article.tags.slice(0, 3).map((tag) => (
-                <p className="!underline !text-base" key={tag}>{tag}</p>
+                <p className="!underline !text-base" key={tag}>
+                  {tag}
+                </p>
               ))}
             </div>
           )}
@@ -122,7 +123,7 @@ function ArticleItem({
       </Link>
 
       <h1 className="!text-4xl !m-0">{article.title}</h1>
-          <p className='font-semibold !mt-2 !mb-10'>By BiologiMd® Skin Health</p>
+      <p className="font-semibold !mt-2 !mb-10">By BiologiMd® Skin Health</p>
 
       <div
         className="mt-4 "
@@ -132,12 +133,15 @@ function ArticleItem({
       {/* Linked Products via shopPosts metafield */}
       {article.shopPosts?.referenceList?.nodes?.length > 0 && (
         <div className="mt-16">
-          <div className='flex justify-center '>
-          <h2 className="text-2xl font-semibold mb-4">Shop The Post</h2>
+          <div className="flex justify-center ">
+            <h2 className="text-2xl font-semibold mb-4">Shop The Post</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {article.shopPosts.referenceList.nodes.map((product) => (
-              <div key={product.id} className="flex flex-col gap-4 justify-between items-center">
+              <div
+                key={product.id}
+                className="flex flex-col gap-4 justify-between items-center"
+              >
                 <Link to={`/products/${product.handle}`}>
                   {product.featuredImage && (
                     <Image
@@ -146,16 +150,15 @@ function ArticleItem({
                       className="mb-3 h-[270px] object-cover w-full"
                     />
                   )}
-                 <h3 className="text-[#2B8C57] font-semibold mb-2 text-center">{product.title}</h3>
-
+                  <h3 className="text-[#2B8C57] font-semibold mb-2 text-center">
+                    {product.title}
+                  </h3>
                 </Link>
 
                 {product.tags?.length > 0 && (
                   <div className="flex flex-wrap gap-2 text-sm">
                     {product.tags.slice(0, 3).map((tag) => (
-                      <span key={tag} >
-                        {tag}
-                      </span>
+                      <span key={tag}>{tag}</span>
                     ))}
                   </div>
                 )}

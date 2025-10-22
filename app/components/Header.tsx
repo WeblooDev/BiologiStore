@@ -20,8 +20,6 @@ import {useLocation} from 'react-router';
 import right from '~/assets/images/right-arrow.svg';
 import left from '~/assets/images/left-arrow.svg';
 
-
-
 interface HeaderProps {
   header: HeaderQuery;
   cart: Promise<CartApiQueryFragment | null>;
@@ -30,11 +28,13 @@ interface HeaderProps {
 
 type Viewport = 'desktop';
 
-
 function sanitizeUrl(url: string): string {
   if (url?.startsWith('/')) return url;
 
-  const domainsToStrip = ['https://shop.biologimd.com', 'https://checkout.biologimd.com'];
+  const domainsToStrip = [
+    'https://shop.biologimd.com',
+    'https://checkout.biologimd.com',
+  ];
   for (const domain of domainsToStrip) {
     if (url?.startsWith(domain)) {
       return url.replace(domain, '');
@@ -44,9 +44,8 @@ function sanitizeUrl(url: string): string {
   return url;
 }
 
-
 export function Header({header, isLoggedIn, cart}: HeaderProps) {
-    const { open } = useAside(); // ✅ ADD THIS LINE
+  const {open} = useAside(); // ✅ ADD THIS LINE
 
   const {shop, menu} = header;
   const location = useLocation();
@@ -54,33 +53,33 @@ export function Header({header, isLoggedIn, cart}: HeaderProps) {
   // Check if the path starts with /products/
   const isProductPage = location.pathname.startsWith('/products/');
 
-   return (
-
-    
+  return (
     <div
       className={` w-full absolute top-0 z-10 transition-all duration-300 ${
         isProductPage ? 'bg-transparent hover:bg-white' : 'bg-white'
       }`}
     >
-
-      <div className='border-b border-b-[#BDBDBD] flex justify-center p-2 w-full'>
-  <PromoCarousel />
-
+      <div className="border-b border-b-[#BDBDBD] flex justify-center p-2 w-full">
+        <PromoCarousel />
       </div>
       {/* Top Logo Section */}
-        <header className="container m-auto w-full flex justify-between items-center p-4 md:p-6">
+      <header className="container m-auto w-full flex justify-between items-center p-4 md:p-6">
         <div className="w-[10%] opacity-100 md:opacity-0 md:pointer-events-none transition-opacity duration-300">
-      <button onClick={() => open('mobile')} aria-label="Open menu">
-        <img
-          src={burger}
-          alt="Open menu"
-          className="w-7 h-7 object-contain cursor-pointer"
-        /> 
-      </button>
-    </div>
+          <button onClick={() => open('mobile')} aria-label="Open menu">
+            <img
+              src={burger}
+              alt="Open menu"
+              className="w-7 h-7 object-contain cursor-pointer"
+            />
+          </button>
+        </div>
 
         <a href="/" className="block">
-          <img src={logoBiologi} alt="BiologiMD" className=" h-10 w-[200px] md:w-auto" />
+          <img
+            src={logoBiologi}
+            alt="BiologiMD"
+            className=" h-10 w-[200px] md:w-auto"
+          />
         </a>
 
         <HeaderCtas isLoggedIn={isLoggedIn} cart={cart} />
@@ -113,24 +112,23 @@ export function HeaderMenu({
 }) {
   const {close} = useAside();
 
-if (viewport === 'mobile') {
-  return (
-    <nav className="flex flex-col w-full">
-      {menu.items.map((item) => (
-        <MobileMenuItem key={item.id} item={item} />
-      ))}
+  if (viewport === 'mobile') {
+    return (
+      <nav className="flex flex-col w-full">
+        {menu.items.map((item) => (
+          <MobileMenuItem key={item.id} item={item} />
+        ))}
 
-      {/* Sign In block after all links */}
-      <div className="flex items-center gap-3 px-4 py-6  bg-[#f6f6f6]">
-        <img src={signin} alt="Sign in" className="w-5 h-5" />
-        <a href="/account" className="text-base  text-[#2B8C57]">
-          Sign In
-        </a>
-      </div>
-    </nav>
-  );
-}
-
+        {/* Sign In block after all links */}
+        <div className="flex items-center gap-3 px-4 py-6  bg-[#f6f6f6]">
+          <img src={signin} alt="Sign in" className="w-5 h-5" />
+          <a href="/account" className="text-base  text-[#2B8C57]">
+            Sign In
+          </a>
+        </div>
+      </nav>
+    );
+  }
 
   // Desktop view logic with sticky behavior
   const menuRef = useRef<HTMLDivElement>(null);
@@ -157,20 +155,20 @@ if (viewport === 'mobile') {
       setIsSticky(scrollTop >= offsetTop);
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('scroll', handleScroll, {passive: true});
     return () => window.removeEventListener('scroll', handleScroll);
   }, [offsetTop]);
 
   return (
     <>
-      <div style={{ height: isSticky ? menuHeight : undefined }} />
+      <div style={{height: isSticky ? menuHeight : undefined}} />
       <div
         ref={menuRef}
         className={`w-full transition-all duration-300 ${
           isSticky ? 'fixed top-0 left-0 z-50 bg-white' : 'relative'
         }`}
       >
-<div role="navigation" className="hidden md:block">
+        <div role="navigation" className="hidden md:block">
           <RenderMenuItems
             items={(menu || FALLBACK_HEADER_MENU).items}
             isSticky={isSticky}
@@ -183,7 +181,6 @@ if (viewport === 'mobile') {
   );
 }
 
-
 function RenderMenuItems({
   items,
   isSticky,
@@ -195,7 +192,6 @@ function RenderMenuItems({
   isLoggedIn: HeaderProps['isLoggedIn'];
   cart: HeaderProps['cart'];
 }) {
-
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [underlineStyle, setUnderlineStyle] = useState({left: 0, width: 0});
   const containerRef = useRef<HTMLUListElement>(null);
@@ -233,24 +229,28 @@ function RenderMenuItems({
 
   return (
     <div>
-      <div className="relative w-full px-2" onMouseLeave={() => setActiveIndex(null)}>
+      <div
+        className="relative w-full px-2"
+        onMouseLeave={() => setActiveIndex(null)}
+      >
         <div className="container m-auto w-full flex items-center justify-between px-4 ">
           <div>
-                    <a href="/" className="block">
-
-                  <img
-          src={logoBiologi}
-          alt="Logo"
-          className={` transform duration-0  ${
-            isSticky ? 'opacity-100 ' : 'opacity-0 '
-          }`}
-        />
-        </a>
-
+            <a href="/" className="block">
+              <img
+                src={logoBiologi}
+                alt="Logo"
+                className={` transform duration-0  ${
+                  isSticky ? 'opacity-100 ' : 'opacity-0 '
+                }`}
+              />
+            </a>
           </div>
 
           <div className="relative">
-            <ul ref={containerRef} className="font-gayathri flex gap-8 justify-center relative !py-4">
+            <ul
+              ref={containerRef}
+              className="font-poppins flex gap-8 justify-center relative !py-4"
+            >
               {items.map((item, index) => (
                 <li
                   key={item.id}
@@ -258,7 +258,8 @@ function RenderMenuItems({
                   onMouseEnter={() => setActiveIndex(index)}
                   ref={(el) => (itemRefs.current[index] = el)}
                 >
-                  <a href={sanitizeUrl(item.url)}
+                  <a
+                    href={sanitizeUrl(item.url)}
                     className={`text-base px-2 py-1 transition-colors duration-200 !no-underline ${
                       index === activeIndex ? '!text-[#2B8C57]' : 'text-black'
                     }`}
@@ -274,11 +275,10 @@ function RenderMenuItems({
             />
           </div>
 
-          <div  className={`transform  ${
-            isSticky ? 'opacity-100 ' : 'opacity-0 '
-          }`}>
-                   <HeaderCtas isLoggedIn={isLoggedIn} cart={cart} />
-
+          <div
+            className={`transform  ${isSticky ? 'opacity-100 ' : 'opacity-0 '}`}
+          >
+            <HeaderCtas isLoggedIn={isLoggedIn} cart={cart} />
           </div>
         </div>
 
@@ -296,7 +296,7 @@ function RenderMenuItems({
                   key={subItem.id}
                   className="flex flex-col gap-3 overflow-y-auto pr-4"
                 >
-                  <p className="text-base font-semibold font-gayathri !text-[#2B8C57]">
+                  <p className="text-base font-semibold font-poppins !text-[#2B8C57]">
                     {subItem.title}
                   </p>
                   <NestedMenuItems items={subItem.items} />
@@ -317,7 +317,10 @@ function NestedMenuItems({items}: {items: any[]}) {
     <ul className="flex flex-col gap-1">
       {items.map((item) => (
         <li key={item.id}>
-         <a href={sanitizeUrl(item.url)} className="!text-sm text-[#3F3F3F] font-gayathri">
+          <a
+            href={sanitizeUrl(item.url)}
+            className="!text-sm text-[#3F3F3F] font-poppins"
+          >
             {item.title}
           </a>
           {item.items?.length > 0 && <NestedMenuItems items={item.items} />}
@@ -327,11 +330,11 @@ function NestedMenuItems({items}: {items: any[]}) {
   );
 }
 
-
-
-function MobileMenuItem({ item }: { item: any }) {
+function MobileMenuItem({item}: {item: any}) {
   const [isOpen, setIsOpen] = useState(false);
-  const [openSubmenus, setOpenSubmenus] = useState<{ [key: string]: boolean }>({});
+  const [openSubmenus, setOpenSubmenus] = useState<{[key: string]: boolean}>(
+    {},
+  );
 
   const toggleSubmenu = (id: string) => {
     setOpenSubmenus((prev) => ({
@@ -391,9 +394,17 @@ function MobileMenuItem({ item }: { item: any }) {
                     strokeWidth={2}
                     viewBox="0 0 24 24"
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M5 12h14"
+                    />
                     {!openSubmenus[subItem.id] && (
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 5v14" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M12 5v14"
+                      />
                     )}
                   </svg>
                 )}
@@ -408,7 +419,7 @@ function MobileMenuItem({ item }: { item: any }) {
                 } flex flex-col gap-3`}
               >
                 {subItem.items?.map((subSubItem: any) => (
-                 <a
+                  <a
                     key={subSubItem.id}
                     href={sanitizeUrl(subSubItem.url)}
                     className="text-base cursor-pointer"
@@ -427,16 +438,15 @@ function MobileMenuItem({ item }: { item: any }) {
 
 export default MobileMenuItem;
 
-
-
-
-
 function HeaderCtas({
   isLoggedIn,
   cart,
 }: Pick<HeaderProps, 'isLoggedIn' | 'cart'>) {
   return (
-    <nav className="header-ctas flex items-center gap-2 md:gap-8" role="navigation">
+    <nav
+      className="header-ctas flex items-center gap-2 md:gap-8"
+      role="navigation"
+    >
       <Suspense
         fallback={
           <a href="/account">
@@ -468,7 +478,6 @@ function HeaderCtas({
     </nav>
   );
 }
-
 
 function SearchToggle() {
   const {open} = useAside();
@@ -502,7 +511,7 @@ function CartBadge({count}: {count: number | null}) {
       }}
       className="relative inline-block"
     >
-      <img src={cartIcon} alt="Cart" className='h-5 w-6' />
+      <img src={cartIcon} alt="Cart" className="h-5 w-6" />
       {typeof count === 'number' && count > 0 && (
         <span className="absolute -top-[7px] -right-[8px] text-xs bg-[#2B8C57] flex items-center justify-center p-2 text-white w-2 h-2 rounded-full text-[10px]">
           {count}
@@ -511,7 +520,6 @@ function CartBadge({count}: {count: number | null}) {
     </a>
   );
 }
-
 
 function CartToggle({cart}: Pick<HeaderProps, 'cart'>) {
   return (
@@ -535,8 +543,6 @@ const FALLBACK_HEADER_MENU = {
   id: 'gid://shopify/Menu/199655587896',
   items: [],
 };
-
-
 
 export function PromoCarousel() {
   const messages = [
@@ -589,7 +595,7 @@ export function PromoCarousel() {
             <div
               key={i}
               className="w-full flex-shrink-0 flex justify-center items-center"
-              style={{ width: `${100 / messages.length}%` }}
+              style={{width: `${100 / messages.length}%`}}
             >
               <p className="text-[13px] text-[#4F4F4F] uppercase text-center whitespace-nowrap">
                 {msg}
@@ -609,5 +615,3 @@ export function PromoCarousel() {
     </div>
   );
 }
-
-

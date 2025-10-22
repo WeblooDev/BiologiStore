@@ -14,10 +14,13 @@ export function CartSummary({cart, layout}: CartSummaryProps) {
     layout === 'page' ? 'cart-summary-page' : 'cart-summary-aside';
 
   return (
-    <div aria-labelledby="cart-summary !bg-[#F6F6F6] !flex flex-col gap-3" className={className}>
+    <div
+      aria-labelledby="cart-summary !bg-[#F6F6F6] !flex flex-col gap-3"
+      className={className}
+    >
       <dl className="cart-subtotal">
-        <dt className='font-semibold'>Subtotal</dt>
-        <dd className='font-semibold'>
+        <dt className="font-semibold">Subtotal</dt>
+        <dd className="font-semibold">
           {cart.cost?.subtotalAmount?.amount ? (
             <Money data={cart.cost?.subtotalAmount} />
           ) : (
@@ -35,8 +38,8 @@ function CartCheckoutActions({checkoutUrl}: {checkoutUrl?: string}) {
   if (!checkoutUrl) return null;
 
   return (
-    <div className='bg-[#2B8C57] py-2 text-white flex items-center justify-center'>
-      <a href={checkoutUrl} target="_self" className='bg-[#2B8C57]'>
+    <div className="bg-[#2B8C57] py-2 text-white flex items-center justify-center">
+      <a href={checkoutUrl} target="_self" className="bg-[#2B8C57]">
         <p>Continue to Checkout &rarr;</p>
       </a>
       <br />
@@ -72,8 +75,13 @@ function CartDiscounts({
 
       {/* Show an input to apply a discount */}
       <UpdateDiscountForm discountCodes={codes}>
-        <div className='flex justify-between'>
-          <input type="text" name="discountCode" placeholder="Discount code" className='bg-white'/>
+        <div className="flex justify-between">
+          <input
+            type="text"
+            name="discountCode"
+            placeholder="Discount code"
+            className="bg-white"
+          />
           &nbsp;
           <button type="submit">Apply</button>
         </div>
@@ -145,13 +153,13 @@ function CartGiftCard({
         giftCardCodes={appliedGiftCardCodes.current}
         saveAppliedCode={saveAppliedCode}
       >
-        <div className='flex justify-between'>
+        <div className="flex justify-between">
           <input
             type="text"
             name="giftCardCode"
             placeholder="Gift card code"
             ref={giftCardCodeInput}
-            className='bg-white'
+            className="bg-white"
           />
           &nbsp;
           <button type="submit">Apply</button>

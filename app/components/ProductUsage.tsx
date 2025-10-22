@@ -21,7 +21,7 @@ export function ProductUsage({
   try {
     usageData = JSON.parse(json);
   } catch (e) {
-    console.error("Invalid usage JSON", e);
+    console.error('Invalid usage JSON', e);
     return null;
   }
 
@@ -38,8 +38,8 @@ export function ProductUsage({
 
   return (
     <section className="container m-auto !py-16 !px-5">
-        <div className="h-[2px] w-full bg-[#E7E7E7] mt-[2rem] mb-[60px]"></div>
-      <h2 className="font-gayathri !text-2xl font-semibold mb-6">Usage</h2>
+      <div className="h-[2px] w-full bg-[#E7E7E7] mt-[2rem] mb-[60px]"></div>
+      <h2 className="font-poppins !text-2xl font-semibold mb-6">Usage</h2>
 
       <div className="flex flex-col lg:flex-row gap-10 justify-between w-full p5">
         {/* Left: Grouped usage blocks */}
@@ -50,7 +50,9 @@ export function ProductUsage({
               {blocks.map((block, i) => (
                 <div key={i} className="mt-2">
                   {block.subtitle && (
-                    <h4 className="font-gayathri text-base font-semibold text-[#2B8C57]">{block.subtitle}</h4>
+                    <h4 className="font-poppins text-base font-semibold text-[#2B8C57]">
+                      {block.subtitle}
+                    </h4>
                   )}
                   <p className="text-sm">{block.description}</p>
                 </div>

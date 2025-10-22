@@ -65,23 +65,18 @@ export function Aside({
           >
             {heading}
           </h3>
-         <button
-          onClick={close}
-          aria-label="Close"
-          
-        >
-          <svg
-            className="w-7 h-7 transition-transform duration-300 cursor-pointer rotate-45"
-            fill="none"
-            stroke={isMobile ? 'white' : 'black'}
-            strokeWidth={2}
-            viewBox="0 0 24 24"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14" />
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 5v14" />
-          </svg>
-        </button>
-
+          <button onClick={close} aria-label="Close">
+            <svg
+              className="w-7 h-7 transition-transform duration-300 cursor-pointer rotate-45"
+              fill="none"
+              stroke={isMobile ? 'white' : 'black'}
+              strokeWidth={2}
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 5v14" />
+            </svg>
+          </button>
         </header>
         <main className="h-full">{children}</main>
       </aside>

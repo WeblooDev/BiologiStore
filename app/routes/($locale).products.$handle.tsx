@@ -12,17 +12,16 @@ import {ProductPrice} from '~/components/ProductPrice';
 import {ProductImage} from '~/components/ProductImage';
 import {ProductForm} from '~/components/ProductForm';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
-import { ProductBenefits } from '../components/ProductBenefits';
-import { ProductSiblings } from '../components/ProductSiblings'; 
-import { DiscoverRegimenSection } from '~/components/DiscoverRegimen';
+import {ProductBenefits} from '../components/ProductBenefits';
+import {ProductSiblings} from '../components/ProductSiblings';
+import {DiscoverRegimenSection} from '~/components/DiscoverRegimen';
 import discoverImage from '~/assets/images/discover.png';
-import { ProductUsage } from '~/components/ProductUsage';
-import { ProductExpectation } from '~/components/ProductExpectation';
-import { BestSellers } from '~/components/BestSellers';
-import { Suspense } from 'react';
+import {ProductUsage} from '~/components/ProductUsage';
+import {ProductExpectation} from '~/components/ProductExpectation';
+import {BestSellers} from '~/components/BestSellers';
+import {Suspense} from 'react';
 import bullet from '~/assets/images/bulle.svg';
 import {BundleProducts} from '~/components/BundleProducts';
-
 
 export const meta: MetaFunction<typeof loader> = ({data}) => {
   return [
@@ -67,11 +66,11 @@ async function loadCriticalData({
   return {product};
 }
 
-function loadDeferredData({ context }: LoaderFunctionArgs) {
+function loadDeferredData({context}: LoaderFunctionArgs) {
   const bestSellers = context.storefront
     .query(RECOMMENDED_PRODUCTS_QUERY)
     .catch((err) => {
-      console.error("Error fetching best sellers:", err);
+      console.error('Error fetching best sellers:', err);
       return null;
     });
 
@@ -80,13 +79,8 @@ function loadDeferredData({ context }: LoaderFunctionArgs) {
   };
 }
 
-
-
-
 export default function Product() {
-  const { product, bestSellers } = useLoaderData<typeof loader>();
-
-
+  const {product, bestSellers} = useLoaderData<typeof loader>();
 
   const selectedVariant = useOptimisticVariant(
     product.selectedOrFirstAvailableVariant,
@@ -99,106 +93,109 @@ export default function Product() {
     selectedOrFirstAvailableVariant: selectedVariant,
   });
 
-  const { title, tags, descriptionHtml } = product;
+  const {title, tags, descriptionHtml} = product;
   const siblings = product?.siblings?.referenceList?.nodes || [];
 
-
-const bundleProducts = product?.bundleProducts?.references?.nodes || [];
-console.log('🧾 Full bundleProducts metafield:', product?.bundleProducts);
+  const bundleProducts = product?.bundleProducts?.references?.nodes || [];
+  console.log('🧾 Full bundleProducts metafield:', product?.bundleProducts);
 
   return (
     <>
- <div
-  className="product bg-cover bg-center bg-no-repeat"
-  style={{
-    backgroundImage: `url(${product?.imgBackground?.reference?.image?.url})`,
-  }}
->
+      <div
+        className="product bg-cover bg-center bg-no-repeat"
+        style={{
+          backgroundImage: `url(${product?.imgBackground?.reference?.image?.url})`,
+        }}
+      >
+        <div className="product-main bg-white p-6 max-w-[600px]">
+          <h1 className="!text-[32px] text-[#2B8C57] !m-0">{title}</h1>
 
-  <div className="product-main bg-white p-6 max-w-[600px]">
-    <h1 className="!text-[32px] text-[#2B8C57] !m-0">{title}</h1>
+          {tags?.length > 0 && (
+            <div className="mb-4 flex flex-wrap gap-2">
+              {tags.map((tag: string, index: number) => (
+                <div key={tag} className="flex items-center gap-1">
+                  <span className="!text-sm text-[#4F4F4F] underline">
+                    {tag}
+                  </span>
+                  {index < tags.length - 1 && (
+                    <img src={bullet} alt="" className="w-[6px] h-[6px]" />
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
 
-    {tags?.length > 0 && (
-      <div className="mb-4 flex flex-wrap gap-2">
-       {tags.map((tag: string, index: number) => (
-      <div key={tag} className="flex items-center gap-1">
-        <span className="!text-sm text-[#4F4F4F] underline">{tag}</span>
-        {index < tags.length - 1 && (
-          <img src={bullet} alt="" className="w-[6px] h-[6px]" />
-        )}
+          <ProductPrice
+            price={selectedVariant?.price}
+            compareAtPrice={selectedVariant?.compareAtPrice}
+          />
+
+          <div
+            className="prose prose-p:!text-sm max-w-none"
+            dangerouslySetInnerHTML={{__html: descriptionHtml}}
+          />
+
+          <p className="!text-sm mt-2">
+            {
+              selectedVariant.selectedOptions.find(
+                (opt) => opt.name.toLowerCase() === 'size',
+              )?.value
+            }
+          </p>
+
+          <ProductForm
+            productOptions={productOptions}
+            selectedVariant={selectedVariant}
+          />
+
+          <div>
+            <p className="font-poppins !text-xl !mt-8 font-normal">
+              Pair it With
+            </p>
+            <p>Our products are designed to work better together</p>
+          </div>
+
+          <ProductSiblings products={siblings} />
+        </div>
+
+        <Analytics.ProductView
+          data={{
+            products: [
+              {
+                id: product.id,
+                title: product.title,
+                price: selectedVariant?.price.amount || '0',
+                vendor: product.vendor,
+                variantId: selectedVariant?.id || '',
+                variantTitle: selectedVariant?.title || '',
+                quantity: 1,
+              },
+            ],
+          }}
+        />
       </div>
-    ))}
 
-      </div>
-    )}
-
-    <ProductPrice
-      price={selectedVariant?.price}
-      compareAtPrice={selectedVariant?.compareAtPrice}
-      
-    />
-
-<div
-  className="prose prose-p:!text-sm max-w-none"
-  dangerouslySetInnerHTML={{ __html: descriptionHtml }}
-/>
-
-    <p className="!text-sm mt-2">
-      {selectedVariant.selectedOptions.find(
-        (opt) => opt.name.toLowerCase() === 'size'
-      )?.value}
-    </p>
-
-    <ProductForm
-      productOptions={productOptions}
-      selectedVariant={selectedVariant}
-    />
-
-  <div>
-      <p className="font-gayathri !text-xl !mt-8 font-normal">Pair it With</p>
-      <p>Our products are designed to work better together</p>
-  </div>
-
-    <ProductSiblings products={siblings} />
-  </div>
-
-  <Analytics.ProductView
-    data={{
-      products: [
-        {
-          id: product.id,
-          title: product.title,
-          price: selectedVariant?.price.amount || '0',
-          vendor: product.vendor,
-          variantId: selectedVariant?.id || '',
-          variantTitle: selectedVariant?.title || '',
-          quantity: 1,
-        },
-      ],
-    }}
-  />
-</div>
-
-<BundleProducts products={bundleProducts} />
-
+      <BundleProducts products={bundleProducts} />
 
       <ProductBenefits
         json={product.metafield?.value || '[]'}
         images={product.images?.nodes || []}
       />
 
-    <ProductExpectation
-      json={product.expectation?.value || '[]'}
-      beforeAfter={
-        product.beforeAfter?.references?.nodes?.map((ref: any) => ref.image?.url) || []
-      }
-      expectImage={
-        product.expectImage?.references?.nodes?.map((node: any) => ({
-          title: node.title,
-          featuredImage: node.featuredImage,
-        })) || []
-      }
-    />
+      <ProductExpectation
+        json={product.expectation?.value || '[]'}
+        beforeAfter={
+          product.beforeAfter?.references?.nodes?.map(
+            (ref: any) => ref.image?.url,
+          ) || []
+        }
+        expectImage={
+          product.expectImage?.references?.nodes?.map((node: any) => ({
+            title: node.title,
+            featuredImage: node.featuredImage,
+          })) || []
+        }
+      />
 
       <ProductUsage
         json={product.usage?.value || '[]'}
@@ -217,10 +214,12 @@ console.log('🧾 Full bundleProducts metafield:', product?.bundleProducts);
       />
 
       <Suspense fallback={<div>Loading Best Sellers...</div>}>
-      <Await resolve={bestSellers}>
-        {(data) => data && <BestSellers title='Recently Viewed' products={data} />}
-      </Await>
-    </Suspense>
+        <Await resolve={bestSellers}>
+          {(data) =>
+            data && <BestSellers title="Recently Viewed" products={data} />
+          }
+        </Await>
+      </Suspense>
     </>
   );
 }
@@ -423,7 +422,6 @@ const PRODUCT_FRAGMENT = `#graphql
   ${PRODUCT_VARIANT_FRAGMENT}
 `;
 
-
 const PRODUCT_QUERY = `#graphql
   query Product(
     $country: CountryCode
@@ -437,7 +435,6 @@ const PRODUCT_QUERY = `#graphql
   }
   ${PRODUCT_FRAGMENT}
 ` as const;
-
 
 const RECOMMENDED_PRODUCTS_QUERY = `#graphql
   fragment RecommendedProduct on Product {

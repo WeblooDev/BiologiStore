@@ -39,7 +39,7 @@ export function ProductItem({
       {
         method: 'post',
         action: '/cart',
-      }
+      },
     );
   };
 
@@ -66,23 +66,24 @@ export function ProductItem({
           </Link>
 
           {/* Quick View Button */}
-         <button
-  onClick={(e) => {
-    e.preventDefault();     // stop <Link> navigation
-    e.stopPropagation();    // prevent bubbling to parent
-        console.log('Quick View Clicked'); // ✅ Confirm this logs
+          <button
+            onClick={(e) => {
+              e.preventDefault(); // stop <Link> navigation
+              e.stopPropagation(); // prevent bubbling to parent
+              console.log('Quick View Clicked'); // ✅ Confirm this logs
 
-    setShowQuickView(true); // open modal
-  }}
-  className="absolute bottom-[1px] w-full bg-[#2B8C57] text-white uppercase hover:underline flex items-center justify-center text-xs px-2 py-2 opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity duration-300 z-20"
->
-  Quick View
-</button>
-
+              setShowQuickView(true); // open modal
+            }}
+            className="absolute bottom-[1px] w-full bg-[#2B8C57] text-white uppercase hover:underline flex items-center justify-center text-xs px-2 py-2 opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity duration-300 z-20"
+          >
+            Quick View
+          </button>
         </div>
 
         <div className="flex flex-col items-center gap-2 mt-4 w-full">
-          <h4 className="font-gayathri text-xl text-[#2B8C57]">{product.title}</h4>
+          <h4 className="font-poppins text-xl text-[#2B8C57]">
+            {product.title}
+          </h4>
 
           {product.tags?.length > 0 && (
             <div className="flex flex-wrap gap-2 items-center justify-center">
@@ -90,7 +91,11 @@ export function ProductItem({
                 <div key={tag} className="flex items-center gap-1">
                   <span className="text-sm">{tag}</span>
                   {index < product.tags.length - 1 && (
-                    <img src={bullet} alt="bullet" className="!w-auto h-[7px]" />
+                    <img
+                      src={bullet}
+                      alt="bullet"
+                      className="!w-auto h-[7px]"
+                    />
                   )}
                 </div>
               ))}
@@ -118,79 +123,84 @@ export function ProductItem({
           onClick={() => setShowQuickView(false)}
         >
           <AnimatePresence>
-         <motion.div
-          initial={{scale: 0.7, opacity: 0}}
-          animate={{scale: 1, opacity: 1}}
-          exit={{scale: 0.8, opacity: 0}}
-          transition={{duration: 0.5, ease: 'easeOut'}}
-          className="container bg-white  relative flex flex-col md:flex-row shadow-2xl"
-          onClick={(e) => e.stopPropagation()}
->
-
-            <div className="w-full md:w-[40%] h-full bg-[#F6F6F6]">
-              {image && (
-                <img
-                  src={image.url}
-                  alt={image.altText || ''}
-                  className="w-full h-full object-cover rounded mb-4"
-                />
-              )}
-            </div>
-
-            {/* Right: Info */}
-            <div className="w-full md:w-[60%] flex flex-col gap-3 justify-between p-6">
-              <h3 className="font-gayathri text-2xl font-bold text-[#2B8C57] mb-2">
-                {product.title}
-              </h3>
-
-              {product.tags?.length > 0 && (
-                <div className="mb-2 flex flex-wrap gap-2">
-                  {product.tags.map((tag) => (
-                    <span key={tag} className="text-sm underline text-[#4F4F4F]">{tag}</span>
-                  ))}
-                </div>
-              )}
-
-              <p className="text-base mb-2 text-[#2B8C57]">
-                <Money data={product.priceRange.minVariantPrice} />
-              </p>
-
-              {product.variants?.nodes?.[0]?.title && (
-                <p className="text-gray-600 text-sm mb-2">
-                  Size: {product.variants.nodes[0].title}
-                </p>
-              )}
-
-              {product.descriptionHtml && (
-                <div
-                  className="text-gray-700 text-sm mb-4"
-                  dangerouslySetInnerHTML={{__html: product.descriptionHtml}}
-                />
-              )}
-
-              <button
-className='block text-center mt-2 bg-[#2B8C57] cursor-pointer uppercase border border-[#2B8C57] text-white hover:bg-[#2B8C57] hover:text-white text-sm px-4 py-2 transition-all'                onClick={handleAddToCart}
-              >
-                Add to Cart
-              </button>
-
-              <Link
-                to={`/products/${product.handle}`}
-className='block text-center  mt-4 !underline text-sm px-4 py-2 transition-all'              >
-                View Full Product Page
-              </Link>
-            </div>
-
-            {/* Close button */}
-            <button
-              className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-xl font-bold cursor-pointer"
-              onClick={() => setShowQuickView(false)}
+            <motion.div
+              initial={{scale: 0.7, opacity: 0}}
+              animate={{scale: 1, opacity: 1}}
+              exit={{scale: 0.8, opacity: 0}}
+              transition={{duration: 0.5, ease: 'easeOut'}}
+              className="container bg-white  relative flex flex-col md:flex-row shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
             >
-            <img src={close} className="h-[20px]" />
-            </button>
-          </motion.div>
-          </AnimatePresence>
+              <div className="w-full md:w-[40%] h-full bg-[#F6F6F6]">
+                {image && (
+                  <img
+                    src={image.url}
+                    alt={image.altText || ''}
+                    className="w-full h-full object-cover rounded mb-4"
+                  />
+                )}
+              </div>
 
+              {/* Right: Info */}
+              <div className="w-full md:w-[60%] flex flex-col gap-3 justify-between p-6">
+                <h3 className="font-poppins text-2xl font-bold text-[#2B8C57] mb-2">
+                  {product.title}
+                </h3>
+
+                {product.tags?.length > 0 && (
+                  <div className="mb-2 flex flex-wrap gap-2">
+                    {product.tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="text-sm underline text-[#4F4F4F]"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                <p className="text-base mb-2 text-[#2B8C57]">
+                  <Money data={product.priceRange.minVariantPrice} />
+                </p>
+
+                {product.variants?.nodes?.[0]?.title && (
+                  <p className="text-gray-600 text-sm mb-2">
+                    Size: {product.variants.nodes[0].title}
+                  </p>
+                )}
+
+                {product.descriptionHtml && (
+                  <div
+                    className="text-gray-700 text-sm mb-4"
+                    dangerouslySetInnerHTML={{__html: product.descriptionHtml}}
+                  />
+                )}
+
+                <button
+                  className="block text-center mt-2 bg-[#2B8C57] cursor-pointer uppercase border border-[#2B8C57] text-white hover:bg-[#2B8C57] hover:text-white text-sm px-4 py-2 transition-all"
+                  onClick={handleAddToCart}
+                >
+                  Add to Cart
+                </button>
+
+                <Link
+                  to={`/products/${product.handle}`}
+                  className="block text-center  mt-4 !underline text-sm px-4 py-2 transition-all"
+                >
+                  View Full Product Page
+                </Link>
+              </div>
+
+              {/* Close button */}
+              <button
+                className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-xl font-bold cursor-pointer"
+                onClick={() => setShowQuickView(false)}
+              >
+                <img src={close} className="h-[20px]" />
+              </button>
+            </motion.div>
+          </AnimatePresence>
         </div>
       )}
     </>

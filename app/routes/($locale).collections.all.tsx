@@ -21,7 +21,7 @@ export async function loader(args: LoaderFunctionArgs) {
 
 async function loadCriticalData({context, request}: LoaderFunctionArgs) {
   const {storefront} = context;
-  const paginationVariables = getPaginationVariables(request, {pageBy: 8});
+  const paginationVariables = getPaginationVariables(request, {pageBy: 24}); // 24/48/96 as you like
 
   const [{products}, {collections}] = await Promise.all([
     storefront.query(CATALOG_QUERY, {
@@ -65,8 +65,6 @@ async function loadCriticalData({context, request}: LoaderFunctionArgs) {
   };
 }
 
-
-
 function loadDeferredData({context}: LoaderFunctionArgs) {
   const recommendedProducts = context.storefront
     .query(RECOMMENDED_PRODUCTS_QUERY)
@@ -92,82 +90,88 @@ export default function Collection() {
   const data = useLoaderData<typeof loader>();
 
   const getInitialFilter = (): FilterState => {
-  const params = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
-  return {
-    category: params.get('category') || '',
-    skinType: params.get('skinType') || '',
-    sort: params.get('sort') || 'RELEVANCE',
-    price: params.get('price') || '',
+    const params = new URLSearchParams(
+      typeof window !== 'undefined' ? window.location.search : '',
+    );
+    return {
+      category: params.get('category') || '',
+      skinType: params.get('skinType') || '',
+      sort: params.get('sort') || 'RELEVANCE',
+      price: params.get('price') || '',
+    };
   };
-};
 
-const [filters, setFilters] = useState<FilterState>(getInitialFilter);
+  const [filters, setFilters] = useState<FilterState>(getInitialFilter);
 
+  const filteredProducts = useMemo(() => {
+    return data.products.nodes
+      .filter((product) => {
+        const {category, skinType, price} = filters;
 
- const filteredProducts = useMemo(() => {
-  return data.products.nodes
-   .filter((product) => {
-  const {category, skinType, price} = filters;
+        const normalize = (str: string | undefined) =>
+          str?.trim().toLowerCase().replace(/\s+/g, '');
 
-  const normalize = (str: string | undefined) =>
-    str?.trim().toLowerCase().replace(/\s+/g, '');
+        const categoryMatch =
+          !category || normalize(product.productType) === normalize(category);
 
-  const categoryMatch =
-    !category || normalize(product.productType) === normalize(category);
+        const skinTypeMatch =
+          !skinType ||
+          product.variants.nodes.some((variant) =>
+            variant.selectedOptions.some(
+              (opt) =>
+                normalize(opt.name) === 'suitableforskintype' &&
+                normalize(opt.value) === skinType,
+            ),
+          );
 
-  const skinTypeMatch =
-    !skinType ||
-    product.variants.nodes.some((variant) =>
-      variant.selectedOptions.some(
-        (opt) =>
-          normalize(opt.name) === 'suitableforskintype' &&
-          normalize(opt.value) === skinType
-      )
+        const priceAmount = parseFloat(
+          product.priceRange.minVariantPrice.amount,
+        );
+        const priceMatch = !price
+          ? true
+          : (() => {
+              const [min, max] = price.split('-').map(Number);
+              return priceAmount >= min && priceAmount <= max;
+            })();
+
+        return skinTypeMatch && categoryMatch && priceMatch;
+      })
+
+      .sort((a, b) => {
+        if (filters.sort === 'PRICE_ASC') {
+          return (
+            parseFloat(a.priceRange.minVariantPrice.amount) -
+            parseFloat(b.priceRange.minVariantPrice.amount)
+          );
+        }
+        if (filters.sort === 'PRICE_DESC') {
+          return (
+            parseFloat(b.priceRange.minVariantPrice.amount) -
+            parseFloat(a.priceRange.minVariantPrice.amount)
+          );
+        }
+        if (filters.sort === 'UPDATED_AT') {
+          const aIsNew = a.metafield?.value === 'true' ? 1 : 0;
+          const bIsNew = b.metafield?.value === 'true' ? 1 : 0;
+          return bIsNew - aIsNew;
+        }
+        return 0;
+      });
+  }, [data.products.nodes, filters]);
+
+  const BATCH_SIZE = 6;
+  const [visibleCount, setVisibleCount] = useState(BATCH_SIZE);
+
+  const handleLoadMore = () => {
+    setVisibleCount((prev) =>
+      Math.min(prev + BATCH_SIZE, filteredProducts.length),
     );
+  };
 
-  const priceAmount = parseFloat(product.priceRange.minVariantPrice.amount);
-  const priceMatch = !price
-    ? true
-    : (() => {
-        const [min, max] = price.split('-').map(Number);
-        return priceAmount >= min && priceAmount <= max;
-      })();
-
-  return skinTypeMatch && categoryMatch && priceMatch;
-})
-
-  .sort((a, b) => {
-  if (filters.sort === 'PRICE_ASC') {
-    return (
-      parseFloat(a.priceRange.minVariantPrice.amount) -
-      parseFloat(b.priceRange.minVariantPrice.amount)
-    );
-  }
-  if (filters.sort === 'PRICE_DESC') {
-    return (
-      parseFloat(b.priceRange.minVariantPrice.amount) -
-      parseFloat(a.priceRange.minVariantPrice.amount)
-    );
-  }
-  if (filters.sort === 'UPDATED_AT') {
-    const aIsNew = a.metafield?.value === 'true' ? 1 : 0;
-    const bIsNew = b.metafield?.value === 'true' ? 1 : 0;
-    return bIsNew - aIsNew; 
-  }
-  return 0;
-});
-
-}, [data.products.nodes, filters]);
-
-const BATCH_SIZE = 6;
-const [visibleCount, setVisibleCount] = useState(BATCH_SIZE);
-
-const handleLoadMore = () => {
-  setVisibleCount((prev) => Math.min(prev + BATCH_SIZE, filteredProducts.length));
-};
-
-const progress = Math.min((visibleCount / filteredProducts.length) * 100, 100);
-
+  const progress = Math.min(
+    (visibleCount / filteredProducts.length) * 100,
+    100,
+  );
 
   return (
     <>
@@ -175,7 +179,10 @@ const progress = Math.min((visibleCount / filteredProducts.length) * 100, 100);
         image={{url: productHero, altText: 'Welcome to our store'}}
         title="Shop All"
         links={[
-          {label: 'Shop Medical Grade Skin Care', href: '/collections/cleansers'},
+          {
+            label: 'Shop Medical Grade Skin Care',
+            href: '/collections/cleansers',
+          },
           {label: 'Shop Bundles', href: '/collections/moisturizers'},
           {label: 'Shop Best Sellers', href: '/collections/treatments'},
         ]}
@@ -184,56 +191,52 @@ const progress = Math.min((visibleCount / filteredProducts.length) * 100, 100);
       <div className="container m-auto collection">
         <AllCollections collections={data.allCollections} />
 
-      <ProductFilter
-        filters={filters}
-        onFilterChange={setFilters}
-        categories={data.allCollections.nodes}
-        skinTypes={data.skinTypes}
-        skinTypeCounts={data.skinTypeCounts}
-        categoryCounts={data.categoryCounts}
-      />
+        <ProductFilter
+          filters={filters}
+          onFilterChange={setFilters}
+          categories={data.allCollections.nodes}
+          skinTypes={data.skinTypes}
+          skinTypeCounts={data.skinTypeCounts}
+          categoryCounts={data.categoryCounts}
+        />
 
+        {/* Product Grid */}
+        <div className="container products-grid grid grid-cols-2 md:grid-cols-4 gap-8 p-4">
+          {filteredProducts.slice(0, visibleCount).map((product, index) => (
+            <ProductItem
+              key={product.id}
+              product={product}
+              loading={index < BATCH_SIZE ? 'eager' : undefined}
+            />
+          ))}
+        </div>
 
-{/* Product Grid */}
-<div className="container products-grid grid grid-cols-2 md:grid-cols-4 gap-8 p-4">
-  {filteredProducts.slice(0, visibleCount).map((product, index) => (
-    <ProductItem
-      key={product.id}
-      product={product}
-      loading={index < BATCH_SIZE ? 'eager' : undefined}
-    />
-  ))}
-</div>
+        {/* Viewed Count */}
+        <p className="text-center text-sm text-gray-600 !my-6">
+          You’ve viewed <span className="font-semibold">{visibleCount}</span> of{' '}
+          <span className="font-semibold">{filteredProducts.length}</span>{' '}
+          products
+        </p>
 
-{/* Viewed Count */}
-<p className="text-center text-sm text-gray-600 !my-6">
-  You’ve viewed <span className="font-semibold">{visibleCount}</span> of{' '}
-  <span className="font-semibold">{filteredProducts.length}</span> products
-</p>
+        {/* Progress Bar */}
+        <div className="w-[30%] m-auto h-[2px] bg-gray-200 rounded overflow-hidden mt-2 mb-6">
+          <div
+            className="h-full bg-[#2B8C57] transition-all duration-300 ease-in-out"
+            style={{width: `${progress}%`}}
+          />
+        </div>
 
-{/* Progress Bar */}
-<div className="w-[30%] m-auto h-[2px] bg-gray-200 rounded overflow-hidden mt-2 mb-6">
-  <div
-    className="h-full bg-[#2B8C57] transition-all duration-300 ease-in-out"
-    style={{width: `${progress}%`}}
-  />
-</div>
-
-
-
-
-{/* Load More Button */}
-{visibleCount < filteredProducts.length && (
-  <div className="flex justify-center mt-4">
-    <button
-      onClick={handleLoadMore}
-      className="bg-white border border-[#2B8C57] text-[#2B8C57] px-6 py-3 uppercase text-sm hover:bg-[#2B8C57] hover:text-white stransition cursor-pointer"
-    >
-      Load More
-    </button>
-  </div>
-)}
-
+        {/* Load More Button */}
+        {visibleCount < filteredProducts.length && (
+          <div className="flex justify-center mt-4">
+            <button
+              onClick={handleLoadMore}
+              className="bg-white border border-[#2B8C57] text-[#2B8C57] px-6 py-3 uppercase text-sm hover:bg-[#2B8C57] hover:text-white stransition cursor-pointer"
+            >
+              Load More
+            </button>
+          </div>
+        )}
 
         <Suspense fallback={<div>Loading Best Sellers...</div>}>
           <Await resolve={data.recommendedProducts}>
@@ -288,7 +291,6 @@ const COLLECTION_ITEM_FRAGMENT = `#graphql
   }
 ` as const;
 
-
 const CATALOG_QUERY = `#graphql
   query Catalog(
     $country: CountryCode
@@ -298,7 +300,14 @@ const CATALOG_QUERY = `#graphql
     $startCursor: String
     $endCursor: String
   ) @inContext(country: $country, language: $language) {
-    products(first: $first, last: $last, before: $startCursor, after: $endCursor) {
+   products(
+     first: $first
+     last: $last
+     before: $startCursor
+     after: $endCursor
+     sortKey: UPDATED_AT
+     reverse: true
+   ) {
       nodes {
         ...CollectionItem
       }
@@ -361,7 +370,6 @@ const PRODUCT_TYPES_WITH_SAMPLE_PRODUCTS_QUERY = `#graphql
   }
 ` as const;
 
-
 const RECOMMENDED_PRODUCTS_QUERY = `#graphql
   fragment RecommendedProduct on Product {
     id
@@ -397,4 +405,3 @@ const RECOMMENDED_PRODUCTS_QUERY = `#graphql
     }
   }
 ` as const;
-

@@ -2,9 +2,8 @@ import {type LoaderFunctionArgs} from '@shopify/remix-oxygen';
 import {Link, useLoaderData, type MetaFunction} from 'react-router';
 import {useState} from 'react';
 import {getPaginationVariables} from '@shopify/hydrogen';
-import { HeroBlogSection } from '~/components/HeroBlog';
+import {HeroBlogSection} from '~/components/HeroBlog';
 import bloghero from '~/assets/images/bloghero.webp';
-
 
 export const meta: MetaFunction = () => {
   return [{title: `Hydrogen | Blogs`}];
@@ -66,15 +65,15 @@ export default function Blogs() {
     new Set(
       allBlogNodes
         .flatMap((blog) => blog.articles?.nodes?.[0]?.tags ?? [])
-        .filter((tag) => tag)
-    )
+        .filter((tag) => tag),
+    ),
   );
 
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
 
   const filteredBlogs = selectedTag
     ? allBlogNodes.filter((blog) =>
-        blog.articles?.nodes?.[0]?.tags?.includes(selectedTag)
+        blog.articles?.nodes?.[0]?.tags?.includes(selectedTag),
       )
     : allBlogNodes;
 
@@ -85,7 +84,7 @@ export default function Blogs() {
           url: bloghero,
           altText: 'Welcome to our store',
         }}
-        />
+      />
       <h1 className="text-4xl font-bold mb-8">Blogs</h1>
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
         {/* Sidebar */}
@@ -94,27 +93,30 @@ export default function Blogs() {
             <ul className="space-y-2">
               <li>
                 <button
-                    onClick={() => setSelectedTag(null)}
-                    className={`font-gayathri w-full text-left py-2 border-b cursor-pointer transition-colors duration-200 ${
-                      selectedTag === null ? 'text-green-600 font-semibold' : 'text-black'
-                    }`}
-                    style={{borderBottomColor: '#E7E7E7'}} >
-                    All Categories
-              </button>
-
+                  onClick={() => setSelectedTag(null)}
+                  className={`font-poppins w-full text-left py-2 border-b cursor-pointer transition-colors duration-200 ${
+                    selectedTag === null
+                      ? 'text-green-600 font-semibold'
+                      : 'text-black'
+                  }`}
+                  style={{borderBottomColor: '#E7E7E7'}}
+                >
+                  All Categories
+                </button>
               </li>
               {allTags.map((tag) => (
                 <li key={tag}>
-              <button
-                onClick={() => setSelectedTag(tag)}
-                className={`font-gayathri block w-full text-left py-2 border-b cursor-pointer transition-colors duration-200 ${
-                  selectedTag === tag ? 'text-green-600 font-semibold' : 'text-black'
-                }`}
-                style={{borderBottomColor: '#E7E7E7'}}
-              >
-                {tag}
-              </button>
-
+                  <button
+                    onClick={() => setSelectedTag(tag)}
+                    className={`font-poppins block w-full text-left py-2 border-b cursor-pointer transition-colors duration-200 ${
+                      selectedTag === tag
+                        ? 'text-green-600 font-semibold'
+                        : 'text-black'
+                    }`}
+                    style={{borderBottomColor: '#E7E7E7'}}
+                  >
+                    {tag}
+                  </button>
                 </li>
               ))}
             </ul>
@@ -127,7 +129,10 @@ export default function Blogs() {
             const article = blog.articles?.nodes?.[0];
 
             return (
-              <div className="blog-card flex flex-col gap-4 justify-between mb-6" key={blog.handle}>
+              <div
+                className="blog-card flex flex-col gap-4 justify-between mb-6"
+                key={blog.handle}
+              >
                 <Link to={`/blogs/${blog.handle}`} prefetch="intent">
                   {article?.image?.url && (
                     <img
@@ -139,18 +144,15 @@ export default function Blogs() {
                   <h2 className="!text-base  mb-1">{blog.title}</h2>
                 </Link>
                 {article?.excerpt && (
-                  <p className="text-sm mb-2 line-clamp-3">
-                    {article.excerpt}
-                  </p>
+                  <p className="text-sm mb-2 line-clamp-3">{article.excerpt}</p>
                 )}
                 {blog.seo?.description && (
-                  <p className="text-gray-600 text-sm mb-2">{blog.seo.description}</p>
+                  <p className="text-gray-600 text-sm mb-2">
+                    {blog.seo.description}
+                  </p>
                 )}
-                <Link
-                  to={`/blogs/${blog.handle}`}
-                  className=" !underline"
-                >
-                  Read More 
+                <Link to={`/blogs/${blog.handle}`} className=" !underline">
+                  Read More
                 </Link>
               </div>
             );

@@ -16,13 +16,18 @@ type BestSellersProps = {
   title?: string;
 };
 
-export function BestSellers({products, title = 'Best Sellers'}: BestSellersProps) {
+export function BestSellers({
+  products,
+  title = 'Best Sellers',
+}: BestSellersProps) {
   if (!products) return null;
 
   const productList: ProductNode[] = products.products.nodes;
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [visibleIndex, setVisibleIndex] = useState(0);
-  const [selectedProduct, setSelectedProduct] = useState<ProductNode | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<ProductNode | null>(
+    null,
+  );
   const maxVisible = 3;
 
   const scrollByProduct = () => {
@@ -31,7 +36,9 @@ export function BestSellers({products, title = 'Best Sellers'}: BestSellersProps
       if (child) {
         const productWidth = child.clientWidth + 24;
         containerRef.current.scrollBy({left: productWidth, behavior: 'smooth'});
-        setVisibleIndex((prev) => Math.min(prev + 1, productList.length - maxVisible));
+        setVisibleIndex((prev) =>
+          Math.min(prev + 1, productList.length - maxVisible),
+        );
       }
     }
   };
@@ -41,7 +48,10 @@ export function BestSellers({products, title = 'Best Sellers'}: BestSellersProps
       const child = containerRef.current.querySelector('div');
       if (child) {
         const productWidth = child.clientWidth + 24;
-        containerRef.current.scrollBy({left: -productWidth, behavior: 'smooth'});
+        containerRef.current.scrollBy({
+          left: -productWidth,
+          behavior: 'smooth',
+        });
         setVisibleIndex((prev) => Math.max(prev - 1, 0));
       }
     }
@@ -57,21 +67,21 @@ export function BestSellers({products, title = 'Best Sellers'}: BestSellersProps
   }, []);
 
   const addToCart = (product: ProductNode) => {
-  const variantId = product?.variants?.nodes?.[0]?.id;
-  if (!variantId) {
-    alert('No variant available');
-    return;
-  }
+    const variantId = product?.variants?.nodes?.[0]?.id;
+    if (!variantId) {
+      alert('No variant available');
+      return;
+    }
 
-  // Replace this with Shopify/Hydrogen logic
-  console.log('Added to cart:', variantId);
-  alert(`Product "${product.title}" added to cart!`);
-};
+    // Replace this with Shopify/Hydrogen logic
+    console.log('Added to cart:', variantId);
+    alert(`Product "${product.title}" added to cart!`);
+  };
 
   return (
     <section className="container mx-auto py-10 px-6">
       <div className="flex justify-center mb-6">
-        <h2 className="font-gayathri !text-4xl !font-normal">{title}</h2>
+        <h2 className="font-poppins !text-4xl !font-normal">{title}</h2>
       </div>
 
       <div className="relative">
@@ -97,42 +107,48 @@ export function BestSellers({products, title = 'Best Sellers'}: BestSellersProps
           className="flex overflow-hidden scroll-smooth gap-6 no-scrollbar px-4 w-[85%] m-auto"
         >
           {productList.map((product) => (
-          <div key={product.id} className="relative flex-shrink-0 w-full sm:w-[calc(100%/2-1rem)] lg:w-[calc(100%/3-1rem)]">
-  <div className="flex flex-col items-center gap-3 justify-between">
-    {product.featuredImage && (
-      <div className="group relative bg-[#F6F6F6] w-full">
-        <a href={`/products/${product.handle}`}>
-          <Image
-            data={product.featuredImage}
-            sizes="(min-width: 768px) 33vw, 100vw"
-            className="h-[300px] md:h-[400px] lg:h-[500px] object-cover mb-6 transition-transform duration-300 group-hover:scale-105"
-          />
-        </a>
-        <div
-          onClick={() => setSelectedProduct(product)}
-          className="absolute bottom-[1px] w-full bg-[#2B8C57] text-white uppercase hover:underline flex items-center justify-center text-xs px-2 py-2 opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity duration-300 z-20"
-        >
-          Quick View
-        </div>
-      </div>
-    )}
+            <div
+              key={product.id}
+              className="relative flex-shrink-0 w-full sm:w-[calc(100%/2-1rem)] lg:w-[calc(100%/3-1rem)]"
+            >
+              <div className="flex flex-col items-center gap-3 justify-between">
+                {product.featuredImage && (
+                  <div className="group relative bg-[#F6F6F6] w-full">
+                    <a href={`/products/${product.handle}`}>
+                      <Image
+                        data={product.featuredImage}
+                        sizes="(min-width: 768px) 33vw, 100vw"
+                        className="h-[300px] md:h-[400px] lg:h-[500px] object-cover mb-6 transition-transform duration-300 group-hover:scale-105"
+                      />
+                    </a>
+                    <div
+                      onClick={() => setSelectedProduct(product)}
+                      className="absolute bottom-[1px] w-full bg-[#2B8C57] text-white uppercase hover:underline flex items-center justify-center text-xs px-2 py-2 opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity duration-300 z-20"
+                    >
+                      Quick View
+                    </div>
+                  </div>
+                )}
 
-
-                <h3 className="font-gayathri text-xl text-[#2B8C57]">{product.title}</h3>
+                <h3 className="font-poppins text-xl text-[#2B8C57]">
+                  {product.title}
+                </h3>
                 <div className="!font-light">
-                  <Money data={product.priceRange.minVariantPrice} className="text-sm" />
+                  <Money
+                    data={product.priceRange.minVariantPrice}
+                    className="text-sm"
+                  />
                 </div>
 
                 <div className="w-full m-auto flex items-center justify-center">
-                 <button
-                className="w-[90%] border border-[#2B8C57] uppercase
+                  <button
+                    className="w-[90%] border border-[#2B8C57] uppercase
                 bg-white px-12 py-2 text-[#2B8C57] cursor-pointer hover:text-white
                 hover:bg-[#2B8C57] !text-xs md:!text-sm"
-                onClick={() => addToCart(product)}
-              >
-                Add to Bag
-              </button>
-
+                    onClick={() => addToCart(product)}
+                  >
+                    Add to Bag
+                  </button>
                 </div>
               </div>
             </div>
@@ -158,7 +174,7 @@ export function BestSellers({products, title = 'Best Sellers'}: BestSellersProps
               className="absolute top-5 right-4 text-xl font-bold  cursor-pointer"
               onClick={() => setSelectedProduct(null)}
             >
-              <img src={close} alt="" className='h-5 w-4' />
+              <img src={close} alt="" className="h-5 w-4" />
             </button>
 
             <div className="w-[40%] h-full bg-[#F6F6F6]">
@@ -172,7 +188,7 @@ export function BestSellers({products, title = 'Best Sellers'}: BestSellersProps
             </div>
 
             <div className="w-[60%] flex flex-col gap-3 justify-between p-8">
-              <h3 className="font-gayathri !text-3xl font-bold text-[#2B8C57] mb-2">
+              <h3 className="font-poppins !text-3xl font-bold text-[#2B8C57] mb-2">
                 {selectedProduct.title}
               </h3>
 
@@ -180,7 +196,9 @@ export function BestSellers({products, title = 'Best Sellers'}: BestSellersProps
                 <div className="mb-4 flex flex-wrap gap-2">
                   {selectedProduct.tags.map((tag, index) => (
                     <div key={tag} className="flex items-center gap-1">
-                      <span className="text-sm underline text-[#4F4F4F]">{tag}</span>
+                      <span className="text-sm underline text-[#4F4F4F]">
+                        {tag}
+                      </span>
                       {index < selectedProduct.tags.length - 1 && (
                         <img src={bullet} alt="" className="w-[6px] h-[6px]" />
                       )}
@@ -190,7 +208,7 @@ export function BestSellers({products, title = 'Best Sellers'}: BestSellersProps
               )}
 
               <p className="!text-base mb-2 flex items-center text-[#2B8C57]">
-              <Money data={selectedProduct.priceRange.minVariantPrice} />
+                <Money data={selectedProduct.priceRange.minVariantPrice} />
               </p>
 
               {selectedProduct.variants?.nodes?.[0]?.title && (
@@ -202,25 +220,26 @@ export function BestSellers({products, title = 'Best Sellers'}: BestSellersProps
               {selectedProduct.descriptionHtml && (
                 <div
                   className="text-sm mb-4"
-                  dangerouslySetInnerHTML={{__html: selectedProduct.descriptionHtml}}
+                  dangerouslySetInnerHTML={{
+                    __html: selectedProduct.descriptionHtml,
+                  }}
                 />
               )}
 
-          <div className='flex flex-col w-full'>
-              <button
-              className="block text-center mt-2 bg-[#2B8C57] cursor-pointer uppercase border border-[#2B8C57] text-white hover:bg-[#2B8C57] hover:text-white text-sm px-4 py-2 transition-all"
-              onClick={() => addToCart(selectedProduct)}
-            >
-              Add to Bag
-            </button>
+              <div className="flex flex-col w-full">
+                <button
+                  className="block text-center mt-2 bg-[#2B8C57] cursor-pointer uppercase border border-[#2B8C57] text-white hover:bg-[#2B8C57] hover:text-white text-sm px-4 py-2 transition-all"
+                  onClick={() => addToCart(selectedProduct)}
+                >
+                  Add to Bag
+                </button>
 
-
-              <a
-                href={`/products/${selectedProduct.handle}`}
-                className="block text-center  mt-4 !underline text-sm px-4 py-2 transition-all"
-              >
-                View Full Product Details
-              </a>
+                <a
+                  href={`/products/${selectedProduct.handle}`}
+                  className="block text-center  mt-4 !underline text-sm px-4 py-2 transition-all"
+                >
+                  View Full Product Details
+                </a>
               </div>
             </div>
           </motion.div>
