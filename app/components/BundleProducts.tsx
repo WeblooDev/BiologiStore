@@ -20,7 +20,6 @@ export function BundleProducts({products}: Props) {
   return (
     <div
       className="bundle-products py-16 bg-cover bg-center"
-      style={{backgroundImage: `url(${bundleBackground})`}}
     >
       <div className="flex justify-center">
         <h2 className="!text-3xl font-semibold mb-4">This Bundle Includes</h2>
@@ -29,8 +28,8 @@ export function BundleProducts({products}: Props) {
         {productRows.map((row, rowIndex) => (
           <div
             key={rowIndex}
-            className={`container m-auto grid grid-cols-1 sm:grid-cols-2 gap-6 pt-6 ${
-              rowIndex > 0 ? 'border-t border-gray-400' : ''
+            className={`container mx-auto grid grid-cols-1 sm:grid-cols-2 gap-6 pt-6 ${
+              rowIndex > 0 ? '`container mx-auto border-t border-gray-400' : ''
             }`}
           >
             {row.map((product) => {
@@ -39,9 +38,9 @@ export function BundleProducts({products}: Props) {
                 <a
                   key={product.id}
                   href={`/products/${product.handle}`}
-                  className=" overflow-hidden transition  bg-opacity-80 !no-underline"
+                  className=" overflow-hidden transition  "
                 >
-                  <div className="flex items-center py-6">
+                  <div className="flex flex-col items-center py-6">
                     {product.featuredImage && (
                       <div className="bg-[#F6F6F6] p-4">
                         <img
@@ -51,13 +50,11 @@ export function BundleProducts({products}: Props) {
                         />
                       </div>
                     )}
-                    <div className="p-4 w-[70%] flex flex-col items-start gap-4">
-                      <h3 className="font-poppins text-base font-medium underline text-gray-800">
+                    <div className="p-4 flex flex-col items-center">
+                      <h3 className="font-poppins text-base ">
                         {product.title}
                       </h3>
-                      <p className="text-xs w-[90%] mt-1">
-                        {product.description}
-                      </p>
+                 
 
                       {/* Display tags if any */}
                       {product.tags?.length > 0 && (
