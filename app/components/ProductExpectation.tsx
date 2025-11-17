@@ -28,28 +28,38 @@ export function ProductExpectation({
   try {
     expectations = JSON.parse(json);
   } catch (e) {
-    console.error('Invalid expectations JSON', e);
+    console.error('❌ Invalid expectations JSON', e);
     return null;
   }
 
-  if (!expectations.length) return null;
+  if (!expectations.length) {
+    return null;
+  }
+
+  const hasBeforeAfter = beforeAfter && beforeAfter.length === 2;
 
   return (
-    <section className="mt-12 bg-[#F2F2F2] w-full !py-16">
-      <div className="container !p-5 m-auto flex flex-col justify-between lg:flex-row gap-12 ">
-        {beforeAfter && beforeAfter.length === 2 && (
+    <section className="mt-12 w-full !pt-6">
+      <div
+        className={`container !p-5 m-auto flex flex-col justify-between ${hasBeforeAfter ? 'lg:flex-row' : ''} gap-12`}
+      >
+        {hasBeforeAfter && (
           <BeforeAfterSlider before={beforeAfter[0]} after={beforeAfter[1]} />
         )}
 
-        <div className="flex flex-col gap-5 justify-between">
+        <div
+          className={`flex flex-col gap-5 justify-between ${!hasBeforeAfter ? 'w-full' : ''}`}
+        >
           <h2 className="text-2xl font-semibold mb-6">What to Expect</h2>
 
-          {expectations.map((item, index) => (
-            <div key={index} className="flex flex-col gap-1 ">
-              <h3 className="font-semibold text-black">{item.title}</h3>
-              <p>{item.description}</p>
-            </div>
-          ))}
+          <div className="grid grid-cols-2 gap-4">
+            {expectations.map((item, index) => (
+              <div key={index} className="flex flex-col gap-1 ">
+                <h3 className="font-semibold text-black">{item.title}</h3>
+                <p>{item.description}</p>
+              </div>
+            ))}
+          </div>
           <div>
             {expectImage?.length > 0 && (
               <div className="flex flex-col gap-2">

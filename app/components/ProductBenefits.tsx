@@ -106,7 +106,7 @@ export function ProductBenefits({
 
         {/* Right: Benefits */}
         <div className="w-full lg:w-1/2 flex flex-col gap-6 justify-center mb-[80px] ">
-          <h1 className="text-xl">Benefits</h1>
+          {/* <h1 className="text-xl">Benefits</h1> */}
           <ul className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {benefits.map((benefit, index) => (
               <li key={index} className="flex items-start gap-3">

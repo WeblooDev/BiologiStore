@@ -235,3 +235,22 @@ export const FOOTER_QUERY = `#graphql
   }
   ${MENU_FRAGMENT}
 ` as const;
+
+export const COLLECTIONS_QUERY = `#graphql
+  query Collections(
+    $country: CountryCode
+    $language: LanguageCode
+  ) @inContext(language: $language, country: $country) {
+    collections(first: 200, sortKey: TITLE) {
+      nodes {
+        id
+        title
+        handle
+        seo {
+          title
+          description
+        }
+      }
+    }
+  }
+` as const;

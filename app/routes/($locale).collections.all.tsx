@@ -96,6 +96,9 @@ export default function Collection() {
     return {
       category: params.get('category') || '',
       skinType: params.get('skinType') || '',
+
+      skinConcern: params.get('skinConcern') || '',
+      ingredient: params.get('ingredient') || '',
       sort: params.get('sort') || 'RELEVANCE',
       price: params.get('price') || '',
     };
@@ -105,8 +108,8 @@ export default function Collection() {
 
   const filteredProducts = useMemo(() => {
     return data.products.nodes
-      .filter((product) => {
-        const {category, skinType, price} = filters;
+      .filter((product: any) => {
+        const {category, skinType, skinConcern, ingredient, price} = filters;
 
         const normalize = (str: string | undefined) =>
           str?.trim().toLowerCase().replace(/\s+/g, '');
@@ -124,6 +127,26 @@ export default function Collection() {
             ),
           );
 
+        const skinConcernMatch =
+          !skinConcern ||
+          product.variants.nodes.some((variant: any) =>
+            variant.selectedOptions.some(
+              (opt: any) =>
+                normalize(opt.name) === 'skinconcern' &&
+                normalize(opt.value) === skinConcern,
+            ),
+          );
+
+        const ingredientMatch =
+          !ingredient ||
+          product.variants.nodes.some((variant: any) =>
+            variant.selectedOptions.some(
+              (opt: any) =>
+                normalize(opt.name) === 'ingredient' &&
+                normalize(opt.value) === ingredient,
+            ),
+          );
+
         const priceAmount = parseFloat(
           product.priceRange.minVariantPrice.amount,
         );
@@ -134,10 +157,16 @@ export default function Collection() {
               return priceAmount >= min && priceAmount <= max;
             })();
 
-        return skinTypeMatch && categoryMatch && priceMatch;
+        return (
+          skinTypeMatch &&
+          categoryMatch &&
+          skinConcernMatch &&
+          ingredientMatch &&
+          priceMatch
+        );
       })
 
-      .sort((a, b) => {
+      .sort((a: any, b: any) => {
         if (filters.sort === 'PRICE_ASC') {
           return (
             parseFloat(a.priceRange.minVariantPrice.amount) -
@@ -175,7 +204,7 @@ export default function Collection() {
 
   return (
     <>
-      <HeroProductSection
+      {/* <HeroProductSection
         image={{url: productHero, altText: 'Welcome to our store'}}
         title="Shop All"
         links={[
@@ -186,9 +215,9 @@ export default function Collection() {
           {label: 'Shop Bundles', href: '/collections/moisturizers'},
           {label: 'Shop Best Sellers', href: '/collections/treatments'},
         ]}
-      />
+      /> */}
 
-      <div className="container m-auto collection">
+      <div className="container m-auto collection mt-32 pt-8">
         <AllCollections collections={data.allCollections} />
 
         <ProductFilter
@@ -198,17 +227,23 @@ export default function Collection() {
           skinTypes={data.skinTypes}
           skinTypeCounts={data.skinTypeCounts}
           categoryCounts={data.categoryCounts}
+          skinConcerns={data.skinConcerns}
+          skinConcernCounts={data.skinConcernCounts}
+          ingredients={data.ingredients}
+          ingredientsCounts={data.ingredientsCounts}
         />
 
         {/* Product Grid */}
         <div className="container products-grid grid grid-cols-2 md:grid-cols-4 gap-8 p-4">
-          {filteredProducts.slice(0, visibleCount).map((product, index) => (
-            <ProductItem
-              key={product.id}
-              product={product}
-              loading={index < BATCH_SIZE ? 'eager' : undefined}
-            />
-          ))}
+          {filteredProducts
+            .slice(0, visibleCount)
+            .map((product: any, index: any) => (
+              <ProductItem
+                key={product.id}
+                product={product}
+                loading={index < BATCH_SIZE ? 'eager' : undefined}
+              />
+            ))}
         </div>
 
         {/* Viewed Count */}
@@ -371,7 +406,7 @@ const PRODUCT_TYPES_WITH_SAMPLE_PRODUCTS_QUERY = `#graphql
 ` as const;
 
 const RECOMMENDED_PRODUCTS_QUERY = `#graphql
-  fragment RecommendedProduct on Product {
+  fragment RecommendedProductAll on Product {
     id
     title
     handle
@@ -396,11 +431,11 @@ const RECOMMENDED_PRODUCTS_QUERY = `#graphql
     }
     tags
   }
-  query RecommendedProducts ($country: CountryCode, $language: LanguageCode)
+  query RecommendedProductsAll ($country: CountryCode, $language: LanguageCode)
     @inContext(country: $country, language: $language) {
     products(first: 6, sortKey: UPDATED_AT, reverse: true) {
       nodes {
-        ...RecommendedProduct
+        ...RecommendedProductAll
       }
     }
   }

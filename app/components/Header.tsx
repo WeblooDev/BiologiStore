@@ -1,9 +1,8 @@
-import {useEffect, useRef, useState} from 'react';
+import {useEffect, useRef, useState, Suspense} from 'react';
 import type {HeaderQuery, CartApiQueryFragment} from 'storefrontapi.generated';
 import {useAside} from '~/components/Aside';
 import logoBiologi from '~/assets/images/logoBiologi.svg';
-import {Suspense} from 'react';
-import {Await} from 'react-router';
+import {Await, useLocation} from 'react-router';
 import cartIcon from '~/assets/images/cart.svg';
 import search from '~/assets/images/search.svg';
 import signin from '~/assets/images/signin.svg';
@@ -16,7 +15,6 @@ import {
   useAnalytics,
   useOptimisticCart,
 } from '@shopify/hydrogen';
-import {useLocation} from 'react-router';
 import right from '~/assets/images/right-arrow.svg';
 import left from '~/assets/images/left-arrow.svg';
 
@@ -46,12 +44,49 @@ function sanitizeUrl(url: string): string {
 
 export function Header({header, isLoggedIn, cart}: HeaderProps) {
   const {open} = useAside(); // ✅ ADD THIS LINE
+  // Desktop view logic with sticky behavior
+  const menuRef = useRef<HTMLDivElement>(null);
+  const [isSticky, setIsSticky] = useState(false);
+  const [offsetTop, setOffsetTop] = useState(0);
+  const [menuHeight, setMenuHeight] = useState(0);
+
+  useEffect(() => {
+    const updateMeasurements = () => {
+      if (menuRef.current) {
+        setOffsetTop(menuRef.current.offsetTop);
+        setMenuHeight(menuRef.current.offsetHeight);
+        setIsSticky(false);
+      }
+    };
+
+    updateMeasurements();
+    window.addEventListener('resize', updateMeasurements);
+    return () => window.removeEventListener('resize', updateMeasurements);
+  }, []);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.scrollY;
+      const shouldBeSticky = scrollTop >= offsetTop;
+      setIsSticky((prev) => {
+        if (prev !== shouldBeSticky) {
+          return shouldBeSticky;
+        }
+        return prev;
+      });
+    };
+
+    window.addEventListener('scroll', handleScroll, {passive: true});
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [offsetTop]);
 
   const {shop, menu} = header;
   const location = useLocation();
 
   // Check if the path starts with /products/
-  const isProductPage = location.pathname.startsWith('/products/');
+  const isProductPage =
+    location.pathname.startsWith('/products/') ||
+    location.pathname.startsWith('/bundles');
 
   return (
     <div
@@ -90,6 +125,10 @@ export function Header({header, isLoggedIn, cart}: HeaderProps) {
         viewport="desktop"
         isLoggedIn={isLoggedIn}
         cart={cart}
+        isSticky={isSticky}
+        offsetTop={offsetTop}
+        menuHeight={menuHeight}
+        menuRef={menuRef}
       />
     </div>
   );
@@ -100,15 +139,19 @@ export function HeaderMenu({
   viewport,
   isLoggedIn,
   cart,
-  primaryDomainUrl,
-  publicStoreDomain,
+  isSticky,
+  offsetTop,
+  menuHeight,
+  menuRef,
 }: {
   menu: HeaderProps['header']['menu'];
   viewport: 'desktop' | 'mobile';
   isLoggedIn: HeaderProps['isLoggedIn'];
   cart: HeaderProps['cart'];
-  primaryDomainUrl?: string;
-  publicStoreDomain?: string;
+  isSticky: boolean;
+  offsetTop: number;
+  menuHeight: number;
+  menuRef: React.RefObject<HTMLDivElement>;
 }) {
   const {close} = useAside();
 
@@ -129,35 +172,6 @@ export function HeaderMenu({
       </nav>
     );
   }
-
-  // Desktop view logic with sticky behavior
-  const menuRef = useRef<HTMLDivElement>(null);
-  const [isSticky, setIsSticky] = useState(false);
-  const [offsetTop, setOffsetTop] = useState(0);
-  const [menuHeight, setMenuHeight] = useState(0);
-
-  useEffect(() => {
-    const updateMeasurements = () => {
-      if (menuRef.current) {
-        setOffsetTop(menuRef.current.offsetTop);
-        setMenuHeight(menuRef.current.offsetHeight);
-      }
-    };
-
-    updateMeasurements();
-    window.addEventListener('resize', updateMeasurements);
-    return () => window.removeEventListener('resize', updateMeasurements);
-  }, []);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollTop = window.scrollY;
-      setIsSticky(scrollTop >= offsetTop);
-    };
-
-    window.addEventListener('scroll', handleScroll, {passive: true});
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [offsetTop]);
 
   return (
     <>

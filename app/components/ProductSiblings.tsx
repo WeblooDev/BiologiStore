@@ -14,7 +14,7 @@ export function ProductSiblings({products}: {products: SiblingProduct[]}) {
   if (!products?.length) return null;
 
   return (
-    <div className="mt-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+    <div className=" grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
       {products.map((product) => (
         <div
           key={product.id}
@@ -32,7 +32,7 @@ export function ProductSiblings({products}: {products: SiblingProduct[]}) {
           <h3 className="font-poppins text-sm ">{product.title}</h3>
           <a
             href={`/products/${product.handle}`}
-            className="border uppercase border-[#2B8C57] !text-[#2B8C57] px-2 py-1 text-[12px]"
+            className="border uppercase border-[#2B8C57] !text-[#2B8C57] px-2 py-1 text-[12px] w-full"
           >
             Shop now
           </a>

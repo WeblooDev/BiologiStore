@@ -17,10 +17,8 @@ export function AllCollections({collections}: AllCollectionsProps) {
 
   return (
     <section className="container mx-auto my-12">
-      <div className="flex flex-col gap-6 justify-center items-center">
-        <h2 className="font-poppins !text-4xl !font-normal mb-4">
-          Shop By Skin Concern
-        </h2>
+      <div className="flex flex-col gap-8 justify-center items-center">
+        <h2 className="font-poppins !text-2xl !font-bold">Shop By Category</h2>
         <ul className="flex flex-wrap gap-6 justify-center">
           {collections.nodes.map((collection) => (
             <li key={collection.id} className="w-[150px] max-w-[194px]">

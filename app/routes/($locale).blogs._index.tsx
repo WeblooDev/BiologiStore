@@ -127,13 +127,14 @@ export default function Blogs() {
         <div className="md:col-span-3 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredBlogs.map((blog) => {
             const article = blog.articles?.nodes?.[0];
+            if (!article) return null;
 
             return (
               <div
                 className="blog-card flex flex-col gap-4 justify-between mb-6"
                 key={blog.handle}
               >
-                <Link to={`/blogs/${blog.handle}`} prefetch="intent">
+                <a href={`/blogs/${blog.handle}/${article.handle}`}>
                   {article?.image?.url && (
                     <img
                       src={article.image.url}
@@ -141,8 +142,8 @@ export default function Blogs() {
                       className="w-full h-38 object-cover mb-4"
                     />
                   )}
-                  <h2 className="!text-base  mb-1">{blog.title}</h2>
-                </Link>
+                  <h2 className="!text-base  mb-1">{article.title}</h2>
+                </a>
                 {article?.excerpt && (
                   <p className="text-sm mb-2 line-clamp-3">{article.excerpt}</p>
                 )}
@@ -151,9 +152,12 @@ export default function Blogs() {
                     {blog.seo.description}
                   </p>
                 )}
-                <Link to={`/blogs/${blog.handle}`} className=" !underline">
+                <a
+                  href={`/blogs/${blog.handle}/${article.handle}`}
+                  className=" !underline"
+                >
                   Read More
-                </Link>
+                </a>
               </div>
             );
           })}
@@ -164,7 +168,7 @@ export default function Blogs() {
 }
 
 const BLOGS_QUERY = `#graphql
-  query Blogs(
+  query BlogsIndex(
     $country: CountryCode
     $endCursor: String
     $first: Int

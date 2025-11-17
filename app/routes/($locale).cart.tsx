@@ -1,4 +1,4 @@
-import {type MetaFunction, useLoaderData} from 'react-router';
+import {Link, type MetaFunction, useLoaderData} from 'react-router';
 import type {CartQueryDataReturn} from '@shopify/hydrogen';
 import {CartForm} from '@shopify/hydrogen';
 import {
@@ -110,7 +110,12 @@ export default function Cart() {
 
   return (
     <div className="cart">
-      <h1>Cart</h1>
+      <header className="flex items-center justify-between">
+        <h2 className="text-xl font-semibold">Your bag</h2>
+        <Link to="/cart" prefetch="viewport" className="text-sm underline">
+          Go to cart
+        </Link>
+      </header>
       <CartMain layout="page" cart={cart} />
     </div>
   );

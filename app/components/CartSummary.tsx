@@ -3,6 +3,7 @@ import type {CartLayout} from '~/components/CartMain';
 import {CartForm, Money, type OptimisticCart} from '@shopify/hydrogen';
 import {useRef} from 'react';
 import {FetcherWithComponents} from 'react-router';
+import {Root} from 'postcss';
 
 type CartSummaryProps = {
   cart: OptimisticCart<CartApiQueryFragment | null>;
@@ -15,21 +16,50 @@ export function CartSummary({cart, layout}: CartSummaryProps) {
 
   return (
     <div
-      aria-labelledby="cart-summary !bg-[#F6F6F6] !flex flex-col gap-3"
-      className={className}
+      aria-labelledby="cart-summary"
+      className={`${className} flex flex-col gap-4 border-0!`}
     >
-      <dl className="cart-subtotal">
-        <dt className="font-semibold">Subtotal</dt>
-        <dd className="font-semibold">
-          {cart.cost?.subtotalAmount?.amount ? (
-            <Money data={cart.cost?.subtotalAmount} />
-          ) : (
-            '-'
-          )}
-        </dd>
-      </dl>
-      <CartDiscounts discountCodes={cart.discountCodes} />
-      <CartGiftCard giftCardCodes={cart.appliedGiftCards} />
+      <div className="bg-[#F6F6F6] px-3 flex flex-col gap-1 text-sm">
+        <dl className="flex items-center justify-between">
+          <dt className="font-semibold">Original price</dt>
+          <dd className="font-semibold">
+            {cart.cost?.subtotalAmount?.amount ? (
+              <Money data={cart.cost?.subtotalAmount} />
+            ) : (
+              '-'
+            )}
+          </dd>
+        </dl>
+
+        <dl className="flex items-center justify-between">
+          <dt className="text-[#2B8C57] font-semibold">Discount</dt>
+          <dd className="text-[#2B8C57] font-semibold">
+            {cart.discountCodes?.length ? (
+              <CartDiscounts discountCodes={cart.discountCodes} />
+            ) : (
+              <span>-</span>
+            )}
+          </dd>
+        </dl>
+
+        <p className="text-xs text-gray-600">
+          Taxes and shipping are calculated at checkout
+        </p>
+
+        <dl className="flex items-center justify-between">
+          <dt className="font-semibold">Subtotal</dt>
+          <dd className="font-semibold">
+            {cart.cost?.subtotalAmount?.amount ? (
+              <Money data={cart.cost?.subtotalAmount} />
+            ) : (
+              '-'
+            )}
+          </dd>
+        </dl>
+      </div>
+
+      {/* <CartGiftCard giftCardCodes={cart.appliedGiftCards} /> */}
+
       <CartCheckoutActions checkoutUrl={cart.checkoutUrl} />
     </div>
   );
@@ -39,8 +69,8 @@ function CartCheckoutActions({checkoutUrl}: {checkoutUrl?: string}) {
 
   return (
     <div className="bg-[#2B8C57] py-2 text-white flex items-center justify-center">
-      <a href={checkoutUrl} target="_self" className="bg-[#2B8C57]">
-        <p>Continue to Checkout &rarr;</p>
+      <a href={checkoutUrl} target="_self" className="bg-[#2B8C57] uppercase">
+        <p>Secure Checkout</p>
       </a>
       <br />
     </div>

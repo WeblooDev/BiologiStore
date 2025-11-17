@@ -4,10 +4,10 @@ import {HeroAboutSection} from '~/components/HeroAboutSection';
 import {ImageTextSection} from '~/components/ImageTextSection'; // ✅ Import the component
 import heroaboutImage from '~/assets/images/heroabout.png';
 import about1 from '~/assets/images/about1.webp';
-import about2 from '~/assets/images/abou2.webp';
+import about2 from '~/assets/images/about-camelia.webp';
 import about3 from '~/assets/images/about3.webp';
-import about4 from '~/assets/images/about4.webp';
-import trustedbyexpert from '~/assets/images/trustedbyexpert.webp';
+import about4 from '~/assets/images/biologi-experts.webp';
+import trustedbyexpert from '~/assets/images/chosen-by-you.webp';
 
 import {TrustedByExpertSection} from '~/components/TrustedByExpert';
 
@@ -104,7 +104,7 @@ export default function AboutPage() {
           {
             title: 'BiologiMD® Experts by Your Side',
             description:
-              'Our team is here to guide you. Get straightforward advice, product recommendations, and support to help you get the best results from your routine. ',
+              'Our team is here to guide you. Get straightforward advice, product recommendations, and support to help you get the best results from your routine.',
           },
           {
             title: '',

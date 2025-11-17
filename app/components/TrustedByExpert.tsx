@@ -21,7 +21,7 @@ export function TrustedByExpertSection({
 }: TrustedByExpertSectionProps) {
   return (
     <div
-      className="relative w-full h-[600px] bg-cover bg-center  items-start flex flex-col p-8 gap-6 justify-center"
+      className="relative w-full h-[600px] bg-cover bg-center  items-start flex flex-col p-8 gap-6 justify-center mt-16"
       style={{backgroundImage: `url(${image.url})`}}
     >
       <div className="flex flex-col gap-6 items-start ">

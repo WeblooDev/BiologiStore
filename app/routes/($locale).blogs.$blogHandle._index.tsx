@@ -94,7 +94,7 @@ function ArticleItem({
 
   return (
     <div className="blog-article w-[50%] m-auto" key={article.id}>
-      <Link to={`/blogs/${article.blog.handle}/${article.handle}`}>
+      <div>
         {article.image && (
           <div className="blog-article-image">
             <Image
@@ -120,71 +120,25 @@ function ArticleItem({
           <span>|</span>
           <p className="!text-base">{publishedAt}</p>
         </div>
-      </Link>
 
-      <h1 className="!text-4xl !m-0">{article.title}</h1>
-      <p className="font-semibold !mt-2 !mb-10">By BiologiMd® Skin Health</p>
+        <h1 className="!text-4xl !m-0">{article.title}</h1>
+        <p className="font-semibold !mt-2 !mb-10">By BiologiMd® Skin Health</p>
+      </div>
 
-      <div
-        className="mt-4 "
-        dangerouslySetInnerHTML={{__html: article.contentHtml}}
-      />
-
-      {/* Linked Products via shopPosts metafield */}
-      {article.shopPosts?.referenceList?.nodes?.length > 0 && (
-        <div className="mt-16">
-          <div className="flex justify-center ">
-            <h2 className="text-2xl font-semibold mb-4">Shop The Post</h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {article.shopPosts.referenceList.nodes.map((product) => (
-              <div
-                key={product.id}
-                className="flex flex-col gap-4 justify-between items-center"
-              >
-                <Link to={`/products/${product.handle}`}>
-                  {product.featuredImage && (
-                    <Image
-                      data={product.featuredImage}
-                      alt={product.title}
-                      className="mb-3 h-[270px] object-cover w-full"
-                    />
-                  )}
-                  <h3 className="text-[#2B8C57] font-semibold mb-2 text-center">
-                    {product.title}
-                  </h3>
-                </Link>
-
-                {product.tags?.length > 0 && (
-                  <div className="flex flex-wrap gap-2 text-sm">
-                    {product.tags.slice(0, 3).map((tag) => (
-                      <span key={tag}>{tag}</span>
-                    ))}
-                  </div>
-                )}
-
-                <p className="text-gray-900 font-medium mb-3">
-                  ${product.priceRange.minVariantPrice.amount}{' '}
-                </p>
-
-                <form method="post" action="/cart/add">
-                  <input
-                    type="hidden"
-                    name="id"
-                    value={product.variants.nodes[0]?.id}
-                  />
-                  <button
-                    type="submit"
-                    className=" text-[#2B8C57] px-4 py-2 border !border-[#2B8C57]"
-                  >
-                    Add to Bag
-                  </button>
-                </form>
-              </div>
-            ))}
-          </div>
-        </div>
+      {/* Excerpt or preview text */}
+      {article.excerptHtml && (
+        <div
+          className="mt-4 text-gray-700 line-clamp-3"
+          dangerouslySetInnerHTML={{__html: article.excerptHtml}}
+        />
       )}
+
+      <a
+        href={`/blogs/${article.blog.handle}/${article.handle}`}
+        className="inline-block mt-6 text-[#2B8C57] underline hover:no-underline"
+      >
+        Read Full Article →
+      </a>
     </div>
   );
 }
@@ -229,9 +183,10 @@ const BLOGS_QUERY = `#graphql
     author: authorV2 {
       name
     }
-    contentHtml
+    excerptHtml
     handle
     id
+    contentHtml
     image {
       id
       altText
@@ -245,31 +200,34 @@ const BLOGS_QUERY = `#graphql
       handle
     }
     tags
-    shopPosts: metafield(namespace: "custom", key: "shopPosts") {
-      referenceList: references(first: 3) {
+    shopPosts: metafield(namespace: "custom", key: "shop_posts") {
+      references(first: 10) {
         nodes {
           ... on Product {
             id
-            title
             handle
+            title
             tags
-            featuredImage {
-              url
-              altText
-              width
-              height
-            }
             priceRange {
               minVariantPrice {
                 amount
                 currencyCode
               }
             }
+            featuredImage {
+              id
+              url
+              altText
+              width
+              height
+            }
             variants(first: 1) {
               nodes {
                 id
+                title
               }
             }
+            descriptionHtml
           }
         }
       }

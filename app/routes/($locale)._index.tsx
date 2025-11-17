@@ -6,7 +6,10 @@ import {BestSellers} from '~/components/BestSellers';
 import {DiscoverRegimenSection} from '~/components/DiscoverRegimen';
 import {AllCollections} from '~/components/AllCollections';
 import {PackProduct} from '~/components/PackProduct';
-import heroImage from '~/assets/images/hero.png';
+import heroImage1 from '~/assets/images/hero.webp';
+import heroImage2 from '~/assets/images/hero-2.webp';
+import heroImage3 from '~/assets/images/hero-3.webp';
+import heroImage4 from '~/assets/images/hero-4.webp';
 import homepage from '~/assets/images/homepage.webp';
 import discoverImage from '~/assets/images/discover.png';
 
@@ -31,8 +34,8 @@ async function loadCriticalData({context}: LoaderFunctionArgs) {
 }
 
 function loadDeferredData({context}: LoaderFunctionArgs) {
-  const recommendedProducts = context.storefront
-    .query(RECOMMENDED_PRODUCTS_QUERY)
+  const bestSellers = context.storefront
+    .query(BEST_SELLERS_QUERY)
     .catch((error) => {
       console.error(error);
       return null;
@@ -55,7 +58,7 @@ function loadDeferredData({context}: LoaderFunctionArgs) {
     });
 
   return {
-    recommendedProducts,
+    bestSellers,
     latestBlogs,
     packProduct,
   };
@@ -67,17 +70,22 @@ export default function Homepage() {
   return (
     <div className="home">
       <HeroSection
-        image={{url: heroImage, altText: 'Holiday Hero'}}
-        title="Gentle Cleanser "
-        text="This Gentle Foaming Cleanser Washes Away Impurities and Leaves the Skin Feeling Smooth and Refreshed"
-        buttonText="ADD TO BAG"
+        image={[
+          {url: heroImage1, altText: 'Holiday Hero'},
+          {url: heroImage2, altText: 'Holiday Hero'},
+          {url: heroImage3, altText: 'Holiday Hero'},
+          {url: heroImage4, altText: 'Holiday Hero'},
+        ]}
+        title="Upgrade Your Daily Skincare Routine"
+        text="Discover advanced medical grade formulas trusted for long term skin health."
+        buttonText="SHOP ALL"
         buttonLink="/collections"
       />
 
       <AllCollections collections={data.allCollections} />
 
       <Suspense fallback={<div>Loading Best Sellers...</div>}>
-        <Await resolve={data.recommendedProducts}>
+        <Await resolve={data.bestSellers}>
           {(response) => (
             <BestSellers title="Best Sellers" products={response} />
           )}
@@ -87,31 +95,26 @@ export default function Homepage() {
       <Suspense fallback={<div>Loading Featured Pack...</div>}>
         <Await resolve={data.packProduct}>
           {(res) => {
-            const product = res?.products?.nodes?.[0];
-            return <PackProduct product={product} />;
+            const products = res?.products?.nodes || [];
+            return <PackProduct products={products} />;
           }}
         </Await>
       </Suspense>
 
-      <DiscoverRegimenSection
-        image={{
-          url: discoverImage,
-          altText: 'Welcome to our store',
-        }}
-        title="Discover Your Regimen"
-        text="Find the skincare products best suited for your skin health goals."
-        buttonText="Discover My Regimen"
-        buttonLink="/collections"
-      />
-
       <Suspense fallback={<div>Loading Blogs...</div>}>
         <Await resolve={data.latestBlogs}>
           {(blogsData) => (
-            <section className="container mx-auto px-4 py-12">
+            <section className="container mx-auto px-4 py-12 mb-12">
               <div className="flex justify-between gap-4 my-6 items-end px-4 ">
-                <h2 className="font-poppins text-3xl font-bold !m-0">
-                  The BiologiMD® Blogs
-                </h2>
+                <div className="flex flex-col gap-3">
+                  <h2 className="font-poppins text-3xl font-bold !m-0">
+                    The BiologiMD® Blogs
+                  </h2>
+                  <p className="text-sm text-gray-600">
+                    Discover expert tips, skincare insights, and the latest from
+                    BiologiMD®.
+                  </p>
+                </div>
                 <a
                   href="/blogs"
                   className="!no-underline inline-block bg-white border border-[#2B8C57] px-8 py-2 uppercase text-sm cursor-pointer transition-all duration-300 text-[#2B8C57] hover:bg-[#2B8C57] hover:!text-white hover:border-[#2B8C57]"
@@ -166,6 +169,17 @@ export default function Homepage() {
           )}
         </Await>
       </Suspense>
+
+      {/* <DiscoverRegimenSection
+        image={{
+          url: discoverImage,
+          altText: 'Welcome to our store',
+        }}
+        title="Discover Your Regimen"
+        text="Find the skincare products best suited for your skin health goals."
+        buttonText="Discover My Regimen"
+        buttonLink="/collections"
+      /> */}
     </div>
   );
 }
@@ -229,6 +243,42 @@ const RECOMMENDED_PRODUCTS_QUERY = `#graphql
   }
 ` as const;
 
+const BEST_SELLERS_QUERY = `#graphql
+  fragment BestSellerProduct on Product {
+    id
+    title
+    handle
+    descriptionHtml
+    priceRange {
+      minVariantPrice {
+        amount
+        currencyCode
+      }
+    }
+    variants(first: 1) {
+      nodes {
+        title
+      }
+    }
+    featuredImage {
+      id
+      url
+      altText
+      width
+      height
+    }
+    tags
+  }
+  query BestSellers ($country: CountryCode, $language: LanguageCode)
+    @inContext(country: $country, language: $language) {
+    products(first: 6, query: "tag:best-sellers", sortKey: UPDATED_AT, reverse: true) {
+      nodes {
+        ...BestSellerProduct
+      }
+    }
+  }
+` as const;
+
 const PRODUCT_WITH_PACK_TAG_QUERY = `#graphql
   fragment ProductWithTagFields on Product {
     id
@@ -250,7 +300,7 @@ const PRODUCT_WITH_PACK_TAG_QUERY = `#graphql
 
   query ProductsWithTag($tag: String!, $country: CountryCode, $language: LanguageCode)
     @inContext(country: $country, language: $language) {
-    products(first: 1, query: $tag) {
+    products(first: 2, query: $tag) {
       nodes {
         ...ProductWithTagFields
       }
@@ -259,7 +309,7 @@ const PRODUCT_WITH_PACK_TAG_QUERY = `#graphql
 ` as const;
 
 const BLOGS_QUERY = `#graphql
-  query Blogs($first: Int) {
+  query BlogsHome($first: Int) {
     blogs(first: $first) {
       nodes {
         title
