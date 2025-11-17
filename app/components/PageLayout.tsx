@@ -4,6 +4,7 @@ import type {
   CartApiQueryFragment,
   FooterQuery,
   HeaderQuery,
+  RecommendedProductsForCartQuery,
 } from 'storefrontapi.generated';
 
 import {Aside} from '~/components/Aside';
@@ -16,6 +17,16 @@ import {
 } from '~/components/SearchFormPredictive';
 import {SearchResultsPredictive} from '~/components/SearchResultsPredictive';
 
+interface CollectionsQueryResult {
+  collections: {
+    nodes: Array<{
+      id: string;
+      title: string;
+      handle: string;
+    }>;
+  };
+}
+
 interface PageLayoutProps {
   cart: Promise<CartApiQueryFragment | null>;
   footer: Promise<FooterQuery | null>;
@@ -23,6 +34,8 @@ interface PageLayoutProps {
   isLoggedIn: Promise<boolean>;
   publicStoreDomain: string;
   children?: React.ReactNode;
+  collections: Promise<CollectionsQueryResult | null>;
+  recommendedProducts: Promise<RecommendedProductsForCartQuery | null>;
 }
 
 export function PageLayout({
@@ -31,11 +44,13 @@ export function PageLayout({
   footer,
   header,
   isLoggedIn,
+  collections,
   publicStoreDomain,
+  recommendedProducts,
 }: PageLayoutProps) {
   return (
     <Aside.Provider>
-      <CartAside cart={cart} />
+      <CartAside cart={cart} recommendedProducts={recommendedProducts} />
       <SearchAside />
       <MobileMenuAside
         header={header}
@@ -56,18 +71,31 @@ export function PageLayout({
         footer={footer}
         header={header}
         publicStoreDomain={publicStoreDomain}
+        collections={collections}
       />
     </Aside.Provider>
   );
 }
 
-function CartAside({cart}: {cart: PageLayoutProps['cart']}) {
+function CartAside({
+  cart,
+  recommendedProducts,
+}: {
+  cart: PageLayoutProps['cart'];
+  recommendedProducts: PageLayoutProps['recommendedProducts'];
+}) {
   return (
     <Aside type="cart" heading="Your bag">
       <Suspense fallback={<p>Loading cart ...</p>}>
-        <Await resolve={cart}>
-          {(cart) => {
-            return <CartMain cart={cart} layout="aside" />;
+        <Await resolve={Promise.all([cart, recommendedProducts])}>
+          {([cartResult, recommended]) => {
+            return (
+              <CartMain
+                cart={cartResult}
+                layout="aside"
+                recommendedProducts={recommended}
+              />
+            );
           }}
         </Await>
       </Suspense>

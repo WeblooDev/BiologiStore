@@ -1,9 +1,12 @@
 import {redirect, type LoaderFunctionArgs} from '@shopify/remix-oxygen';
-import {useLoaderData, type MetaFunction} from 'react-router';
+import {Await, useLoaderData, type MetaFunction} from 'react-router';
 import {getPaginationVariables, Analytics} from '@shopify/hydrogen';
-import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 import {ProductItem} from '~/components/ProductItem';
+import {Suspense, useState, useMemo} from 'react';
+import {BestSellers} from '~/components/BestSellers';
+import {AllCollections} from '~/components/AllCollections';
+import {ProductFilter, type FilterState} from '~/components/ProductFilter';
 
 export const meta: MetaFunction<typeof loader> = ({data}) => {
   return [{title: `Hydrogen | ${data?.collection.title ?? ''} Collection`}];
@@ -31,18 +34,18 @@ async function loadCriticalData({
   const {handle} = params;
   const {storefront} = context;
   const paginationVariables = getPaginationVariables(request, {
-    pageBy: 8,
+    pageBy: 24,
   });
 
   if (!handle) {
     throw redirect('/collections');
   }
 
-  const [{collection}] = await Promise.all([
+  const [{collection}, {collections}] = await Promise.all([
     storefront.query(COLLECTION_QUERY, {
       variables: {handle, ...paginationVariables},
-      // Add other queries here, so that they are loaded in parallel
     }),
+    storefront.query(ALL_COLLECTIONS_QUERY),
   ]);
 
   if (!collection) {
@@ -54,8 +57,38 @@ async function loadCriticalData({
   // The API handle might be localized, so redirect to the localized handle
   redirectIfHandleIsLocalized(request, {handle, data: collection});
 
+  // Count skin types and categories
+  const skinTypeSet = new Set<string>();
+  const skinTypeCounts: Record<string, number> = {};
+  const categoryCounts: Record<string, number> = {};
+
+  collection.products.nodes.forEach((product) => {
+    // Count categories (productType)
+    const category = product.productType?.trim();
+    if (category) {
+      categoryCounts[category] = (categoryCounts[category] || 0) + 1;
+    }
+
+    // Count skin types from variant options
+    product.variants?.nodes?.forEach((variant) => {
+      variant.selectedOptions?.forEach((opt) => {
+        if (opt.name.toLowerCase() === 'suitable for skin type') {
+          const value = opt.value.trim();
+          skinTypeSet.add(value);
+          skinTypeCounts[value] = (skinTypeCounts[value] || 0) + 1;
+        }
+      });
+    });
+  });
+
+  const skinTypes = Array.from(skinTypeSet);
+
   return {
     collection,
+    allCollections: collections,
+    skinTypes,
+    skinTypeCounts,
+    categoryCounts,
   };
 }
 
@@ -65,38 +98,205 @@ async function loadCriticalData({
  * Make sure to not throw any errors here, as it will cause the page to 500.
  */
 function loadDeferredData({context}: LoaderFunctionArgs) {
-  return {};
+  const recommendedProducts = context.storefront
+    .query(RECOMMENDED_PRODUCTS_QUERY)
+    .catch((error) => {
+      console.error(error);
+      return null;
+    });
+
+  return {
+    recommendedProducts,
+  };
 }
 
 export default function Collection() {
-  const {collection} = useLoaderData<typeof loader>();
+  const data = useLoaderData<typeof loader>();
+
+  const getInitialFilter = (): FilterState => {
+    const params = new URLSearchParams(
+      typeof window !== 'undefined' ? window.location.search : '',
+    );
+    return {
+      category: params.get('category') || '',
+      skinType: params.get('skinType') || '',
+      skinConcern: params.get('skinConcern') || '',
+      ingredient: params.get('ingredient') || '',
+      sort: params.get('sort') || 'RELEVANCE',
+      price: params.get('price') || '',
+    };
+  };
+
+  const [filters, setFilters] = useState<FilterState>(getInitialFilter);
+
+  const filteredProducts = useMemo(() => {
+    return data.collection.products.nodes
+      .filter((product: any) => {
+        const {category, skinType, skinConcern, ingredient, price} = filters;
+
+        const normalize = (str: string | undefined) =>
+          str?.trim().toLowerCase().replace(/\\s+/g, '');
+
+        const categoryMatch =
+          !category || normalize(product.productType) === normalize(category);
+
+        const skinTypeMatch =
+          !skinType ||
+          product.variants.nodes.some((variant) =>
+            variant.selectedOptions.some(
+              (opt) =>
+                normalize(opt.name) === 'suitableforskintype' &&
+                normalize(opt.value) === skinType,
+            ),
+          );
+
+        const skinConcernMatch =
+          !skinConcern ||
+          product.variants.nodes.some((variant: any) =>
+            variant.selectedOptions.some(
+              (opt: any) =>
+                normalize(opt.name) === 'skinconcern' &&
+                normalize(opt.value) === skinConcern,
+            ),
+          );
+
+        const ingredientMatch =
+          !ingredient ||
+          product.variants.nodes.some((variant: any) =>
+            variant.selectedOptions.some(
+              (opt: any) =>
+                normalize(opt.name) === 'ingredient' &&
+                normalize(opt.value) === ingredient,
+            ),
+          );
+
+        const priceAmount = parseFloat(
+          product.priceRange.minVariantPrice.amount,
+        );
+        const priceMatch = !price
+          ? true
+          : (() => {
+              const [min, max] = price.split('-').map(Number);
+              return priceAmount >= min && priceAmount <= max;
+            })();
+
+        return (
+          skinTypeMatch &&
+          categoryMatch &&
+          skinConcernMatch &&
+          ingredientMatch &&
+          priceMatch
+        );
+      })
+      .sort((a: any, b: any) => {
+        if (filters.sort === 'PRICE_ASC') {
+          return (
+            parseFloat(a.priceRange.minVariantPrice.amount) -
+            parseFloat(b.priceRange.minVariantPrice.amount)
+          );
+        }
+        if (filters.sort === 'PRICE_DESC') {
+          return (
+            parseFloat(b.priceRange.minVariantPrice.amount) -
+            parseFloat(a.priceRange.minVariantPrice.amount)
+          );
+        }
+        if (filters.sort === 'UPDATED_AT') {
+          const aIsNew = a.metafield?.value === 'true' ? 1 : 0;
+          const bIsNew = b.metafield?.value === 'true' ? 1 : 0;
+          return bIsNew - aIsNew;
+        }
+        return 0;
+      });
+  }, [data.collection.products.nodes, filters]);
+
+  const BATCH_SIZE = 6;
+  const [visibleCount, setVisibleCount] = useState(BATCH_SIZE);
+
+  const handleLoadMore = () => {
+    setVisibleCount((prev) =>
+      Math.min(prev + BATCH_SIZE, filteredProducts.length),
+    );
+  };
+
+  const progress = Math.min(
+    (visibleCount / filteredProducts.length) * 100,
+    100,
+  );
 
   return (
-    <div className="collection pt-[190px]">
-      <h1>{collection.title}</h1>
-      <p className="collection-description">{collection.description}</p>
-      <img src="" alt="" />
-      <PaginatedResourceSection
-        connection={collection.products}
-        resourcesClassName="products-grid"
-      >
-        {({node: product, index}) => (
-          <ProductItem
-            key={product.id}
-            product={product}
-            loading={index < 8 ? 'eager' : undefined}
+    <>
+      <div className="container m-auto collection mt-32 pt-8">
+        <AllCollections collections={data.allCollections} />
+
+        <ProductFilter
+          filters={filters}
+          onFilterChange={setFilters}
+          categories={data.allCollections.nodes}
+          skinTypes={data.skinTypes}
+          skinTypeCounts={data.skinTypeCounts}
+          categoryCounts={data.categoryCounts}
+          skinConcerns={data.skinConcerns}
+          skinConcernCounts={data.skinConcernCounts}
+          ingredients={data.ingredients}
+          ingredientsCounts={data.ingredientsCounts}
+        />
+
+        {/* Product Grid */}
+        <div className="container products-grid grid grid-cols-2 md:grid-cols-4 gap-8 p-4">
+          {filteredProducts
+            .slice(0, visibleCount)
+            .map((product: any, index: any) => (
+              <ProductItem
+                key={product.id}
+                product={product}
+                loading={index < BATCH_SIZE ? 'eager' : undefined}
+              />
+            ))}
+        </div>
+
+        {/* Viewed Count */}
+        <p className="text-center text-sm text-gray-600 !my-6">
+          You've viewed <span className="font-semibold">{visibleCount}</span> of{' '}
+          <span className="font-semibold">{filteredProducts.length}</span>{' '}
+          products
+        </p>
+
+        {/* Progress Bar */}
+        <div className="w-[30%] m-auto h-[2px] bg-gray-200 rounded overflow-hidden mt-2 mb-6">
+          <div
+            className="h-full bg-[#2B8C57] transition-all duration-300 ease-in-out"
+            style={{width: `${progress}%`}}
           />
+        </div>
+
+        {/* Load More Button */}
+        {visibleCount < filteredProducts.length && (
+          <div className="flex justify-center mt-4">
+            <button
+              onClick={handleLoadMore}
+              className="bg-white border border-[#2B8C57] text-[#2B8C57] px-6 py-3 uppercase text-sm hover:bg-[#2B8C57] hover:text-white transition cursor-pointer"
+            >
+              Load More
+            </button>
+          </div>
         )}
-      </PaginatedResourceSection>
+
+        <Suspense fallback={<div>Loading Best Sellers...</div>}>
+          <Await resolve={data.recommendedProducts}>
+            {(response) => <BestSellers products={response} />}
+          </Await>
+        </Suspense>
+      </div>
       <Analytics.CollectionView
         data={{
           collection: {
-            id: collection.id,
-            handle: collection.handle,
+            id: data.collection.id,
+            handle: data.collection.handle,
           },
         }}
       />
-    </div>
+    </>
   );
 }
 
@@ -109,6 +309,9 @@ const PRODUCT_ITEM_FRAGMENT = `#graphql
     id
     handle
     title
+    descriptionHtml
+    productType
+    tags
     featuredImage {
       id
       altText
@@ -116,12 +319,24 @@ const PRODUCT_ITEM_FRAGMENT = `#graphql
       width
       height
     }
+    metafield(namespace: "custom", key: "new") {
+      value
+    }
     priceRange {
       minVariantPrice {
         ...MoneyProductItem
       }
       maxVariantPrice {
         ...MoneyProductItem
+      }
+    }
+    variants(first: 10) {
+      nodes {
+        title
+        selectedOptions {
+          name
+          value
+        }
       }
     }
   }
@@ -159,6 +374,66 @@ const COLLECTION_QUERY = `#graphql
           endCursor
           startCursor
         }
+      }
+    }
+  }
+` as const;
+
+const ALL_COLLECTIONS_QUERY = `#graphql
+  fragment CollectionFields on Collection {
+    id
+    title
+    handle
+    image {
+      id
+      url
+      altText
+      width
+      height
+    }
+  }
+
+  query AllCollections($country: CountryCode, $language: LanguageCode)
+    @inContext(country: $country, language: $language) {
+    collections(first: 20, sortKey: UPDATED_AT, reverse: true) {
+      nodes {
+        ...CollectionFields
+      }
+    }
+  }
+` as const;
+
+const RECOMMENDED_PRODUCTS_QUERY = `#graphql
+  fragment RecommendedProductCollection on Product {
+    id
+    title
+    handle
+    descriptionHtml
+    priceRange {
+      minVariantPrice {
+        amount
+        currencyCode
+      }
+    }
+    variants(first: 1) {
+      nodes {
+        title
+      }
+    }
+    featuredImage {
+      id
+      url
+      altText
+      width
+      height
+    }
+    tags
+  }
+  query RecommendedProductsCollection ($country: CountryCode, $language: LanguageCode)
+    @inContext(country: $country, language: $language) {
+    products(first: 6, sortKey: UPDATED_AT, reverse: true) {
+      nodes {
+        ...RecommendedProductCollection
       }
     }
   }

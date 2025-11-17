@@ -12,7 +12,7 @@ import {
   useRouteLoaderData,
 } from 'react-router';
 import favicon from '~/assets/favicon.svg';
-import {FOOTER_QUERY, HEADER_QUERY} from '~/lib/fragments';
+import {FOOTER_QUERY, HEADER_QUERY, COLLECTIONS_QUERY} from '~/lib/fragments';
 import resetStyles from '~/styles/reset.css?url';
 import appStyles from '~/styles/app.css?url';
 import tailwindCss from './styles/tailwind.css?url';
@@ -138,12 +138,84 @@ function loadDeferredData({context}: LoaderFunctionArgs) {
       console.error(error);
       return null;
     });
+
+  const collections = storefront
+    .query(COLLECTIONS_QUERY, {
+      cache: storefront.CacheLong(),
+      variables: {
+        country: storefront.i18n.country,
+        language: storefront.i18n.language,
+      },
+    })
+    .catch((error) => {
+      // Log query errors, but don't throw them so the page can still render
+      console.error(error);
+      return null;
+    });
+
+  const recommendedProducts = storefront
+    .query(RECOMMENDED_PRODUCTS_QUERY)
+    .catch((error) => {
+      console.error(error);
+      return null;
+    });
+
   return {
     cart: cart.get(),
     isLoggedIn: customerAccount.isLoggedIn(),
     footer,
+    collections,
+    recommendedProducts,
   };
 }
+
+const RECOMMENDED_PRODUCTS_QUERY = `#graphql
+  fragment RecommendedProductForCart on Product {
+    id
+    title
+    handle
+    tags
+    priceRange {
+      minVariantPrice {
+        amount
+        currencyCode
+      }
+    }
+    imgBackground: metafield(namespace: "custom", key: "imgBackground") {
+      reference {
+        ... on MediaImage {
+          image {
+            url
+            altText
+            width
+            height
+          }
+        }
+      }
+    }
+    skintype: metafield(namespace: "custom", key: "skintype") {
+      value
+    }
+    bundleProducts: metafield(namespace: "custom", key: "bundle_products") {
+      references(first: 10) {
+        nodes {
+          ... on Product {
+            id
+            title
+          }
+        }
+      }
+    }
+  }
+  query RecommendedProductsForCart($country: CountryCode, $language: LanguageCode)
+    @inContext(country: $country, language: $language) {
+    products(first: 6, sortKey: UPDATED_AT, reverse: true) {
+      nodes {
+        ...RecommendedProductForCart
+      }
+    }
+  }
+` as const;
 
 export function Layout({children}: {children?: React.ReactNode}) {
   const nonce = useNonce();

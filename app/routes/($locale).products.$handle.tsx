@@ -19,9 +19,14 @@ import discoverImage from '~/assets/images/discover.png';
 import {ProductUsage} from '~/components/ProductUsage';
 import {ProductExpectation} from '~/components/ProductExpectation';
 import {BestSellers} from '~/components/BestSellers';
-import {Suspense} from 'react';
+import {RecentlyViewed} from '~/components/RecentlyViewed';
+import {Suspense, useEffect} from 'react';
 import bullet from '~/assets/images/bulle.svg';
 import {BundleProducts} from '~/components/BundleProducts';
+import {BundleRegimen} from '~/components/BundleRegimen';
+import {ProductFAQ} from '~/components/ProductFAQ';
+import nightUseSvg from '~/assets/images/nightuse.svg';
+import dayUseSvg from '~/assets/images/dayuse.svg';
 
 export const meta: MetaFunction<typeof loader> = ({data}) => {
   return [
@@ -74,13 +79,22 @@ function loadDeferredData({context}: LoaderFunctionArgs) {
       return null;
     });
 
+  const recommendedProducts = context.storefront
+    .query(RECOMMENDED_PRODUCTS_FOR_RECENTLY_VIEWED_QUERY)
+    .catch((err) => {
+      console.error('Error fetching recommended products:', err);
+      return null;
+    });
+
   return {
     bestSellers,
+    recommendedProducts,
   };
 }
 
 export default function Product() {
-  const {product, bestSellers} = useLoaderData<typeof loader>();
+  const {product, bestSellers, recommendedProducts} =
+    useLoaderData<typeof loader>();
 
   const selectedVariant = useOptimisticVariant(
     product.selectedOrFirstAvailableVariant,
@@ -97,33 +111,142 @@ export default function Product() {
   const siblings = product?.siblings?.referenceList?.nodes || [];
 
   const bundleProducts = product?.bundleProducts?.references?.nodes || [];
-  console.log('🧾 Full bundleProducts metafield:', product?.bundleProducts);
+
+  // Parse metafield values
+  const parseSkinConcern = () => {
+    try {
+      const raw = (product as any)?.skinConcern?.value;
+      if (!raw) return [];
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (e) {
+      return [];
+    }
+  };
+
+  const parseDayUse = () => {
+    try {
+      const raw = (product as any)?.dayUse?.value;
+      if (!raw) return null;
+      return JSON.parse(raw);
+    } catch (e) {
+      return raw;
+    }
+  };
+
+  const parseNightUse = () => {
+    try {
+      const raw = (product as any)?.nightUse?.value;
+      if (!raw) return null;
+      return JSON.parse(raw);
+    } catch (e) {
+      return raw;
+    }
+  };
+
+  const parseFdaApproved = () => {
+    try {
+      const raw = (product as any)?.fdaApproved?.value;
+      if (!raw) return false;
+      const parsed = JSON.parse(raw);
+      return parsed === true || parsed === 'true';
+    } catch (e) {
+      return raw === 'true' || raw === true;
+    }
+  };
+
+  const skinConcern = parseSkinConcern();
+  const dayUse = parseDayUse();
+  const nightUse = parseNightUse();
+  const fdaApproved = parseFdaApproved();
+
+  // Track recently viewed products on the client
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const storageKey = 'recentlyViewedProducts';
+      const existingRaw = window.localStorage.getItem(storageKey);
+      const existing: string[] = existingRaw ? JSON.parse(existingRaw) : [];
+      const handle = product.handle as string;
+
+      const withoutCurrent = existing.filter((h) => h !== handle);
+      const updated = [handle, ...withoutCurrent].slice(0, 10);
+
+      window.localStorage.setItem(storageKey, JSON.stringify(updated));
+    } catch (e) {
+      // Ignore storage errors
+    }
+  }, [product.handle]);
+
+  console.log(product);
 
   return (
     <>
       <div
-        className="product bg-cover bg-center bg-no-repeat"
+        className="product bg-cover bg-center bg-no-repeat min-h-screen"
         style={{
           backgroundImage: `url(${product?.imgBackground?.reference?.image?.url})`,
         }}
       >
-        <div className="product-main bg-white p-6 max-w-[600px]">
-          <h1 className="!text-[32px] text-[#2B8C57] !m-0">{title}</h1>
+        <div className="product-main bg-white p-6 max-w-[600px] h-fit">
+          <div className="flex flex-col gap-1">
+            <h1 className="!text-[32px] text-[#2B8C57] !m-0">{title}</h1>
 
-          {tags?.length > 0 && (
-            <div className="mb-4 flex flex-wrap gap-2">
-              {tags.map((tag: string, index: number) => (
-                <div key={tag} className="flex items-center gap-1">
-                  <span className="!text-sm text-[#4F4F4F] underline">
-                    {tag}
-                  </span>
-                  {index < tags.length - 1 && (
-                    <img src={bullet} alt="" className="w-[6px] h-[6px]" />
-                  )}
+            <div className="flex flex-row gap-2 items-center">
+              {tags?.length > 0 && (
+                <div className="mb-4 flex flex-wrap gap-2 items-center">
+                  {tags.map((tag: string, index: number) => (
+                    <div key={tag} className="flex items-center gap-1">
+                      <span className="!text-sm text-[#4F4F4F] underline">
+                        {tag}
+                      </span>
+                      {index < tags.length - 1 && (
+                        <span className="!text-sm text-[#4F4F4F]">+</span>
+                      )}
+                    </div>
+                  ))}
                 </div>
-              ))}
+              )}
+              {skinConcern.length > 0 && (
+                <img src={bullet} alt="" className="w-[6px] h-[6px] mb-4" />
+              )}
+              {skinConcern.length > 0 && (
+                <div className="mb-4 flex flex-wrap gap-2 items-center">
+                  {skinConcern.map((tag: string, index: number) => (
+                    <div key={tag} className="flex items-center gap-1">
+                      <span className="!text-sm text-[#4F4F4F] underline">
+                        {tag}
+                      </span>
+                      {index < skinConcern.length - 1 && (
+                        <span className="!text-sm text-[#4F4F4F]">+</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+              {(dayUse || nightUse) && (
+                <img src={bullet} alt="" className="w-[6px] h-[6px] mb-4" />
+              )}
+              {dayUse && (
+                <div className="mb-4 flex flex-wrap gap-2 items-center">
+                  <img src={dayUseSvg} alt="" />
+                </div>
+              )}
+              {nightUse && (
+                <div className="mb-4 flex flex-wrap gap-2 items-center">
+                  <img src={nightUseSvg} alt="" />
+                </div>
+              )}
+              {fdaApproved && (
+                <img src={bullet} alt="" className="w-[6px] h-[6px] mb-4" />
+              )}
+              {fdaApproved && (
+                <div className="mb-4 flex flex-wrap gap-2 items-center">
+                  <p className="!text-sm text-[#4F4F4F]">FDA Approved</p>
+                </div>
+              )}
             </div>
-          )}
+          </div>
 
           <ProductPrice
             price={selectedVariant?.price}
@@ -148,14 +271,15 @@ export default function Product() {
             selectedVariant={selectedVariant}
           />
 
-          <div>
-            <p className="font-poppins !text-xl !mt-8 font-normal">
-              Pair it With
-            </p>
-            <p>Our products are designed to work better together</p>
-          </div>
+          {siblings && (
+            <>
+              <p className="font-poppins !text-lg !mt-8 font-normal">
+                Pair it With
+              </p>
 
-          <ProductSiblings products={siblings} />
+              <ProductSiblings products={siblings} />
+            </>
+          )}
         </div>
 
         <Analytics.ProductView
@@ -175,7 +299,9 @@ export default function Product() {
         />
       </div>
 
-      <BundleProducts products={bundleProducts} />
+      {/* <BundleProducts products={bundleProducts} /> */}
+
+      {bundleProducts && <BundleRegimen products={bundleProducts} />}
 
       <ProductBenefits
         json={product.metafield?.value || '[]'}
@@ -202,21 +328,37 @@ export default function Product() {
         image={product.usagePicture?.reference?.image}
       />
 
-      <DiscoverRegimenSection
+      {/* <DiscoverRegimenSection
         image={{
           url: discoverImage,
           altText: 'Welcome to our store',
-        }}
-        title="Discover Your Regimen"
-        text="Find the skincare products best suited for your skin health goals."
-        buttonText="Discover My Regimen"
-        buttonLink="/collections"
-      />
+          }}
+          title="Discover Your Regimen"
+          text="Find the skincare products best suited for your skin health goals."
+          buttonText="Discover My Regimen"
+          buttonLink="/collections"
+          /> */}
 
-      <Suspense fallback={<div>Loading Best Sellers...</div>}>
+      <Suspense fallback={<div>Loading products...</div>}>
         <Await resolve={bestSellers}>
           {(data) =>
-            data && <BestSellers title="Recently Viewed" products={data} />
+            data && <BestSellers title="Shoppers also loved" products={data} />
+          }
+        </Await>
+      </Suspense>
+
+      <ProductFAQ json={product.faqProduct?.value || '[]'} />
+
+      <Suspense fallback={<div>Loading Recently Viewed...</div>}>
+        <Await resolve={recommendedProducts}>
+          {(data) =>
+            data && (
+              <RecentlyViewed
+                title="Recently Viewed"
+                products={data}
+                currentProductHandle={product.handle}
+              />
+            )
           }
         </Await>
       </Suspense>
@@ -279,6 +421,27 @@ const PRODUCT_FRAGMENT = `#graphql
     usage: metafield(namespace: "custom", key: "usage") {
       value
     }
+    faqProduct: metafield(namespace: "product", key: "faq") {
+      value
+    }
+    skinConcern: metafield(namespace: "custom", key: "concern") {
+      value
+    }
+    dayUse: metafield(namespace: "product", key: "dayuse") {
+      value
+    }
+    nightUse: metafield(namespace: "product", key: "nightuse") {
+      value
+    }
+    skinType: metafield(namespace: "custom", key: "skintype") {
+      value
+    }
+    fdaApproved: metafield(namespace: "custom", key: "fda_approved") {
+      value
+    }
+    allIngredients: metafield(namespace: "custom", key: "all_ingredients") {
+      value
+    }
       expectImage: metafield(namespace: "custom", key: "expectImage") {
   references(first: 10) {
     nodes {
@@ -318,6 +481,18 @@ const PRODUCT_FRAGMENT = `#graphql
         handle
         description
         tags
+        dayUse: metafield(namespace: "product", key: "dayuse") {
+          value
+        }
+        nightUse: metafield(namespace: "product", key: "nightuse") {
+          value
+        }
+        skinConcern: metafield(namespace: "product", key: "concern") {
+          value
+        }
+        fdaApproved: metafield(namespace: "product", key: "fda_approved") {
+          value
+        }
         featuredImage {
           url
           altText
@@ -329,6 +504,9 @@ const PRODUCT_FRAGMENT = `#graphql
             amount
             currencyCode
           }
+        }
+        stepLabel: metafield(namespace: "custom", key: "step_label") {
+          value
         }
       }
     }
@@ -385,6 +563,7 @@ const PRODUCT_FRAGMENT = `#graphql
               width
               height
             }
+            
           }
         }
       }
@@ -437,7 +616,7 @@ const PRODUCT_QUERY = `#graphql
 ` as const;
 
 const RECOMMENDED_PRODUCTS_QUERY = `#graphql
-  fragment RecommendedProduct on Product {
+  fragment RecommendedProductBestSelling on Product {
     id
     title
     handle
@@ -457,11 +636,41 @@ const RECOMMENDED_PRODUCTS_QUERY = `#graphql
     tags
   }
 
-  query RecommendedProducts($country: CountryCode, $language: LanguageCode)
+  query RecommendedProductsBestSelling($country: CountryCode, $language: LanguageCode)
   @inContext(country: $country, language: $language) {
     products(first: 4, sortKey: BEST_SELLING) {
       nodes {
-        ...RecommendedProduct
+        ...RecommendedProductBestSelling
+      }
+    }
+  }
+` as const;
+
+const RECOMMENDED_PRODUCTS_FOR_RECENTLY_VIEWED_QUERY = `#graphql
+  fragment RecentlyViewedProduct on Product {
+    id
+    title
+    handle
+    priceRange {
+      minVariantPrice {
+        amount
+        currencyCode
+      }
+    }
+    featuredImage {
+      id
+      url
+      altText
+      width
+      height
+    }
+  }
+
+  query RecentlyViewedProducts($country: CountryCode, $language: LanguageCode)
+  @inContext(country: $country, language: $language) {
+    products(first: 20, sortKey: UPDATED_AT, reverse: true) {
+      nodes {
+        ...RecentlyViewedProduct
       }
     }
   }

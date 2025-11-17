@@ -6,16 +6,24 @@ export function CustomerServiceForm() {
   const [questionType, setQuestionType] = useState('general');
 
   return (
-    <div className="w-full lg:w-[50%] mx-auto p-6 pt-[220px] flex flex-col gap-4">
+    <div className="w-full lg:w-[50%] mx-auto p-6 pt-[220px] flex flex-col gap-4 mb-12">
+      <div className="flex items-center gap-4 mb-6 text-sm">
+        <a className="!underline text-[#4F4F4F]" href="/">
+          Home
+        </a>
+        <span>/</span>
+        <p className="text-[#4F4F4F]">Customer Service</p>
+      </div>
+
       <h2 className="!text-2xl font-bold mb-4">Customer Service</h2>
       <p>
         For any questions or assistance, please use the form below to contact
         our customer service team:
       </p>
 
-      <div className="flex flex-col gap-5">
+      <div className="flex flex-col gap-8">
         <div>
-          <label className="block text-sm mb-1  " htmlFor="name">
+          <label className="block text-sm mb-1 font-medium" htmlFor="name">
             Your Name
           </label>
           <input
@@ -27,7 +35,7 @@ export function CustomerServiceForm() {
         </div>
 
         <div>
-          <label className="block text-sm mb-1 " htmlFor="email">
+          <label className="block text-sm mb-1 font-medium" htmlFor="email">
             Email
           </label>
           <input
@@ -39,7 +47,7 @@ export function CustomerServiceForm() {
         </div>
 
         <div>
-          <label className="block text-sm mb-1 " htmlFor="phone">
+          <label className="block text-sm mb-1 font-medium" htmlFor="phone">
             Phone* (optional)
           </label>
           <div className="flex items-center  border-b ">
@@ -54,7 +62,7 @@ export function CustomerServiceForm() {
         </div>
 
         <div>
-          <label className="block text-sm mb-1  " htmlFor="order">
+          <label className="block text-sm mb-1 font-medium" htmlFor="order">
             Order Number (optional)
           </label>
           <input
@@ -65,7 +73,7 @@ export function CustomerServiceForm() {
         </div>
 
         <div className="flex flex-col gap-2">
-          <p className="text-sm ">Question Type</p>
+          <p className="text-sm font-medium">Question Type</p>
           <div className="space-y-2">
             {[
               {label: 'General Questions and Comments', value: 'general'},
@@ -101,7 +109,7 @@ export function CustomerServiceForm() {
         </div>
 
         <div>
-          <label className="block text-sm mb-1" htmlFor="message">
+          <label className="block text-sm mb-1 font-medium" htmlFor="message">
             Message
           </label>
           <textarea

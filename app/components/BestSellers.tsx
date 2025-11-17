@@ -6,8 +6,8 @@ import left from '~/assets/images/left-arrow.svg';
 import bullet from '~/assets/images/bulle.svg';
 import close from '~/assets/images/closee.svg';
 
-import {Link} from 'react-router-dom';
 import {motion} from 'framer-motion';
+import {Link} from 'react-router';
 
 type ProductNode = RecommendedProductsQuery['products']['nodes'][0];
 
@@ -79,9 +79,9 @@ export function BestSellers({
   };
 
   return (
-    <section className="container mx-auto py-10 px-6">
-      <div className="flex justify-center mb-6">
-        <h2 className="font-poppins !text-4xl !font-normal">{title}</h2>
+    <section className="container mx-auto py-10 px-6 mb-16">
+      <div className="flex justify-center mb-12">
+        <h2 className="font-poppins !text-2xl !font-bold">{title}</h2>
       </div>
 
       <div className="relative">
@@ -107,20 +107,21 @@ export function BestSellers({
           className="flex overflow-hidden scroll-smooth gap-6 no-scrollbar px-4 w-[85%] m-auto"
         >
           {productList.map((product) => (
-            <div
+            <Link
+              to={`/products/${product.handle}`}
               key={product.id}
               className="relative flex-shrink-0 w-full sm:w-[calc(100%/2-1rem)] lg:w-[calc(100%/3-1rem)]"
             >
-              <div className="flex flex-col items-center gap-3 justify-between">
+              <div className="flex flex-col items-center gap-3 justify-between h-full">
                 {product.featuredImage && (
-                  <div className="group relative bg-[#F6F6F6] w-full">
-                    <a href={`/products/${product.handle}`}>
+                  <div className="h-[300px] md:h-[400px] lg:h-[500px] group relative bg-[#F6F6F6] w-full overflow-hidden">
+                    <div className="w-full h-full">
                       <Image
                         data={product.featuredImage}
                         sizes="(min-width: 768px) 33vw, 100vw"
-                        className="h-[300px] md:h-[400px] lg:h-[500px] object-cover mb-6 transition-transform duration-300 group-hover:scale-105"
+                        className="w-full h-full object-cover mb-6 transition-transform duration-300 group-hover:scale-105"
                       />
-                    </a>
+                    </div>
                     <div
                       onClick={() => setSelectedProduct(product)}
                       className="absolute bottom-[1px] w-full bg-[#2B8C57] text-white uppercase hover:underline flex items-center justify-center text-xs px-2 py-2 opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity duration-300 z-20"
@@ -130,9 +131,13 @@ export function BestSellers({
                   </div>
                 )}
 
-                <h3 className="font-poppins text-xl text-[#2B8C57]">
+                <h3 className="font-poppins text-xl text-[#2B8C57] text-center">
                   {product.title}
                 </h3>
+
+                <p className="text-xs text-gray-600 capitalize">
+                  {product.tags?.join(' · ')}
+                </p>
                 <div className="!font-light">
                   <Money
                     data={product.priceRange.minVariantPrice}
@@ -140,7 +145,7 @@ export function BestSellers({
                   />
                 </div>
 
-                <div className="w-full m-auto flex items-center justify-center">
+                <div className="w-full flex items-center justify-center">
                   <button
                     className="w-[90%] border border-[#2B8C57] uppercase
                 bg-white px-12 py-2 text-[#2B8C57] cursor-pointer hover:text-white
@@ -151,7 +156,7 @@ export function BestSellers({
                   </button>
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>

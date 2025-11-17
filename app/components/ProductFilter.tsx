@@ -3,6 +3,8 @@ import {useState} from 'react';
 export type FilterState = {
   category: string;
   skinType: string;
+  skinConcern: string;
+  ingredient: string;
   sort: string;
   price: string;
 };
@@ -12,12 +14,16 @@ interface ProductFilterProps {
   skinTypes: string[];
   skinTypeCounts: Record<string, number>;
   categoryCounts: Record<string, number>;
+  skinConcerns?: string[];
+  skinConcernCounts?: Record<string, number>;
   onFilterChange: (updated: FilterState) => void;
   categories: {
     id: string;
     title: string;
     handle: string;
   }[];
+  ingredients?: string[];
+  ingredientsCounts?: Record<string, number>;
 }
 
 export function ProductFilter({
@@ -27,6 +33,10 @@ export function ProductFilter({
   skinTypes,
   skinTypeCounts,
   categoryCounts,
+  skinConcerns = [],
+  skinConcernCounts = {},
+  ingredients = [],
+  ingredientsCounts = {},
 }: ProductFilterProps) {
   const handleChange = (field: keyof FilterState, value: string) => {
     const updated = {...filters, [field]: value};
@@ -49,6 +59,18 @@ export function ProductFilter({
       url.searchParams.set('skinType', updated.skinType);
     } else {
       url.searchParams.delete('skinType');
+    }
+
+    if (updated.skinConcern) {
+      url.searchParams.set('skinConcern', updated.skinConcern);
+    } else {
+      url.searchParams.delete('skinConcern');
+    }
+
+    if (updated.ingredient) {
+      url.searchParams.set('ingredient', updated.ingredient);
+    } else {
+      url.searchParams.delete('ingredient');
     }
 
     if (updated.sort) {
@@ -105,6 +127,44 @@ export function ProductFilter({
                   value={type.toLowerCase().replace(/\s+/g, '_')}
                 >
                   {type} ({count})
+                </option>
+              );
+            })}
+          </select>
+
+          <select
+            value={filters.skinConcern}
+            onChange={(e) => handleChange('skinConcern', e.target.value)}
+            className="border-b py-2 w-[200px]"
+          >
+            <option value="">Skin Concern</option>
+            {skinConcerns.map((concern) => {
+              const count = skinConcernCounts[concern] || 0;
+              return (
+                <option
+                  key={concern}
+                  value={concern.toLowerCase().replace(/\s+/g, '_')}
+                >
+                  {concern} ({count})
+                </option>
+              );
+            })}
+          </select>
+
+          <select
+            value={filters.ingredient}
+            onChange={(e) => handleChange('ingredient', e.target.value)}
+            className="border-b py-2 w-[200px]"
+          >
+            <option value="">Ingredient</option>
+            {ingredients.map((ingredient) => {
+              const count = ingredientsCounts[ingredient] || 0;
+              return (
+                <option
+                  key={ingredient}
+                  value={ingredient.toLowerCase().replace(/\s+/g, '_')}
+                >
+                  {ingredient} ({count})
                 </option>
               );
             })}

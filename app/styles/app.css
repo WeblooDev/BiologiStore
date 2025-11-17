@@ -9,7 +9,6 @@
   }
 }
 
-
 @font-face {
   font-family: 'Poppins';
   src: url('/fonts/Poppins.ttf') format('truetype');
@@ -33,7 +32,7 @@
 }
 
 :root {
-  --aside-width: 400px;
+  --aside-width: 550px;
   --cart-aside-summary-height-with-discount: 300px;
   --cart-aside-summary-height: 250px;
   --grid-item-width: 355px;
@@ -606,4 +605,8 @@ button.reset:hover:not(:has(> *)) {
 
 .menu-link:hover {
   background-color: #f9f9f9;
+}
+
+.swiper-pagination-bullet-active {
+  background-color: #000 !important;
 }

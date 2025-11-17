@@ -5,6 +5,7 @@ import {
   useEffect,
   useState,
 } from 'react';
+import {Link} from 'react-router';
 
 type AsideType = 'search' | 'cart' | 'mobile' | 'closed';
 
@@ -52,31 +53,45 @@ export function Aside({
       role="dialog"
     >
       <button className="close-outside" onClick={close} />
-      <aside>
+      <aside className="p-6">
         <header
-          className={`sticky top-0 w-full flex items-center justify-between !px-3 py-3 border-b ${
+          className={`sticky top-0 w-full flex items-center justify-between pb-3 border-b z-10 ${
             isMobile ? 'bg-[#2B8C57]' : 'bg-white'
           }`}
         >
-          <h3
-            className={`text-xl  ${
-              isMobile ? 'text-white uppercase tracking-widest' : 'text-black'
-            }`}
-          >
-            {heading}
-          </h3>
-          <button onClick={close} aria-label="Close">
-            <svg
-              className="w-7 h-7 transition-transform duration-300 cursor-pointer rotate-45"
-              fill="none"
-              stroke={isMobile ? 'white' : 'black'}
-              strokeWidth={2}
-              viewBox="0 0 24 24"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14" />
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 5v14" />
-            </svg>
-          </button>
+          <h3 className={`text-sm font-semibold text-[#2B8C57]`}>{heading}</h3>
+
+          <div className="flex gap-2 items-center">
+            {type === 'cart' && (
+              <Link
+                to="/cart"
+                prefetch="viewport"
+                className="text-sm underline"
+              >
+                Go to cart
+              </Link>
+            )}
+            <button onClick={close} aria-label="Close">
+              <svg
+                className="w-7 h-7 transition-transform duration-300 cursor-pointer rotate-45"
+                fill="none"
+                stroke={isMobile ? 'white' : 'black'}
+                strokeWidth={2}
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M5 12h14"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 5v14"
+                />
+              </svg>
+            </button>
+          </div>
         </header>
         <main className="h-full">{children}</main>
       </aside>

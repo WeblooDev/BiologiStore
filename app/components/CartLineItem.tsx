@@ -6,6 +6,7 @@ import {Link} from 'react-router';
 import {ProductPrice} from './ProductPrice';
 import {useAside} from './Aside';
 import type {CartApiQueryFragment} from 'storefrontapi.generated';
+import {XIcon} from 'lucide-react';
 
 type CartLine = OptimisticCartLine<CartApiQueryFragment>;
 
@@ -26,35 +27,46 @@ export function CartLineItem({
   const {close} = useAside();
 
   return (
-    <li key={id} className="cart-line gap-2 flex">
-      <div className="bg-[#F6F6F6]">
+    <li
+      key={id}
+      className="cart-line flex gap-4 !px-0 border-b last:border-b-0 border-[#E5E5E5]"
+    >
+      <div className="bg-[#F6F6F6] shrink-0 w-32 h-auto aspect-[1/1.5] flex items-center justify-center">
         {image && (
           <Image
             alt={title}
-            aspectRatio="1/1"
+            aspectRatio="1/1.5"
             data={image}
-            height={100}
+            height={240}
             loading="lazy"
-            width={100}
+            width={240}
           />
         )}
       </div>
 
-      <div className="flex flex-col gap-2 justify-between">
-        <Link
-          prefetch="intent"
-          to={lineItemUrl}
-          onClick={() => {
-            if (layout === 'aside') {
-              close();
-            }
-          }}
-        >
-          <p>
-            <strong>{product.title}</strong>
+      <div className="flex flex-col justify-between flex-1 gap-2 relative">
+        <div className="space-y-1">
+          <Link
+            prefetch="intent"
+            to={lineItemUrl}
+            onClick={() => {
+              if (layout === 'aside') {
+                close();
+              }
+            }}
+          >
+            <p className="text-sm font-semibold">{product.title}</p>
+          </Link>
+          <p className="text-sm text-[#2B8C57] font-semibold">
+            <ProductPrice price={line?.cost?.totalAmount} />
           </p>
-        </Link>
-        <ProductPrice price={line?.cost?.totalAmount} />
+          <p className="!text-sm mt-2">
+            {
+              selectedOptions.find((opt) => opt.name.toLowerCase() === 'size')
+                ?.value
+            }
+          </p>
+        </div>
 
         <CartLineQuantity line={line} />
       </div>
@@ -74,24 +86,23 @@ function CartLineQuantity({line}: {line: CartLine}) {
   const nextQuantity = Number((quantity + 1).toFixed(0));
 
   return (
-    <div className="cart-line-quantity flex gap-2">
-      <small>Quantity</small>
-      <CartLineUpdateButton lines={[{id: lineId, quantity: prevQuantity}]}>
-        <div className="bg-[#F6F6F6] flex items-center justify-center h-4 w-4 rounded-full p-1 cursor-pointer">
+    <div className="cart-line-quantity flex items-center gap-3 text-sm">
+      <div className="flex items-center gap-2">
+        <CartLineUpdateButton lines={[{id: lineId, quantity: prevQuantity}]}>
           <button
+            className="bg-[#F6F6F6] h-5 w-5 rounded-full flex items-center justify-center"
             aria-label="Decrease quantity"
             disabled={quantity <= 1 || !!isOptimistic}
             name="decrease-quantity"
             value={prevQuantity}
           >
-            <span>&#8722; </span>
+            <span>&#8722;</span>
           </button>
-        </div>
-      </CartLineUpdateButton>
-      <p>{quantity}</p>
-      <CartLineUpdateButton lines={[{id: lineId, quantity: nextQuantity}]}>
-        <div className="bg-[#F6F6F6] flex items-center justify-center h-4 w-4 rounded-full p-1 cursor-pointer">
+        </CartLineUpdateButton>
+        <span>{quantity}</span>
+        <CartLineUpdateButton lines={[{id: lineId, quantity: nextQuantity}]}>
           <button
+            className="bg-[#F6F6F6] h-5 w-5 rounded-full flex items-center justify-center"
             aria-label="Increase quantity"
             name="increase-quantity"
             value={nextQuantity}
@@ -99,10 +110,11 @@ function CartLineQuantity({line}: {line: CartLine}) {
           >
             <span>&#43;</span>
           </button>
-        </div>
-      </CartLineUpdateButton>
-      &nbsp;
-      <CartLineRemoveButton lineIds={[lineId]} disabled={!!isOptimistic} />
+        </CartLineUpdateButton>
+      </div>
+      <div className="ml-auto">
+        <CartLineRemoveButton lineIds={[lineId]} disabled={!!isOptimistic} />
+      </div>
     </div>
   );
 }
@@ -126,8 +138,12 @@ function CartLineRemoveButton({
       action={CartForm.ACTIONS.LinesRemove}
       inputs={{lineIds}}
     >
-      <button disabled={disabled} type="submit">
-        Remove
+      <button
+        disabled={disabled}
+        type="submit"
+        className="absolute top-0 right-0"
+      >
+        <XIcon size={24} strokeWidth={0.5} />
       </button>
     </CartForm>
   );

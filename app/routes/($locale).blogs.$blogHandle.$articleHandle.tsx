@@ -2,25 +2,18 @@ import {type LoaderFunctionArgs} from '@shopify/remix-oxygen';
 import {useLoaderData, type MetaFunction} from 'react-router';
 import {Image} from '@shopify/hydrogen';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
+import {ShopThePost} from '~/components/ShopThePost';
 
 export const meta: MetaFunction<typeof loader> = ({data}) => {
   return [{title: `Hydrogen | ${data?.article.title ?? ''} article`}];
 };
 
 export async function loader(args: LoaderFunctionArgs) {
-  // Start fetching non-critical data without blocking time to first byte
   const deferredData = loadDeferredData(args);
-
-  // Await the critical data required to render initial state of the page
   const criticalData = await loadCriticalData(args);
-
   return {...deferredData, ...criticalData};
 }
 
-/**
- * Load data necessary for rendering content above the fold. This is the critical data
- * needed to render the page. If it's unavailable, the whole page should 400 or 500 error.
- */
 async function loadCriticalData({
   context,
   request,
@@ -35,8 +28,8 @@ async function loadCriticalData({
   const [{blog}] = await Promise.all([
     context.storefront.query(ARTICLE_QUERY, {
       variables: {blogHandle, articleHandle},
+      cache: context.storefront.CacheNone(),
     }),
-    // Add other queries here, so that they are loaded in parallel
   ]);
 
   if (!blog?.articleByHandle) {
@@ -60,17 +53,17 @@ async function loadCriticalData({
   return {article};
 }
 
-/**
- * Load data for rendering content below the fold. This data is deferred and will be
- * fetched after the initial page load. If it's unavailable, the page should still 200.
- * Make sure to not throw any errors here, as it will cause the page to 500.
- */
 function loadDeferredData({context}: LoaderFunctionArgs) {
   return {};
 }
 
 export default function Article() {
   const {article} = useLoaderData<typeof loader>();
+
+  if (!article) {
+    return <div>Article not found</div>;
+  }
+
   const {title, image, contentHtml, author} = article;
 
   const publishedDate = new Intl.DateTimeFormat('en-US', {
@@ -79,26 +72,58 @@ export default function Article() {
     day: 'numeric',
   }).format(new Date(article.publishedAt));
 
-  return (
-    <div className="article">
-      <h1>
-        {title}
-        <div>
-          <time dateTime={article.publishedAt}>{publishedDate}</time> &middot;{' '}
-          <address>{author?.name}</address>
-        </div>
-      </h1>
+  // Extract products from shopPosts metafield
+  const products = article.shopPosts?.references?.nodes || [];
 
-      {image && <Image data={image} sizes="90vw" loading="eager" />}
+  return (
+    <div className="article pt-[190px] w-[50%] m-auto">
+      <div className="flex items-center gap-4 mb-6">
+        <a className="!underline text-[#4F4F4F]" href="/blogs">
+          Blogs
+        </a>
+        <span>/</span>
+        <p className="text-[#4F4F4F]">{title}</p>
+      </div>
+
+      {image && (
+        <Image
+          data={image}
+          sizes="90vw"
+          loading="eager"
+          className="w-full mb-6 !h-[370px] object-cover"
+        />
+      )}
+
+      <div className="flex items-center gap-4 mb-6">
+        {article.tags?.length > 0 && (
+          <div>
+            {article.tags.slice(0, 3).map((tag) => (
+              <p className="!underline !text-base" key={tag}>
+                {tag}
+              </p>
+            ))}
+          </div>
+        )}
+        <span>|</span>
+        <p className="!text-base">{publishedDate}</p>
+      </div>
+
+      <h1 className="!text-4xl !m-0 mb-4">{title}</h1>
+
+      {author?.name && (
+        <p className="font-semibold !mt-2 !mb-10">By {author.name}</p>
+      )}
+
       <div
         dangerouslySetInnerHTML={{__html: contentHtml}}
-        className="article"
+        className="article-content mb-12"
       />
+
+      {products.length > 0 && <ShopThePost products={products} />}
     </div>
   );
 }
 
-// NOTE: https://shopify.dev/docs/api/storefront/latest/objects/blog#field-blog-articlebyhandle
 const ARTICLE_QUERY = `#graphql
   query Article(
     $articleHandle: String!
@@ -113,6 +138,7 @@ const ARTICLE_QUERY = `#graphql
         title
         contentHtml
         publishedAt
+        tags
         author: authorV2 {
           name
         }
@@ -126,6 +152,38 @@ const ARTICLE_QUERY = `#graphql
         seo {
           description
           title
+        }
+        shopPosts: metafield(namespace: "custom", key: "shopposts") {
+          references(first: 10) {
+            nodes {
+              ... on Product {
+                id
+                handle
+                title
+                tags
+                priceRange {
+                  minVariantPrice {
+                    amount
+                    currencyCode
+                  }
+                }
+                featuredImage {
+                  id
+                  url
+                  altText
+                  width
+                  height
+                }
+                variants(first: 1) {
+                  nodes {
+                    id
+                    title
+                  }
+                }
+                descriptionHtml
+              }
+            }
+          }
         }
       }
     }
