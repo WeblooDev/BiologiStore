@@ -42,7 +42,10 @@ function loadDeferredData({context}: LoaderFunctionArgs) {
     });
 
   const latestBlogs = context.storefront
-    .query(BLOGS_QUERY, {variables: {first: 4}})
+    .query(BLOGS_QUERY, {
+      variables: {first: 4},
+      cache: context.storefront.CacheNone(),
+    })
     .catch((error) => {
       console.error(error);
       return null;
@@ -204,43 +207,6 @@ const ALL_COLLECTIONS_QUERY = `#graphql
     collections(first: 20, sortKey: UPDATED_AT, reverse: true) {
       nodes {
         ...CollectionFields
-      }
-    }
-  }
-` as const;
-
-const RECOMMENDED_PRODUCTS_QUERY = `#graphql
-  fragment RecommendedProduct on Product {
-    id
-    title
-    handle
-    descriptionHtml
-    priceRange {
-      minVariantPrice {
-        amount
-        currencyCode
-      }
-    }
-    variants(first: 1) {
-      nodes {
-        id
-        title
-      }
-    }
-    featuredImage {
-      id
-      url
-      altText
-      width
-      height
-    }
-    tags
-  }
-  query RecommendedProducts ($country: CountryCode, $language: LanguageCode)
-    @inContext(country: $country, language: $language) {
-    products(first: 6, sortKey: UPDATED_AT, reverse: true) {
-      nodes {
-        ...RecommendedProduct
       }
     }
   }
