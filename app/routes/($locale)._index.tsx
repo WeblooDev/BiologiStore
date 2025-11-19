@@ -219,11 +219,12 @@ const RECOMMENDED_PRODUCTS_QUERY = `#graphql
         currencyCode
       }
     }
-      variants(first: 1) {
-    nodes {
-      title
+    variants(first: 1) {
+      nodes {
+        id
+        title
+      }
     }
-  }
     featuredImage {
       id
       url
@@ -257,6 +258,7 @@ const BEST_SELLERS_QUERY = `#graphql
     }
     variants(first: 1) {
       nodes {
+        id
         title
       }
     }
@@ -294,6 +296,12 @@ const PRODUCT_WITH_PACK_TAG_QUERY = `#graphql
       minVariantPrice {
         amount
         currencyCode
+      }
+    }
+    variants(first: 1) {
+      nodes {
+        id
+        title
       }
     }
   }

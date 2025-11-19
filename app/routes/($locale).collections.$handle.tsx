@@ -436,6 +436,7 @@ const RECOMMENDED_PRODUCTS_QUERY = `#graphql
     }
     variants(first: 1) {
       nodes {
+        id
         title
       }
     }

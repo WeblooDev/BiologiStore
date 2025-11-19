@@ -155,7 +155,19 @@ export default function Product() {
     }
   };
 
+  const parseSkinType = () => {
+    try {
+      const raw = (product as any)?.skinType?.value;
+      if (!raw) return [];
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (e) {
+      return [];
+    }
+  };
+
   const skinConcern = parseSkinConcern();
+  const skinType = parseSkinType();
   const dayUse = parseDayUse();
   const nightUse = parseNightUse();
   const fdaApproved = parseFdaApproved();
@@ -191,7 +203,7 @@ export default function Product() {
             <h1 className="!text-[32px] text-[#2B8C57] !m-0">{title}</h1>
 
             <div className="flex flex-row gap-2 items-center">
-              {tags?.length > 0 && (
+              {tags?.length > 0 && bundleProducts?.length > 0 && (
                 <div className="mb-4 flex flex-wrap gap-2 items-center">
                   {tags.map((tag: string, index: number) => (
                     <div key={tag} className="flex items-center gap-1">
@@ -199,6 +211,20 @@ export default function Product() {
                         {tag}
                       </span>
                       {index < tags.length - 1 && (
+                        <span className="!text-sm text-[#4F4F4F]">+</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+              {skinType.length > 0 && (
+                <div className="mb-4 flex flex-wrap gap-2 items-center">
+                  {skinType.map((tag: string, index: number) => (
+                    <div key={tag} className="flex items-center gap-1">
+                      <span className="!text-sm text-[#4F4F4F] underline">
+                        {tag}
+                      </span>
+                      {index < skinType.length - 1 && (
                         <span className="!text-sm text-[#4F4F4F]">+</span>
                       )}
                     </div>
