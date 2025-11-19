@@ -1,8 +1,7 @@
 import {useEffect, useRef, useState, Suspense} from 'react';
 import type {HeaderQuery, CartApiQueryFragment} from 'storefrontapi.generated';
-import {useAside} from '~/components/Aside';
 import logoBiologi from '~/assets/images/logoBiologi.svg';
-import {Await, useLocation} from 'react-router';
+import {Await, useLocation, useRouteLoaderData} from 'react-router';
 import cartIcon from '~/assets/images/cart.svg';
 import search from '~/assets/images/search.svg';
 import signin from '~/assets/images/signin.svg';
@@ -11,17 +10,23 @@ import facebook from '~/assets/images/facebook.svg';
 import instagram from '~/assets/images/instagram.svg';
 
 import {
+  CartForm,
   type CartViewPayload,
   useAnalytics,
   useOptimisticCart,
 } from '@shopify/hydrogen';
 import right from '~/assets/images/right-arrow.svg';
 import left from '~/assets/images/left-arrow.svg';
+import {Drawer, useDrawer} from './Drawer';
+import {CartMain} from './CartMain';
+import {useCartFetchers} from '~/lib/cart-utils';
+import type {RootLoader} from '~/root';
 
 interface HeaderProps {
   header: HeaderQuery;
-  cart: Promise<CartApiQueryFragment | null>;
+  cart: CartApiQueryFragment | null;
   isLoggedIn: Promise<boolean>;
+  publicStoreDomain: string;
 }
 
 type Viewport = 'desktop';
@@ -43,7 +48,6 @@ function sanitizeUrl(url: string): string {
 }
 
 export function Header({header, isLoggedIn, cart}: HeaderProps) {
-  const {open} = useAside(); // ✅ ADD THIS LINE
   // Desktop view logic with sticky behavior
   const menuRef = useRef<HTMLDivElement>(null);
   const [isSticky, setIsSticky] = useState(false);
@@ -88,12 +92,33 @@ export function Header({header, isLoggedIn, cart}: HeaderProps) {
     location.pathname.startsWith('/products/') ||
     location.pathname.startsWith('/bundles');
 
+  const {
+    isOpen: isCartOpen,
+    openDrawer: openCart,
+    closeDrawer: closeCart,
+  } = useDrawer();
+
+  const {
+    isOpen: isMenuOpen,
+    openDrawer: openMenu,
+    closeDrawer: closeMenu,
+  } = useDrawer();
+
+  const addToCartFetchers = useCartFetchers(CartForm.ACTIONS.LinesAdd);
+
+  // toggle cart drawer when adding to cart
+  useEffect(() => {
+    if (isCartOpen || !addToCartFetchers.length) return;
+    openCart();
+  }, [addToCartFetchers, isCartOpen, openCart]);
+
   return (
     <div
-      className={` w-full absolute top-0 z-10 transition-all duration-300 ${
+      className={` w-full absolute top-0 z-[100] transition-all duration-300 ${
         isProductPage ? 'bg-transparent hover:bg-white' : 'bg-white'
       }`}
     >
+      <CartDrawer isOpen={isCartOpen} onClose={closeCart} />
       <div className="border-b border-b-[#BDBDBD] flex justify-center p-2 w-full">
         <PromoCarousel />
       </div>
@@ -117,7 +142,7 @@ export function Header({header, isLoggedIn, cart}: HeaderProps) {
           />
         </a>
 
-        <HeaderCtas isLoggedIn={isLoggedIn} cart={cart} />
+        <HeaderCtas isLoggedIn={isLoggedIn} cart={cart} openCart={openCart} />
       </header>
 
       <HeaderMenu
@@ -129,8 +154,32 @@ export function Header({header, isLoggedIn, cart}: HeaderProps) {
         offsetTop={offsetTop}
         menuHeight={menuHeight}
         menuRef={menuRef}
+        openCart={openCart}
+        openMenu={openMenu}
       />
     </div>
+  );
+}
+
+function CartDrawer({isOpen, onClose}: {isOpen: boolean; onClose: () => void}) {
+  const rootData = useRouteLoaderData<RootLoader>('root');
+
+  if (!rootData) return null;
+
+  return (
+    <Drawer open={isOpen} onClose={onClose} heading="Cart" openFrom="right">
+      <Suspense fallback={<CartMain layout="drawer" cart={rootData.cart} />}>
+        <Await resolve={rootData.recommendedProducts}>
+          {(recommendedProducts) => (
+            <CartMain
+              layout="drawer"
+              cart={rootData.cart}
+              recommendedProducts={recommendedProducts}
+            />
+          )}
+        </Await>
+      </Suspense>
+    </Drawer>
   );
 }
 
@@ -143,6 +192,8 @@ export function HeaderMenu({
   offsetTop,
   menuHeight,
   menuRef,
+  openCart,
+  openMenu,
 }: {
   menu: HeaderProps['header']['menu'];
   viewport: 'desktop' | 'mobile';
@@ -152,14 +203,14 @@ export function HeaderMenu({
   offsetTop: number;
   menuHeight: number;
   menuRef: React.RefObject<HTMLDivElement>;
+  openCart: () => void;
+  openMenu: () => void;
 }) {
-  const {close} = useAside();
-
   if (viewport === 'mobile') {
     return (
       <nav className="flex flex-col w-full">
-        {menu.items.map((item) => (
-          <MobileMenuItem key={item.id} item={item} />
+        {menu?.items?.map((item) => (
+          <MobileMenuItem key={item.id} item={item} openMenu={openMenu} />
         ))}
 
         {/* Sign In block after all links */}
@@ -179,7 +230,7 @@ export function HeaderMenu({
       <div
         ref={menuRef}
         className={`w-full transition-all duration-300 ${
-          isSticky ? 'fixed top-0 left-0 z-50 bg-white' : 'relative'
+          isSticky ? 'fixed top-0 left-0 z-[110] bg-white' : 'relative'
         }`}
       >
         <div role="navigation" className="hidden md:block">
@@ -188,6 +239,7 @@ export function HeaderMenu({
             isSticky={isSticky}
             isLoggedIn={isLoggedIn}
             cart={cart}
+            openCart={openCart}
           />
         </div>
       </div>
@@ -200,11 +252,13 @@ function RenderMenuItems({
   isSticky,
   isLoggedIn,
   cart,
+  openCart,
 }: {
   items: any[];
   isSticky: boolean;
   isLoggedIn: HeaderProps['isLoggedIn'];
   cart: HeaderProps['cart'];
+  openCart: () => void;
 }) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [underlineStyle, setUnderlineStyle] = useState({left: 0, width: 0});
@@ -215,7 +269,8 @@ function RenderMenuItems({
     const currentPath = window.location.pathname;
     const foundIndex = items.findIndex((item) => item?.url === currentPath);
     if (foundIndex !== -1) setActiveIndex(foundIndex);
-  }, [items]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     const updateUnderline = () => {
@@ -292,12 +347,16 @@ function RenderMenuItems({
           <div
             className={`transform  ${isSticky ? 'opacity-100 ' : 'opacity-0 '}`}
           >
-            <HeaderCtas isLoggedIn={isLoggedIn} cart={cart} />
+            <HeaderCtas
+              isLoggedIn={isLoggedIn}
+              cart={cart}
+              openCart={openCart}
+            />
           </div>
         </div>
 
         <div
-          className={`absolute top-full left-0 w-screen bg-[#F6F6F6] z-40 shadow-md transform transition-all duration-300 ease-out ${
+          className={`absolute top-full left-0 w-screen bg-[#F6F6F6] z-[105] shadow-md transform transition-all duration-300 ease-out ${
             activeItem?.items?.length
               ? 'opacity-100 translate-y-0 pointer-events-auto'
               : 'opacity-0 -translate-y-4 pointer-events-none'
@@ -344,8 +403,7 @@ function NestedMenuItems({items}: {items: any[]}) {
   );
 }
 
-function MobileMenuItem({item}: {item: any}) {
-  const [isOpen, setIsOpen] = useState(false);
+function MobileMenuItem({item, openMenu}: {item: any; openMenu: () => void}) {
   const [openSubmenus, setOpenSubmenus] = useState<{[key: string]: boolean}>(
     {},
   );
@@ -361,14 +419,14 @@ function MobileMenuItem({item}: {item: any}) {
     <div className="border-b border-gray-400">
       {/* Top-level item toggle */}
       <button
-        onClick={() => setIsOpen((prev) => !prev)}
+        onClick={() => openMenu()}
         className="w-full text-left p-4 flex justify-between items-center text-lg "
       >
         {item.title}
         {item.items?.length > 0 && (
           <svg
             className={`w-5 h-5 transition-transform duration-300 cursor-pointer ${
-              isOpen ? 'rotate-180' : ''
+              openSubmenus[item.id] ? 'rotate-180' : ''
             }`}
             fill="none"
             stroke="currentColor"
@@ -376,7 +434,7 @@ function MobileMenuItem({item}: {item: any}) {
             viewBox="0 0 24 24"
           >
             <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14" />
-            {!isOpen && (
+            {openSubmenus[item.id] && (
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 5v14" />
             )}
           </svg>
@@ -386,7 +444,9 @@ function MobileMenuItem({item}: {item: any}) {
       {/* Submenu list */}
       <div
         className={`transition-all duration-300 ease-in-out overflow-hidden ${
-          isOpen ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'
+          openSubmenus[item.id]
+            ? 'max-h-[1000px] opacity-100'
+            : 'max-h-0 opacity-0'
         }`}
       >
         <div className="mt-2 flex flex-col bg-[#f6f6f6]">
@@ -413,7 +473,7 @@ function MobileMenuItem({item}: {item: any}) {
                       strokeLinejoin="round"
                       d="M5 12h14"
                     />
-                    {!openSubmenus[subItem.id] && (
+                    {openSubmenus[subItem.id] && (
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -455,7 +515,10 @@ export default MobileMenuItem;
 function HeaderCtas({
   isLoggedIn,
   cart,
-}: Pick<HeaderProps, 'isLoggedIn' | 'cart'>) {
+  openCart,
+}: Pick<HeaderProps, 'isLoggedIn' | 'cart'> & {
+  openCart: () => void;
+}) {
   return (
     <nav
       className="header-ctas flex items-center gap-2 md:gap-8"
@@ -488,34 +551,34 @@ function HeaderCtas({
         </Await>
       </Suspense>
       <SearchToggle />
-      <CartToggle cart={cart} />
+      <CartToggle cart={cart} openCart={openCart} />
     </nav>
   );
 }
 
 function SearchToggle() {
-  const {open} = useAside();
+  // TODO: Implement search drawer
   return (
-    <button className="reset" onClick={() => open('search')}>
+    <button className="reset" onClick={() => console.log('Search clicked')}>
       <img src={search} alt="Search" className="w-5 h-5" />
     </button>
   );
 }
 
-function CartBadge({count}: {count: number | null}) {
-  const {open} = useAside();
+function CartBadge({
+  count,
+  openCart,
+}: {
+  count: number | null;
+  openCart: () => void;
+}) {
   const {publish, shop, cart, prevCart} = useAnalytics();
 
   return (
-    <a
-      href="/cart"
-      onClick={(e) => {
-        e.preventDefault();
-
-        // ✅ Add this debug log here
-        console.log("🟢 CartToggle clicked – triggering open('cart')");
-
-        open('cart');
+    <button
+      type="button"
+      onClick={() => {
+        openCart();
         publish('cart_viewed', {
           cart,
           prevCart,
@@ -523,7 +586,7 @@ function CartBadge({count}: {count: number | null}) {
           url: window.location.href || '',
         } as CartViewPayload);
       }}
-      className="relative inline-block"
+      className="relative inline-block reset"
     >
       <img src={cartIcon} alt="Cart" className="h-5 w-6" />
       {typeof count === 'number' && count > 0 && (
@@ -531,26 +594,26 @@ function CartBadge({count}: {count: number | null}) {
           {count}
         </span>
       )}
-    </a>
+    </button>
   );
 }
 
-function CartToggle({cart}: Pick<HeaderProps, 'cart'>) {
-  return (
-    <Suspense fallback={<CartBadge count={null} />}>
-      <Await resolve={cart}>
-        {(resolvedCart) => {
-          const safeCart = resolvedCart ?? null;
-          return <CartBanner cartData={safeCart} />;
-        }}
-      </Await>
-    </Suspense>
-  );
+function CartToggle({
+  cart,
+  openCart,
+}: Pick<HeaderProps, 'cart'> & {openCart: () => void}) {
+  return <CartBanner cartData={cart} openCart={openCart} />;
 }
 
-function CartBanner({cartData}: {cartData: CartApiQueryFragment | null}) {
+function CartBanner({
+  cartData,
+  openCart,
+}: {
+  cartData: CartApiQueryFragment | null;
+  openCart: () => void;
+}) {
   const cart = useOptimisticCart(cartData);
-  return <CartBadge count={cart?.totalQuantity ?? 0} />;
+  return <CartBadge count={cart?.totalQuantity ?? 0} openCart={openCart} />;
 }
 
 const FALLBACK_HEADER_MENU = {
@@ -568,16 +631,6 @@ export function PromoCarousel() {
   const [index, setIndex] = useState(0);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  useEffect(() => {
-    timeoutRef.current = setTimeout(() => {
-      handleNext();
-    }, 5000);
-
-    return () => {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    };
-  }, [index]);
-
   const handlePrev = () => {
     setIndex((prev) => (prev - 1 + messages.length) % messages.length);
   };
@@ -585,6 +638,16 @@ export function PromoCarousel() {
   const handleNext = () => {
     setIndex((prev) => (prev + 1) % messages.length);
   };
+
+  useEffect(() => {
+    timeoutRef.current = setTimeout(() => {
+      setIndex((prev) => (prev + 1) % messages.length);
+    }, 5000);
+
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, [index, messages.length]);
 
   return (
     <div className="relative w-full max-w-[800px] overflow-hidden px-6">

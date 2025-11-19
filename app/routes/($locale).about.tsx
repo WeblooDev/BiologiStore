@@ -50,7 +50,7 @@ export default function AboutPage() {
           },
         ]}
         buttonText="Shop Now"
-        buttonLink="/our-story"
+        buttonLink="/collections/all"
       />
 
       <ImageTextSection
@@ -92,7 +92,7 @@ export default function AboutPage() {
         ]}
         reverse={false}
         buttonText="Visit Our Clinic"
-        buttonLink="/our-story"
+        buttonLink="/contact"
       />
 
       <ImageTextSection
@@ -114,7 +114,7 @@ export default function AboutPage() {
         ]}
         reverse={true}
         buttonText="Contact Us"
-        buttonLink="/our-story"
+        buttonLink="/contact"
       />
 
       <TrustedByExpertSection
@@ -125,7 +125,9 @@ export default function AboutPage() {
         title="Trusted by Experts. Chosen by You."
         text="Experience our professional-grade skincare designed to treat, transform, and maintain your healthiest skin."
         buttonText="Shop Now"
+        buttonLink="/collections/all"
         buttonText1="Learn More"
+        buttonLink1="/about"
       />
     </div>
   );

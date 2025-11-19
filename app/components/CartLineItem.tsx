@@ -4,7 +4,6 @@ import {CartForm, Image, type OptimisticCartLine} from '@shopify/hydrogen';
 import {useVariantUrl} from '~/lib/variants';
 import {Link} from 'react-router';
 import {ProductPrice} from './ProductPrice';
-import {useAside} from './Aside';
 import type {CartApiQueryFragment} from 'storefrontapi.generated';
 import {XIcon} from 'lucide-react';
 
@@ -24,7 +23,6 @@ export function CartLineItem({
   const {id, merchandise} = line;
   const {product, title, image, selectedOptions} = merchandise;
   const lineItemUrl = useVariantUrl(product.handle, selectedOptions);
-  const {close} = useAside();
 
   return (
     <li
@@ -90,7 +88,8 @@ function CartLineQuantity({line}: {line: CartLine}) {
       <div className="flex items-center gap-2">
         <CartLineUpdateButton lines={[{id: lineId, quantity: prevQuantity}]}>
           <button
-            className="bg-[#F6F6F6] h-5 w-5 rounded-full flex items-center justify-center"
+            type="submit"
+            className="bg-[#F6F6F6] h-5 w-5 rounded-full flex items-center justify-center cursor-pointer transition-all duration-300 hover:bg-[#2B8C57] hover:text-white hover:scale-110 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[#F6F6F6] disabled:hover:text-black disabled:hover:scale-100"
             aria-label="Decrease quantity"
             disabled={quantity <= 1 || !!isOptimistic}
             name="decrease-quantity"
@@ -102,7 +101,8 @@ function CartLineQuantity({line}: {line: CartLine}) {
         <span>{quantity}</span>
         <CartLineUpdateButton lines={[{id: lineId, quantity: nextQuantity}]}>
           <button
-            className="bg-[#F6F6F6] h-5 w-5 rounded-full flex items-center justify-center"
+            type="submit"
+            className="bg-[#F6F6F6] h-5 w-5 rounded-full flex items-center justify-center cursor-pointer transition-all duration-300 hover:bg-[#2B8C57] hover:text-white hover:scale-110 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[#F6F6F6] disabled:hover:text-black disabled:hover:scale-100"
             aria-label="Increase quantity"
             name="increase-quantity"
             value={nextQuantity}
@@ -133,7 +133,6 @@ function CartLineRemoveButton({
 }) {
   return (
     <CartForm
-      fetcherKey={getUpdateKey(lineIds)}
       route="/cart"
       action={CartForm.ACTIONS.LinesRemove}
       inputs={{lineIds}}
@@ -141,7 +140,7 @@ function CartLineRemoveButton({
       <button
         disabled={disabled}
         type="submit"
-        className="absolute top-0 right-0"
+        className="absolute top-0 right-0 cursor-pointer transition-all duration-300 hover:scale-125 hover:text-red-500 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:text-current"
       >
         <XIcon size={24} strokeWidth={0.5} />
       </button>

@@ -1,5 +1,10 @@
 import {Link, useFetcher} from 'react-router';
-import {Image, Money} from '@shopify/hydrogen';
+import {
+  CartForm,
+  Image,
+  Money,
+  OptimisticCartLineInput,
+} from '@shopify/hydrogen';
 import type {
   ProductItemFragment,
   CollectionItemFragment,
@@ -8,9 +13,7 @@ import type {
 import {useVariantUrl} from '~/lib/variants';
 import bullet from '~/assets/images/bulle.svg';
 import {useState} from 'react';
-import close from '~/assets/images/closee.svg';
-
-import {motion, AnimatePresence} from 'framer-motion';
+import {QuickView} from './QuickView';
 
 export function ProductItem({
   product,
@@ -41,6 +44,18 @@ export function ProductItem({
         action: '/cart',
       },
     );
+  };
+
+  const getCartLines = (): OptimisticCartLineInput[] => {
+    const variantId = product?.variants?.nodes?.[0]?.id;
+    if (!variantId) return [];
+
+    return [
+      {
+        merchandiseId: variantId,
+        quantity: 1,
+      },
+    ];
   };
 
   return (
@@ -105,104 +120,46 @@ export function ProductItem({
           <small className="block text-sm">
             <Money data={product.priceRange.minVariantPrice} />
           </small>
-          <div className="w-full m-auto flex items-center justify-center">
-            <button
-              onClick={handleAddToCart}
-              className="w-[90%] border border-[#2B8C57] uppercase bg-white px-14 py-2 text-[#2B8C57] cursor-pointer hover:text-white hover:bg-[#2B8C57]  !text-sm"
+          <div className="w-full">
+            <CartForm
+              route="/cart"
+              inputs={{lines: getCartLines()}}
+              action={CartForm.ACTIONS.LinesAdd}
             >
-              Add to Cart
-            </button>
+              {(fetcher) => (
+                <button
+                  type="submit"
+                  disabled={fetcher.state !== 'idle'}
+                  className="w-[90%] border border-[#2B8C57] uppercase
+                  bg-white px-12 py-2 text-[#2B8C57] cursor-pointer hover:text-white
+                  hover:bg-[#2B8C57] !text-xs md:!text-sm disabled:opacity-50 transition-colors duration-200"
+                >
+                  {fetcher.state !== 'idle' ? 'Adding...' : 'Add to Bag'}
+                </button>
+              )}
+            </CartForm>
           </div>
         </div>
       </div>
 
-      {/* Quick View Modal */}
-      {showQuickView && (
-        <div
-          className=" fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center transition-opacity duration-300 shadow-2xl"
-          onClick={() => setShowQuickView(false)}
-        >
-          <AnimatePresence>
-            <motion.div
-              initial={{scale: 0.7, opacity: 0}}
-              animate={{scale: 1, opacity: 1}}
-              exit={{scale: 0.8, opacity: 0}}
-              transition={{duration: 0.5, ease: 'easeOut'}}
-              className="container bg-white  relative flex flex-col md:flex-row shadow-2xl"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="w-full md:w-[40%] h-full bg-[#F6F6F6]">
-                {image && (
-                  <img
-                    src={image.url}
-                    alt={image.altText || ''}
-                    className="w-full h-full object-cover rounded mb-4"
-                  />
-                )}
-              </div>
-
-              {/* Right: Info */}
-              <div className="w-full md:w-[60%] flex flex-col gap-3 justify-between p-6">
-                <h3 className="font-poppins text-2xl font-bold text-[#2B8C57] mb-2">
-                  {product.title}
-                </h3>
-
-                {product.tags?.length > 0 && (
-                  <div className="mb-2 flex flex-wrap gap-2">
-                    {product.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="text-sm underline text-[#4F4F4F]"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                )}
-
-                <p className="text-base mb-2 text-[#2B8C57]">
-                  <Money data={product.priceRange.minVariantPrice} />
-                </p>
-
-                {product.variants?.nodes?.[0]?.title && (
-                  <p className="text-gray-600 text-sm mb-2">
-                    Size: {product.variants.nodes[0].title}
-                  </p>
-                )}
-
-                {product.descriptionHtml && (
-                  <div
-                    className="text-gray-700 text-sm mb-4"
-                    dangerouslySetInnerHTML={{__html: product.descriptionHtml}}
-                  />
-                )}
-
-                <button
-                  className="block text-center mt-2 bg-[#2B8C57] cursor-pointer uppercase border border-[#2B8C57] text-white hover:bg-[#2B8C57] hover:text-white text-sm px-4 py-2 transition-all"
-                  onClick={handleAddToCart}
-                >
-                  Add to Cart
-                </button>
-
-                <Link
-                  to={`/products/${product.handle}`}
-                  className="block text-center  mt-4 !underline text-sm px-4 py-2 transition-all"
-                >
-                  View Full Product Page
-                </Link>
-              </div>
-
-              {/* Close button */}
-              <button
-                className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-xl font-bold cursor-pointer"
-                onClick={() => setShowQuickView(false)}
-              >
-                <img src={close} className="h-[20px]" />
-              </button>
-            </motion.div>
-          </AnimatePresence>
-        </div>
-      )}
+      <QuickView
+        product={product as any}
+        isOpen={showQuickView}
+        onClose={() => setShowQuickView(false)}
+        onAddToCart={() => {
+          if (!firstVariantId) return;
+          fetcher.submit(
+            {
+              variantId: firstVariantId,
+              quantity: 1,
+            },
+            {
+              method: 'post',
+              action: '/cart',
+            },
+          );
+        }}
+      />
     </>
   );
 }

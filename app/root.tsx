@@ -29,12 +29,19 @@ export const shouldRevalidate: ShouldRevalidateFunction = ({
   formMethod,
   currentUrl,
   nextUrl,
+  actionResult,
+  defaultShouldRevalidate,
+  formAction,
 }) => {
   // revalidate when a mutation is performed e.g add to cart, login...
-  if (formMethod && formMethod !== 'GET') return true;
+  if (formMethod && formMethod !== 'GET') {
+    return true;
+  }
 
   // revalidate when manually revalidating via useRevalidator
-  if (currentUrl.toString() === nextUrl.toString()) return true;
+  if (currentUrl.toString() === nextUrl.toString()) {
+    return true;
+  }
 
   // Defaulting to no revalidation for root loader data to improve performance.
   // When using this feature, you risk your UI getting out of sync with your server.
@@ -101,9 +108,9 @@ export async function loader(args: LoaderFunctionArgs) {
  * needed to render the page. If it's unavailable, the whole page should 400 or 500 error.
  */
 async function loadCriticalData({context}: LoaderFunctionArgs) {
-  const {storefront} = context;
+  const {storefront, cart} = context;
 
-  const [header] = await Promise.all([
+  const [header, cartData] = await Promise.all([
     storefront.query(HEADER_QUERY, {
       cache: storefront.CacheLong(),
       variables: {
@@ -112,9 +119,10 @@ async function loadCriticalData({context}: LoaderFunctionArgs) {
         language: storefront.i18n.language,
       },
     }),
+    cart.get(),
   ]);
 
-  return {header};
+  return {header, cart: cartData};
 }
 
 /**
@@ -123,7 +131,7 @@ async function loadCriticalData({context}: LoaderFunctionArgs) {
  * Make sure to not throw any errors here, as it will cause the page to 500.
  */
 function loadDeferredData({context}: LoaderFunctionArgs) {
-  const {storefront, customerAccount, cart} = context;
+  const {storefront, customerAccount} = context;
 
   // defer the footer query (below the fold)
   const footer = storefront
@@ -161,7 +169,6 @@ function loadDeferredData({context}: LoaderFunctionArgs) {
     });
 
   return {
-    cart: cart.get(),
     isLoggedIn: customerAccount.isLoggedIn(),
     footer,
     collections,

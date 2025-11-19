@@ -178,8 +178,6 @@ export default function Product() {
     }
   }, [product.handle]);
 
-  console.log(product);
-
   return (
     <>
       <div
@@ -301,7 +299,12 @@ export default function Product() {
 
       {/* <BundleProducts products={bundleProducts} /> */}
 
-      {bundleProducts && <BundleRegimen products={bundleProducts} />}
+      {bundleProducts && (
+        <BundleRegimen
+          products={bundleProducts}
+          regimenData={product.bundleRegimen}
+        />
+      )}
 
       <ProductBenefits
         json={product.metafield?.value || '[]'}
@@ -472,45 +475,49 @@ const PRODUCT_FRAGMENT = `#graphql
       }
     }
 
- bundleProducts: metafield(namespace: "custom", key: "bundle_products") {
-  references(first: 10) {
-    nodes {
-      ... on Product {
-        id
-        title
-        handle
-        description
-        tags
-        dayUse: metafield(namespace: "product", key: "dayuse") {
-          value
-        }
-        nightUse: metafield(namespace: "product", key: "nightuse") {
-          value
-        }
-        skinConcern: metafield(namespace: "product", key: "concern") {
-          value
-        }
-        fdaApproved: metafield(namespace: "product", key: "fda_approved") {
-          value
-        }
-        featuredImage {
-          url
-          altText
-          width
-          height
-        }
-        priceRange {
-          minVariantPrice {
-            amount
-            currencyCode
+    bundleProducts: metafield(namespace: "custom", key: "bundle_products") {
+      references(first: 10) {
+        nodes {
+          ... on Product {
+            id
+            title
+            handle
+            description
+            tags
+            dayUse: metafield(namespace: "product", key: "dayuse") {
+              value
+            }
+            nightUse: metafield(namespace: "product", key: "nightuse") {
+              value
+            }
+            skinConcern: metafield(namespace: "product", key: "concern") {
+              value
+            }
+            fdaApproved: metafield(namespace: "product", key: "fda_approved") {
+              value
+            }
+            featuredImage {
+              url
+              altText
+              width
+              height
+            }
+            priceRange {
+              minVariantPrice {
+                amount
+                currencyCode
+              }
+            }
+            stepLabel: metafield(namespace: "custom", key: "step_label") {
+              value
+            }
           }
-        }
-        stepLabel: metafield(namespace: "custom", key: "step_label") {
-          value
         }
       }
     }
-  }
+
+bundleRegimen: metafield(namespace: "custom", key: "bundle_regimen") {
+  value
 }
 
 

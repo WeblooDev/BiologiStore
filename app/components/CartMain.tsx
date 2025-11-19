@@ -4,11 +4,10 @@ import type {
   CartApiQueryFragment,
   RecommendedProductsForCartQuery,
 } from 'storefrontapi.generated';
-import {useAside} from '~/components/Aside';
 import {CartLineItem} from '~/components/CartLineItem';
 import {CartSummary} from './CartSummary';
 
-export type CartLayout = 'page' | 'aside';
+export type CartLayout = 'page' | 'drawer';
 
 export type CartMainProps = {
   cart: CartApiQueryFragment | null;
@@ -25,10 +24,7 @@ export function CartMain({
   cart: originalCart,
   recommendedProducts,
 }: CartMainProps) {
-  // The useOptimisticCart hook applies pending actions to the cart
-  // so the user immediately sees feedback when they modify the cart.
-  const unwrappedCart = (originalCart as any)?.cart ?? originalCart;
-  const cart = useOptimisticCart(unwrappedCart as any);
+  const cart = useOptimisticCart(originalCart);
 
   const linesCount = Boolean(cart?.lines?.nodes?.length || 0);
   const withDiscount =
@@ -38,7 +34,9 @@ export function CartMain({
   const cartHasItems = cart?.totalQuantity ? cart.totalQuantity > 0 : false;
 
   return (
-    <div className={`${className} flex flex-col h-full gap-6`}>
+    <div
+      className={`${className} flex flex-col h-full gap-6 ${layout === 'drawer' ? 'p-6' : ''}`}
+    >
       <CartEmpty hidden={linesCount} layout={layout} />
 
       <div className="cart-details flex flex-col justify-between flex-1 gap-6">
@@ -66,7 +64,6 @@ function CartEmpty({
   hidden: boolean;
   layout?: CartMainProps['layout'];
 }) {
-  const {close} = useAside();
   return (
     <div hidden={hidden}>
       <br />
@@ -75,7 +72,7 @@ function CartEmpty({
         started!
       </p>
       <br />
-      <Link to="/collections" onClick={close} prefetch="viewport">
+      <Link to="/collections" prefetch="viewport">
         Continue shopping →
       </Link>
     </div>
@@ -124,7 +121,7 @@ function CartRecommendations({
             <Link
               key={product.id}
               to={`/products/${product.handle}`}
-              className="min-w-[220px] bg-white flex flex-row items-center justify-center shrink-0 relative"
+              className="min-w-[220px] max-w-[350px] bg-white flex flex-row items-center justify-center shrink-0 relative"
             >
               {imageUrl && (
                 <div

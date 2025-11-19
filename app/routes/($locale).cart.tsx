@@ -78,7 +78,7 @@ export async function action({request, context}: ActionFunctionArgs) {
   }
 
   const cartId = result?.cart?.id;
-  const headers = cartId ? cart.setCartId(result.cart.id) : new Headers();
+  const headers = cart.setCartId(result.cart.id);
   const {cart: cartResult, errors, warnings} = result;
 
   const redirectTo = formData.get('redirectTo') ?? null;
@@ -110,7 +110,7 @@ export default function Cart() {
 
   return (
     <div className="cart">
-      <header className="flex items-center justify-between">
+      <header className="flex items-center justify-between pt-[160px] p-20">
         <h2 className="text-xl font-semibold">Your bag</h2>
         <Link to="/cart" prefetch="viewport" className="text-sm underline">
           Go to cart

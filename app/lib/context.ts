@@ -1,7 +1,10 @@
-import {createHydrogenContext} from '@shopify/hydrogen';
+import {
+  cartGetIdDefault,
+  cartSetIdDefault,
+  createHydrogenContext,
+} from '@shopify/hydrogen';
 import {AppSession} from '~/lib/session';
 import {CART_QUERY_FRAGMENT} from '~/lib/fragments';
-import {getLocaleFromRequest} from '~/lib/i18n';
 
 /**
  * The context implementation is separate from server.ts
@@ -31,9 +34,13 @@ export async function createAppLoadContext(
     cache,
     waitUntil,
     session,
-    i18n: getLocaleFromRequest(request),
+    i18n: {language: 'EN', country: 'US'},
     cart: {
       queryFragment: CART_QUERY_FRAGMENT,
+      getId: cartGetIdDefault(request.headers),
+      setId: cartSetIdDefault({
+        maxage: 60 * 60 * 24 * 365, // One year expiry
+      }),
     },
   });
 

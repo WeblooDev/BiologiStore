@@ -30,31 +30,100 @@ async function loadCriticalData({context, request}: LoaderFunctionArgs) {
     storefront.query(ALL_COLLECTIONS_QUERY),
   ]);
 
-  // 🧠 Count skin types and categories
+  // 🧠 Count skin types, categories, skin concerns, and ingredients
   const skinTypeSet = new Set<string>();
   const skinTypeCounts: Record<string, number> = {};
   const categoryCounts: Record<string, number> = {};
+  const skinConcernSet = new Set<string>();
+  const skinConcernCounts: Record<string, number> = {};
+  const ingredientSet = new Set<string>();
+  const ingredientsCounts: Record<string, number> = {};
 
-  products.nodes.forEach((product) => {
-    // Count categories (productType)
+  products.nodes.forEach((product: any) => {
+    // Count categories (from collections/productType)
     const category = product.productType?.trim();
     if (category) {
       categoryCounts[category] = (categoryCounts[category] || 0) + 1;
     }
 
-    // Count skin types from variant options
-    product.variants?.nodes?.forEach((variant) => {
-      variant.selectedOptions?.forEach((opt) => {
-        if (opt.name.toLowerCase() === 'suitable for skin type') {
-          const value = opt.value.trim();
-          skinTypeSet.add(value);
-          skinTypeCounts[value] = (skinTypeCounts[value] || 0) + 1;
-        }
-      });
-    });
+    // Count skin types from metafield (JSON array)
+    if (product.skinType?.value) {
+      try {
+        const types = JSON.parse(product.skinType.value);
+        types.forEach((type: string) => {
+          if (type) {
+            skinTypeSet.add(type);
+            skinTypeCounts[type] = (skinTypeCounts[type] || 0) + 1;
+          }
+        });
+      } catch (e) {
+        // Fallback to comma-separated
+        const types = product.skinType.value
+          .split(',')
+          .map((t: string) => t.trim());
+        types.forEach((type: string) => {
+          if (type) {
+            skinTypeSet.add(type);
+            skinTypeCounts[type] = (skinTypeCounts[type] || 0) + 1;
+          }
+        });
+      }
+    }
+
+    // Count skin concerns from metafield (JSON array)
+    if (product.skinConcern?.value) {
+      try {
+        const concerns = JSON.parse(product.skinConcern.value);
+        concerns.forEach((concern: string) => {
+          if (concern) {
+            skinConcernSet.add(concern);
+            skinConcernCounts[concern] = (skinConcernCounts[concern] || 0) + 1;
+          }
+        });
+      } catch (e) {
+        // Fallback to comma-separated
+        const concerns = product.skinConcern.value
+          .split(',')
+          .map((c: string) => c.trim());
+        concerns.forEach((concern: string) => {
+          if (concern) {
+            skinConcernSet.add(concern);
+            skinConcernCounts[concern] = (skinConcernCounts[concern] || 0) + 1;
+          }
+        });
+      }
+    }
+
+    // Count ingredients from metafield (JSON array)
+    if (product.ingredient?.value) {
+      try {
+        const ingredients = JSON.parse(product.ingredient.value);
+        ingredients.forEach((ingredient: string) => {
+          if (ingredient) {
+            ingredientSet.add(ingredient);
+            ingredientsCounts[ingredient] =
+              (ingredientsCounts[ingredient] || 0) + 1;
+          }
+        });
+      } catch (e) {
+        // Fallback to comma-separated
+        const ingredients = product.ingredient.value
+          .split(',')
+          .map((i: string) => i.trim());
+        ingredients.forEach((ingredient: string) => {
+          if (ingredient) {
+            ingredientSet.add(ingredient);
+            ingredientsCounts[ingredient] =
+              (ingredientsCounts[ingredient] || 0) + 1;
+          }
+        });
+      }
+    }
   });
 
   const skinTypes = Array.from(skinTypeSet);
+  const skinConcerns = Array.from(skinConcernSet);
+  const ingredients = Array.from(ingredientSet);
 
   return {
     products,
@@ -62,6 +131,10 @@ async function loadCriticalData({context, request}: LoaderFunctionArgs) {
     skinTypes,
     skinTypeCounts,
     categoryCounts,
+    skinConcerns,
+    skinConcernCounts,
+    ingredients,
+    ingredientsCounts,
   };
 }
 
@@ -111,41 +184,70 @@ export default function Collection() {
       .filter((product: any) => {
         const {category, skinType, skinConcern, ingredient, price} = filters;
 
-        const normalize = (str: string | undefined) =>
-          str?.trim().toLowerCase().replace(/\s+/g, '');
+        // Normalize function: convert to lowercase and remove underscores, spaces, and special chars
+        const normalizeValue = (val: string) =>
+          val
+            .toLowerCase()
+            .replace(/[_\s&]/g, '')
+            .trim();
 
+        // Category filter now filters by collections
         const categoryMatch =
-          !category || normalize(product.productType) === normalize(category);
+          !category ||
+          (product.collections?.nodes?.some(
+            (col: any) =>
+              normalizeValue(col.title) === normalizeValue(category),
+          ) ??
+            false);
 
         const skinTypeMatch =
           !skinType ||
-          product.variants.nodes.some((variant) =>
-            variant.selectedOptions.some(
-              (opt) =>
-                normalize(opt.name) === 'suitableforskintype' &&
-                normalize(opt.value) === skinType,
-            ),
-          );
+          (() => {
+            if (!product.skinType?.value) return false;
+            try {
+              const types = JSON.parse(product.skinType.value);
+              return types.some(
+                (t: string) => normalizeValue(t) === normalizeValue(skinType),
+              );
+            } catch (e) {
+              return normalizeValue(product.skinType.value).includes(
+                normalizeValue(skinType),
+              );
+            }
+          })();
 
         const skinConcernMatch =
           !skinConcern ||
-          product.variants.nodes.some((variant: any) =>
-            variant.selectedOptions.some(
-              (opt: any) =>
-                normalize(opt.name) === 'skinconcern' &&
-                normalize(opt.value) === skinConcern,
-            ),
-          );
+          (() => {
+            if (!product.skinConcern?.value) return false;
+            try {
+              const concerns = JSON.parse(product.skinConcern.value);
+              return concerns.some(
+                (c: string) =>
+                  normalizeValue(c) === normalizeValue(skinConcern),
+              );
+            } catch (e) {
+              return normalizeValue(product.skinConcern.value).includes(
+                normalizeValue(skinConcern),
+              );
+            }
+          })();
 
         const ingredientMatch =
           !ingredient ||
-          product.variants.nodes.some((variant: any) =>
-            variant.selectedOptions.some(
-              (opt: any) =>
-                normalize(opt.name) === 'ingredient' &&
-                normalize(opt.value) === ingredient,
-            ),
-          );
+          (() => {
+            if (!product.ingredient?.value) return false;
+            try {
+              const ingredients = JSON.parse(product.ingredient.value);
+              return ingredients.some(
+                (i: string) => normalizeValue(i) === normalizeValue(ingredient),
+              );
+            } catch (e) {
+              return normalizeValue(product.ingredient.value).includes(
+                normalizeValue(ingredient),
+              );
+            }
+          })();
 
         const priceAmount = parseFloat(
           product.priceRange.minVariantPrice.amount,
@@ -225,26 +327,31 @@ export default function Collection() {
           onFilterChange={setFilters}
           categories={data.allCollections.nodes}
           skinTypes={data.skinTypes}
-          skinTypeCounts={data.skinTypeCounts}
-          categoryCounts={data.categoryCounts}
           skinConcerns={data.skinConcerns}
-          skinConcernCounts={data.skinConcernCounts}
           ingredients={data.ingredients}
-          ingredientsCounts={data.ingredientsCounts}
         />
 
         {/* Product Grid */}
-        <div className="container products-grid grid grid-cols-2 md:grid-cols-4 gap-8 p-4">
-          {filteredProducts
-            .slice(0, visibleCount)
-            .map((product: any, index: any) => (
-              <ProductItem
-                key={product.id}
-                product={product}
-                loading={index < BATCH_SIZE ? 'eager' : undefined}
-              />
-            ))}
-        </div>
+        {filteredProducts.length === 0 ? (
+          <div className="container mx-auto py-20 text-center">
+            <p className="text-2xl text-gray-600 mb-4">No products found</p>
+            <p className="text-gray-500">
+              Try adjusting your filters to see more results
+            </p>
+          </div>
+        ) : (
+          <div className="container products-grid grid grid-cols-2 md:grid-cols-4 gap-8 p-4">
+            {filteredProducts
+              .slice(0, visibleCount)
+              .map((product: any, index: any) => (
+                <ProductItem
+                  key={product.id}
+                  product={product}
+                  loading={index < BATCH_SIZE ? 'eager' : undefined}
+                />
+              ))}
+          </div>
+        )}
 
         {/* Viewed Count */}
         <p className="text-center text-sm text-gray-600 !my-6">
@@ -306,6 +413,15 @@ const COLLECTION_ITEM_FRAGMENT = `#graphql
     metafield(namespace: "custom", key: "new") {
       value
     }
+    skinConcern: metafield(namespace: "custom", key: "concern") {
+      value
+    }
+    ingredient: metafield(namespace: "custom", key: "ingredients") {
+      value
+    }
+    skinType: metafield(namespace: "custom", key: "skintype") {
+      value
+    }
     priceRange {
       minVariantPrice {
         ...MoneyCollectionItem
@@ -316,11 +432,19 @@ const COLLECTION_ITEM_FRAGMENT = `#graphql
     }
     variants(first: 10) {
       nodes {
-        title  # ✅ Add this line to get the variant size
+        id
+        title
         selectedOptions {
           name
           value
         }
+      }
+    }
+    collections(first: 10) {
+      nodes {
+        id
+        title
+        handle
       }
     }
   }

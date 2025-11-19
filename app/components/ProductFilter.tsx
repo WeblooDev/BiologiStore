@@ -1,4 +1,5 @@
-import {useState} from 'react';
+import {useState, useRef, useEffect} from 'react';
+import {ChevronDown} from 'lucide-react';
 
 export type FilterState = {
   category: string;
@@ -12,10 +13,7 @@ export type FilterState = {
 interface ProductFilterProps {
   filters: FilterState;
   skinTypes: string[];
-  skinTypeCounts: Record<string, number>;
-  categoryCounts: Record<string, number>;
   skinConcerns?: string[];
-  skinConcernCounts?: Record<string, number>;
   onFilterChange: (updated: FilterState) => void;
   categories: {
     id: string;
@@ -23,7 +21,6 @@ interface ProductFilterProps {
     handle: string;
   }[];
   ingredients?: string[];
-  ingredientsCounts?: Record<string, number>;
 }
 
 export function ProductFilter({
@@ -31,12 +28,8 @@ export function ProductFilter({
   onFilterChange,
   categories,
   skinTypes,
-  skinTypeCounts,
-  categoryCounts,
   skinConcerns = [],
-  skinConcernCounts = {},
   ingredients = [],
-  ingredientsCounts = {},
 }: ProductFilterProps) {
   const handleChange = (field: keyof FilterState, value: string) => {
     const updated = {...filters, [field]: value};
@@ -97,95 +90,151 @@ export function ProductFilter({
       <div className="flex justify-between gap-4 mb-6">
         {/* Category & Skin Type */}
         <div className="flex gap-4 items-center">
-          <select
+          <CustomDropdown
             value={filters.category}
-            onChange={(e) => handleChange('category', e.target.value)}
-            className="border-b py-2 w-[200px]"
-          >
-            <option value="">Category</option>
-            {categories.map((collection) => {
-              const count = categoryCounts[collection.title] || 0;
-              return (
-                <option key={collection.id} value={collection.title}>
-                  {collection.title} ({count})
-                </option>
-              );
-            })}
-          </select>
+            onChange={(value) => handleChange('category', value)}
+            options={categories.map((collection) => ({
+              value: collection.title,
+              label: collection.title,
+            }))}
+            placeholder="Category"
+            className="w-[200px]"
+          />
 
-          <select
+          <CustomDropdown
             value={filters.skinType}
-            onChange={(e) => handleChange('skinType', e.target.value)}
-            className="border-b py-2 w-[200px]"
-          >
-            <option value="">Skin Type</option>
-            {skinTypes.map((type) => {
-              const count = skinTypeCounts[type] || 0;
-              return (
-                <option
-                  key={type}
-                  value={type.toLowerCase().replace(/\s+/g, '_')}
-                >
-                  {type} ({count})
-                </option>
-              );
-            })}
-          </select>
+            onChange={(value) => handleChange('skinType', value)}
+            options={skinTypes.map((type) => ({
+              value: type.toLowerCase().replace(/\s+/g, '_'),
+              label: type,
+            }))}
+            placeholder="Skin Type"
+            className="w-[200px]"
+          />
 
-          <select
+          <CustomDropdown
             value={filters.skinConcern}
-            onChange={(e) => handleChange('skinConcern', e.target.value)}
-            className="border-b py-2 w-[200px]"
-          >
-            <option value="">Skin Concern</option>
-            {skinConcerns.map((concern) => {
-              const count = skinConcernCounts[concern] || 0;
-              return (
-                <option
-                  key={concern}
-                  value={concern.toLowerCase().replace(/\s+/g, '_')}
-                >
-                  {concern} ({count})
-                </option>
-              );
-            })}
-          </select>
+            onChange={(value) => handleChange('skinConcern', value)}
+            options={skinConcerns.map((concern) => ({
+              value: concern.toLowerCase().replace(/\s+/g, '_'),
+              label: concern,
+            }))}
+            placeholder="Skin Concern"
+            className="w-[200px]"
+          />
 
-          <select
+          <CustomDropdown
             value={filters.ingredient}
-            onChange={(e) => handleChange('ingredient', e.target.value)}
-            className="border-b py-2 w-[200px]"
-          >
-            <option value="">Ingredient</option>
-            {ingredients.map((ingredient) => {
-              const count = ingredientsCounts[ingredient] || 0;
-              return (
-                <option
-                  key={ingredient}
-                  value={ingredient.toLowerCase().replace(/\s+/g, '_')}
-                >
-                  {ingredient} ({count})
-                </option>
-              );
-            })}
-          </select>
+            onChange={(value) => handleChange('ingredient', value)}
+            options={ingredients.map((ingredient) => ({
+              value: ingredient.toLowerCase().replace(/\s+/g, '_'),
+              label: ingredient,
+            }))}
+            placeholder="Ingredient"
+            className="w-[200px]"
+          />
         </div>
 
         {/* Sort Option */}
         <div className="flex gap-2 items-center">
           <p>Sort by:</p>
-          <select
+          <CustomDropdown
             value={filters.sort}
-            onChange={(e) => handleChange('sort', e.target.value)}
-            className="border-b py-2 w-[200px]"
-          >
-            <option value="RELEVANCE">Relevance</option>
-            <option value="PRICE_ASC">Price: Low to High</option>
-            <option value="PRICE_DESC">Price: High to Low</option>
-            <option value="UPDATED_AT">Newest</option>
-          </select>
+            onChange={(value) => handleChange('sort', value)}
+            options={[
+              {value: 'RELEVANCE', label: 'Relevance'},
+              {value: 'PRICE_ASC', label: 'Price: Low to High'},
+              {value: 'PRICE_DESC', label: 'Price: High to Low'},
+              {value: 'UPDATED_AT', label: 'Newest'},
+            ]}
+            placeholder="Sort by"
+            className="w-[200px]"
+          />
         </div>
       </div>
+    </div>
+  );
+}
+
+// Custom Dropdown Component
+function CustomDropdown({
+  value,
+  onChange,
+  options,
+  placeholder,
+  className = '',
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  options: Array<{value: string; label: string}>;
+  placeholder: string;
+  className?: string;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const selectedOption = options.find((opt) => opt.value === value);
+
+  return (
+    <div ref={dropdownRef} className={`relative ${className}`}>
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full border-b border-gray-300 py-2 px-3 text-left flex items-center justify-between hover:border-[#2B8C57] transition-colors duration-300 cursor-pointer"
+      >
+        <span className={value ? 'text-black' : 'text-gray-500'}>
+          {selectedOption ? selectedOption.label : placeholder}
+        </span>
+        <ChevronDown
+          size={16}
+          className={`transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
+        />
+      </button>
+
+      {isOpen && (
+        <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto">
+          <button
+            type="button"
+            onClick={() => {
+              onChange('');
+              setIsOpen(false);
+            }}
+            className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors duration-200 text-gray-500"
+          >
+            {placeholder}
+          </button>
+          {options.map((option) => (
+            <button
+              key={option.value}
+              type="button"
+              onClick={() => {
+                onChange(option.value);
+                setIsOpen(false);
+              }}
+              className={`w-full text-left px-4 py-2 hover:bg-[#2B8C57] hover:text-white transition-colors duration-200 ${
+                value === option.value ? 'bg-[#2B8C57] text-white' : ''
+              }`}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

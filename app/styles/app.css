@@ -45,6 +45,14 @@ img {
   border-radius: 4px;
 }
 
+a {
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: none;
+}
+
 @font-face {
   font-family: 'raleway';
   src: url('/fonts/Raleway-VariableFont_wght.ttf') format('truetype');

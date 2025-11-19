@@ -10,6 +10,7 @@ interface TrustedByExpertSectionProps {
   buttonText?: string;
   buttonLink?: string;
   buttonText1?: string;
+  buttonLink1?: string;
 }
 
 export function TrustedByExpertSection({
@@ -18,6 +19,8 @@ export function TrustedByExpertSection({
   text,
   buttonText,
   buttonText1,
+  buttonLink,
+  buttonLink1,
 }: TrustedByExpertSectionProps) {
   return (
     <div
@@ -30,13 +33,19 @@ export function TrustedByExpertSection({
       </div>
 
       <div className="flex gap-8">
-        <button className="inline-block bg-[#2B8C57] text-white px-6 py-2 uppercase text-sm">
+        <a
+          href={buttonLink}
+          className="inline-block bg-[#2B8C57] text-white px-6 py-2 uppercase text-sm"
+        >
           {buttonText}
-        </button>
+        </a>
 
-        <button className="inline-block bg-[#2B8C57] text-white px-6 py-2 uppercase text-sm">
+        <a
+          href={buttonLink1}
+          className="inline-block bg-[#2B8C57] text-white px-6 py-2 uppercase text-sm"
+        >
           {buttonText1}
-        </button>
+        </a>
       </div>
     </div>
   );

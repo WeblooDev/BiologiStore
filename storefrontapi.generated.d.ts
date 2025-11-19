@@ -860,7 +860,7 @@ export type ProductItemFragment = Pick<
   };
   variants: {
     nodes: Array<
-      Pick<StorefrontAPI.ProductVariant, 'title'> & {
+      Pick<StorefrontAPI.ProductVariant, 'id' | 'title'> & {
         selectedOptions: Array<
           Pick<StorefrontAPI.SelectedOption, 'name' | 'value'>
         >;
@@ -921,7 +921,7 @@ export type CollectionQuery = {
             };
             variants: {
               nodes: Array<
-                Pick<StorefrontAPI.ProductVariant, 'title'> & {
+                Pick<StorefrontAPI.ProductVariant, 'id' | 'title'> & {
                   selectedOptions: Array<
                     Pick<StorefrontAPI.SelectedOption, 'name' | 'value'>
                   >;
@@ -1036,18 +1036,24 @@ export type CollectionItemFragment = Pick<
     Pick<StorefrontAPI.Image, 'id' | 'altText' | 'url' | 'width' | 'height'>
   >;
   metafield?: StorefrontAPI.Maybe<Pick<StorefrontAPI.Metafield, 'value'>>;
+  skinConcern?: StorefrontAPI.Maybe<Pick<StorefrontAPI.Metafield, 'value'>>;
+  ingredient?: StorefrontAPI.Maybe<Pick<StorefrontAPI.Metafield, 'value'>>;
+  skinType?: StorefrontAPI.Maybe<Pick<StorefrontAPI.Metafield, 'value'>>;
   priceRange: {
     minVariantPrice: Pick<StorefrontAPI.MoneyV2, 'amount' | 'currencyCode'>;
     maxVariantPrice: Pick<StorefrontAPI.MoneyV2, 'amount' | 'currencyCode'>;
   };
   variants: {
     nodes: Array<
-      Pick<StorefrontAPI.ProductVariant, 'title'> & {
+      Pick<StorefrontAPI.ProductVariant, 'id' | 'title'> & {
         selectedOptions: Array<
           Pick<StorefrontAPI.SelectedOption, 'name' | 'value'>
         >;
       }
     >;
+  };
+  collections: {
+    nodes: Array<Pick<StorefrontAPI.Collection, 'id' | 'title' | 'handle'>>;
   };
 };
 
@@ -1078,6 +1084,13 @@ export type CatalogQuery = {
           >
         >;
         metafield?: StorefrontAPI.Maybe<Pick<StorefrontAPI.Metafield, 'value'>>;
+        skinConcern?: StorefrontAPI.Maybe<
+          Pick<StorefrontAPI.Metafield, 'value'>
+        >;
+        ingredient?: StorefrontAPI.Maybe<
+          Pick<StorefrontAPI.Metafield, 'value'>
+        >;
+        skinType?: StorefrontAPI.Maybe<Pick<StorefrontAPI.Metafield, 'value'>>;
         priceRange: {
           minVariantPrice: Pick<
             StorefrontAPI.MoneyV2,
@@ -1090,11 +1103,16 @@ export type CatalogQuery = {
         };
         variants: {
           nodes: Array<
-            Pick<StorefrontAPI.ProductVariant, 'title'> & {
+            Pick<StorefrontAPI.ProductVariant, 'id' | 'title'> & {
               selectedOptions: Array<
                 Pick<StorefrontAPI.SelectedOption, 'name' | 'value'>
               >;
             }
+          >;
+        };
+        collections: {
+          nodes: Array<
+            Pick<StorefrontAPI.Collection, 'id' | 'title' | 'handle'>
           >;
         };
       }
@@ -1336,6 +1354,7 @@ export type ProductFragment = Pick<
       >;
     }>;
   }>;
+  bundleRegimen?: StorefrontAPI.Maybe<Pick<StorefrontAPI.Metafield, 'value'>>;
   imgBackground?: StorefrontAPI.Maybe<{
     reference?: StorefrontAPI.Maybe<{
       image?: StorefrontAPI.Maybe<
@@ -1556,6 +1575,9 @@ export type ProductQuery = {
           >;
         }>;
       }>;
+      bundleRegimen?: StorefrontAPI.Maybe<
+        Pick<StorefrontAPI.Metafield, 'value'>
+      >;
       imgBackground?: StorefrontAPI.Maybe<{
         reference?: StorefrontAPI.Maybe<{
           image?: StorefrontAPI.Maybe<
@@ -2045,7 +2067,7 @@ interface GeneratedQueryTypes {
     return: RecommendedProductsBundlesQuery;
     variables: RecommendedProductsBundlesQueryVariables;
   };
-  '#graphql\n  #graphql\n  fragment MoneyProductItem on MoneyV2 {\n    amount\n    currencyCode\n  }\n  fragment ProductItem on Product {\n    id\n    handle\n    title\n    descriptionHtml\n    productType\n    tags\n    featuredImage {\n      id\n      altText\n      url\n      width\n      height\n    }\n    metafield(namespace: "custom", key: "new") {\n      value\n    }\n    priceRange {\n      minVariantPrice {\n        ...MoneyProductItem\n      }\n      maxVariantPrice {\n        ...MoneyProductItem\n      }\n    }\n    variants(first: 10) {\n      nodes {\n        title\n        selectedOptions {\n          name\n          value\n        }\n      }\n    }\n  }\n\n  query Collection(\n    $handle: String!\n    $country: CountryCode\n    $language: LanguageCode\n    $first: Int\n    $last: Int\n    $startCursor: String\n    $endCursor: String\n  ) @inContext(country: $country, language: $language) {\n    collection(handle: $handle) {\n      id\n      handle\n      title\n      description\n      products(\n        first: $first,\n        last: $last,\n        before: $startCursor,\n        after: $endCursor\n      ) {\n        nodes {\n          ...ProductItem\n        }\n        pageInfo {\n          hasPreviousPage\n          hasNextPage\n          endCursor\n          startCursor\n        }\n      }\n    }\n  }\n': {
+  '#graphql\n  #graphql\n  fragment MoneyProductItem on MoneyV2 {\n    amount\n    currencyCode\n  }\n  fragment ProductItem on Product {\n    id\n    handle\n    title\n    descriptionHtml\n    productType\n    tags\n    featuredImage {\n      id\n      altText\n      url\n      width\n      height\n    }\n    metafield(namespace: "custom", key: "new") {\n      value\n    }\n    priceRange {\n      minVariantPrice {\n        ...MoneyProductItem\n      }\n      maxVariantPrice {\n        ...MoneyProductItem\n      }\n    }\n    variants(first: 10) {\n      nodes {\n        id\n        title\n        selectedOptions {\n          name\n          value\n        }\n      }\n    }\n  }\n\n  query Collection(\n    $handle: String!\n    $country: CountryCode\n    $language: LanguageCode\n    $first: Int\n    $last: Int\n    $startCursor: String\n    $endCursor: String\n  ) @inContext(country: $country, language: $language) {\n    collection(handle: $handle) {\n      id\n      handle\n      title\n      description\n      products(\n        first: $first,\n        last: $last,\n        before: $startCursor,\n        after: $endCursor\n      ) {\n        nodes {\n          ...ProductItem\n        }\n        pageInfo {\n          hasPreviousPage\n          hasNextPage\n          endCursor\n          startCursor\n        }\n      }\n    }\n  }\n': {
     return: CollectionQuery;
     variables: CollectionQueryVariables;
   };
@@ -2061,7 +2083,7 @@ interface GeneratedQueryTypes {
     return: StoreCollectionsQuery;
     variables: StoreCollectionsQueryVariables;
   };
-  '#graphql\n  query Catalog(\n    $country: CountryCode\n    $language: LanguageCode\n    $first: Int\n    $last: Int\n    $startCursor: String\n    $endCursor: String\n  ) @inContext(country: $country, language: $language) {\n   products(\n     first: $first\n     last: $last\n     before: $startCursor\n     after: $endCursor\n     sortKey: UPDATED_AT\n     reverse: true\n   ) {\n      nodes {\n        ...CollectionItem\n      }\n      pageInfo {\n        hasPreviousPage\n        hasNextPage\n        startCursor\n        endCursor\n      }\n    }\n  }\n  #graphql\n  fragment MoneyCollectionItem on MoneyV2 {\n    amount\n    currencyCode\n  }\n\n  fragment CollectionItem on Product {\n    id\n    handle\n    title\n    descriptionHtml  # ✅ Add this line\n    productType\n    tags\n    featuredImage {\n      id\n      altText\n      url\n      width\n      height\n    }\n    metafield(namespace: "custom", key: "new") {\n      value\n    }\n    priceRange {\n      minVariantPrice {\n        ...MoneyCollectionItem\n      }\n      maxVariantPrice {\n        ...MoneyCollectionItem\n      }\n    }\n    variants(first: 10) {\n      nodes {\n        title  # ✅ Add this line to get the variant size\n        selectedOptions {\n          name\n          value\n        }\n      }\n    }\n  }\n\n': {
+  '#graphql\n  query Catalog(\n    $country: CountryCode\n    $language: LanguageCode\n    $first: Int\n    $last: Int\n    $startCursor: String\n    $endCursor: String\n  ) @inContext(country: $country, language: $language) {\n   products(\n     first: $first\n     last: $last\n     before: $startCursor\n     after: $endCursor\n     sortKey: UPDATED_AT\n     reverse: true\n   ) {\n      nodes {\n        ...CollectionItem\n      }\n      pageInfo {\n        hasPreviousPage\n        hasNextPage\n        startCursor\n        endCursor\n      }\n    }\n  }\n  #graphql\n  fragment MoneyCollectionItem on MoneyV2 {\n    amount\n    currencyCode\n  }\n\n  fragment CollectionItem on Product {\n    id\n    handle\n    title\n    descriptionHtml  # ✅ Add this line\n    productType\n    tags\n    featuredImage {\n      id\n      altText\n      url\n      width\n      height\n    }\n    metafield(namespace: "custom", key: "new") {\n      value\n    }\n    skinConcern: metafield(namespace: "custom", key: "concern") {\n      value\n    }\n    ingredient: metafield(namespace: "custom", key: "ingredients") {\n      value\n    }\n    skinType: metafield(namespace: "custom", key: "skintype") {\n      value\n    }\n    priceRange {\n      minVariantPrice {\n        ...MoneyCollectionItem\n      }\n      maxVariantPrice {\n        ...MoneyCollectionItem\n      }\n    }\n    variants(first: 10) {\n      nodes {\n        id\n        title\n        selectedOptions {\n          name\n          value\n        }\n      }\n    }\n    collections(first: 10) {\n      nodes {\n        id\n        title\n        handle\n      }\n    }\n  }\n\n': {
     return: CatalogQuery;
     variables: CatalogQueryVariables;
   };
@@ -2085,7 +2107,7 @@ interface GeneratedQueryTypes {
     return: PoliciesQuery;
     variables: PoliciesQueryVariables;
   };
-  '#graphql\n  query Product(\n    $country: CountryCode\n    $handle: String!\n    $language: LanguageCode\n    $selectedOptions: [SelectedOptionInput!]!\n  ) @inContext(country: $country, language: $language) {\n    product(handle: $handle) {\n      ...Product\n    }\n  }\n  #graphql\n  fragment Product on Product {\n    id\n    title\n    vendor\n    handle\n    descriptionHtml\n    description\n    tags\n    metafield(namespace: "custom", key: "benefits") {\n      value\n    }\n    expectation: metafield(namespace: "custom", key: "expectation") {\n      value\n    }\n    usage: metafield(namespace: "custom", key: "usage") {\n      value\n    }\n    faqProduct: metafield(namespace: "product", key: "faq") {\n      value\n    }\n    skinConcern: metafield(namespace: "custom", key: "concern") {\n      value\n    }\n    dayUse: metafield(namespace: "product", key: "dayuse") {\n      value\n    }\n    nightUse: metafield(namespace: "product", key: "nightuse") {\n      value\n    }\n    skinType: metafield(namespace: "custom", key: "skintype") {\n      value\n    }\n    fdaApproved: metafield(namespace: "custom", key: "fda_approved") {\n      value\n    }\n    allIngredients: metafield(namespace: "custom", key: "all_ingredients") {\n      value\n    }\n      expectImage: metafield(namespace: "custom", key: "expectImage") {\n  references(first: 10) {\n    nodes {\n      ... on Product {\n        id\n        title\n        featuredImage {\n          url\n          altText\n          width\n          height\n        }\n      }\n    }\n  }\n}\n\n    usagePicture: metafield(namespace: "custom", key: "usagePicture") {\n      reference {\n        ... on MediaImage {\n          image {\n            url\n            altText\n            width\n            height\n          }\n        }\n      }\n    }\n\n bundleProducts: metafield(namespace: "custom", key: "bundle_products") {\n  references(first: 10) {\n    nodes {\n      ... on Product {\n        id\n        title\n        handle\n        description\n        tags\n        dayUse: metafield(namespace: "product", key: "dayuse") {\n          value\n        }\n        nightUse: metafield(namespace: "product", key: "nightuse") {\n          value\n        }\n        skinConcern: metafield(namespace: "product", key: "concern") {\n          value\n        }\n        fdaApproved: metafield(namespace: "product", key: "fda_approved") {\n          value\n        }\n        featuredImage {\n          url\n          altText\n          width\n          height\n        }\n        priceRange {\n          minVariantPrice {\n            amount\n            currencyCode\n          }\n        }\n        stepLabel: metafield(namespace: "custom", key: "step_label") {\n          value\n        }\n      }\n    }\n  }\n}\n\n\n      imgBackground: metafield(namespace: "custom", key: "imgBackground") {\n  reference {\n    ... on MediaImage {\n      image {\n        url\n        altText\n        width\n        height\n      }\n    }\n  }\n}\n\n    beforeAfter: metafield(namespace: "custom", key: "beforeafter") {\n      references(first: 2) {\n        nodes {\n          ... on MediaImage {\n            image {\n              url\n              altText\n              width\n              height\n            }\n          }\n        }\n      }\n    }\n    images(first: 5) {\n      nodes {\n        url\n        altText\n        width\n        height\n      }\n    }\n    siblings: metafield(namespace: "custom", key: "siblings") {\n      type\n      referenceList: references(first: 10) {\n        nodes {\n          ... on Product {\n            id\n            title\n            handle\n            featuredImage {\n              url\n              altText\n              width\n              height\n            }\n            \n          }\n        }\n      }\n    }\n    encodedVariantExistence\n    encodedVariantAvailability\n    options {\n      name\n      optionValues {\n        name\n        firstSelectableVariant {\n          ...ProductVariant\n        }\n        swatch {\n          color\n          image {\n            previewImage {\n              url\n            }\n          }\n        }\n      }\n    }\n    selectedOrFirstAvailableVariant(selectedOptions: $selectedOptions, ignoreUnknownOptions: true, caseInsensitiveMatch: true) {\n      ...ProductVariant\n    }\n    adjacentVariants(selectedOptions: $selectedOptions) {\n      ...ProductVariant\n    }\n    seo {\n      description\n      title\n    }\n  }\n  #graphql\n  fragment ProductVariant on ProductVariant {\n    availableForSale\n    compareAtPrice {\n      amount\n      currencyCode\n    }\n    id\n    image {\n      __typename\n      id\n      url\n      altText\n      width\n      height\n    }\n    price {\n      amount\n      currencyCode\n    }\n    product {\n      title\n      handle\n    }\n    selectedOptions {\n      name\n      value\n    }\n    sku\n    title\n    unitPrice {\n      amount\n      currencyCode\n    }\n  }\n\n\n': {
+  '#graphql\n  query Product(\n    $country: CountryCode\n    $handle: String!\n    $language: LanguageCode\n    $selectedOptions: [SelectedOptionInput!]!\n  ) @inContext(country: $country, language: $language) {\n    product(handle: $handle) {\n      ...Product\n    }\n  }\n  #graphql\n  fragment Product on Product {\n    id\n    title\n    vendor\n    handle\n    descriptionHtml\n    description\n    tags\n    metafield(namespace: "custom", key: "benefits") {\n      value\n    }\n    expectation: metafield(namespace: "custom", key: "expectation") {\n      value\n    }\n    usage: metafield(namespace: "custom", key: "usage") {\n      value\n    }\n    faqProduct: metafield(namespace: "product", key: "faq") {\n      value\n    }\n    skinConcern: metafield(namespace: "custom", key: "concern") {\n      value\n    }\n    dayUse: metafield(namespace: "product", key: "dayuse") {\n      value\n    }\n    nightUse: metafield(namespace: "product", key: "nightuse") {\n      value\n    }\n    skinType: metafield(namespace: "custom", key: "skintype") {\n      value\n    }\n    fdaApproved: metafield(namespace: "custom", key: "fda_approved") {\n      value\n    }\n    allIngredients: metafield(namespace: "custom", key: "all_ingredients") {\n      value\n    }\n      expectImage: metafield(namespace: "custom", key: "expectImage") {\n  references(first: 10) {\n    nodes {\n      ... on Product {\n        id\n        title\n        featuredImage {\n          url\n          altText\n          width\n          height\n        }\n      }\n    }\n  }\n}\n\n    usagePicture: metafield(namespace: "custom", key: "usagePicture") {\n      reference {\n        ... on MediaImage {\n          image {\n            url\n            altText\n            width\n            height\n          }\n        }\n      }\n    }\n\n    bundleProducts: metafield(namespace: "custom", key: "bundle_products") {\n      references(first: 10) {\n        nodes {\n          ... on Product {\n            id\n            title\n            handle\n            description\n            tags\n            dayUse: metafield(namespace: "product", key: "dayuse") {\n              value\n            }\n            nightUse: metafield(namespace: "product", key: "nightuse") {\n              value\n            }\n            skinConcern: metafield(namespace: "product", key: "concern") {\n              value\n            }\n            fdaApproved: metafield(namespace: "product", key: "fda_approved") {\n              value\n            }\n            featuredImage {\n              url\n              altText\n              width\n              height\n            }\n            priceRange {\n              minVariantPrice {\n                amount\n                currencyCode\n              }\n            }\n            stepLabel: metafield(namespace: "custom", key: "step_label") {\n              value\n            }\n          }\n        }\n      }\n    }\n\nbundleRegimen: metafield(namespace: "custom", key: "bundle_regimen") {\n  value\n}\n\n\n      imgBackground: metafield(namespace: "custom", key: "imgBackground") {\n  reference {\n    ... on MediaImage {\n      image {\n        url\n        altText\n        width\n        height\n      }\n    }\n  }\n}\n\n    beforeAfter: metafield(namespace: "custom", key: "beforeafter") {\n      references(first: 2) {\n        nodes {\n          ... on MediaImage {\n            image {\n              url\n              altText\n              width\n              height\n            }\n          }\n        }\n      }\n    }\n    images(first: 5) {\n      nodes {\n        url\n        altText\n        width\n        height\n      }\n    }\n    siblings: metafield(namespace: "custom", key: "siblings") {\n      type\n      referenceList: references(first: 10) {\n        nodes {\n          ... on Product {\n            id\n            title\n            handle\n            featuredImage {\n              url\n              altText\n              width\n              height\n            }\n            \n          }\n        }\n      }\n    }\n    encodedVariantExistence\n    encodedVariantAvailability\n    options {\n      name\n      optionValues {\n        name\n        firstSelectableVariant {\n          ...ProductVariant\n        }\n        swatch {\n          color\n          image {\n            previewImage {\n              url\n            }\n          }\n        }\n      }\n    }\n    selectedOrFirstAvailableVariant(selectedOptions: $selectedOptions, ignoreUnknownOptions: true, caseInsensitiveMatch: true) {\n      ...ProductVariant\n    }\n    adjacentVariants(selectedOptions: $selectedOptions) {\n      ...ProductVariant\n    }\n    seo {\n      description\n      title\n    }\n  }\n  #graphql\n  fragment ProductVariant on ProductVariant {\n    availableForSale\n    compareAtPrice {\n      amount\n      currencyCode\n    }\n    id\n    image {\n      __typename\n      id\n      url\n      altText\n      width\n      height\n    }\n    price {\n      amount\n      currencyCode\n    }\n    product {\n      title\n      handle\n    }\n    selectedOptions {\n      name\n      value\n    }\n    sku\n    title\n    unitPrice {\n      amount\n      currencyCode\n    }\n  }\n\n\n': {
     return: ProductQuery;
     variables: ProductQueryVariables;
   };

@@ -57,10 +57,14 @@ async function loadCriticalData({
   // The API handle might be localized, so redirect to the localized handle
   redirectIfHandleIsLocalized(request, {handle, data: collection});
 
-  // Count skin types and categories
+  // Count skin types, categories, concerns, and ingredients
   const skinTypeSet = new Set<string>();
   const skinTypeCounts: Record<string, number> = {};
   const categoryCounts: Record<string, number> = {};
+  const skinConcernSet = new Set<string>();
+  const skinConcernCounts: Record<string, number> = {};
+  const ingredientSet = new Set<string>();
+  const ingredientsCounts: Record<string, number> = {};
 
   collection.products.nodes.forEach((product) => {
     // Count categories (productType)
@@ -69,19 +73,29 @@ async function loadCriticalData({
       categoryCounts[category] = (categoryCounts[category] || 0) + 1;
     }
 
-    // Count skin types from variant options
+    // Count skin types, concerns, and ingredients from variant options
     product.variants?.nodes?.forEach((variant) => {
       variant.selectedOptions?.forEach((opt) => {
-        if (opt.name.toLowerCase() === 'suitable for skin type') {
-          const value = opt.value.trim();
+        const optName = opt.name.toLowerCase().replace(/\s+/g, '');
+        const value = opt.value.trim();
+
+        if (optName === 'suitableforskintype') {
           skinTypeSet.add(value);
           skinTypeCounts[value] = (skinTypeCounts[value] || 0) + 1;
+        } else if (optName === 'skinconcern') {
+          skinConcernSet.add(value);
+          skinConcernCounts[value] = (skinConcernCounts[value] || 0) + 1;
+        } else if (optName === 'ingredient') {
+          ingredientSet.add(value);
+          ingredientsCounts[value] = (ingredientsCounts[value] || 0) + 1;
         }
       });
     });
   });
 
   const skinTypes = Array.from(skinTypeSet);
+  const skinConcerns = Array.from(skinConcernSet);
+  const ingredients = Array.from(ingredientSet);
 
   return {
     collection,
@@ -89,6 +103,10 @@ async function loadCriticalData({
     skinTypes,
     skinTypeCounts,
     categoryCounts,
+    skinConcerns,
+    skinConcernCounts,
+    ingredients,
+    ingredientsCounts,
   };
 }
 
@@ -332,6 +350,7 @@ const PRODUCT_ITEM_FRAGMENT = `#graphql
     }
     variants(first: 10) {
       nodes {
+        id
         title
         selectedOptions {
           name
