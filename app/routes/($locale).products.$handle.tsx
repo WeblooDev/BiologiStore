@@ -202,9 +202,9 @@ export default function Product() {
           <div className="flex flex-col gap-1">
             <h1 className="!text-[32px] text-[#2B8C57] !m-0">{title}</h1>
 
-            <div className="flex flex-row gap-2 items-center">
+            <div className="flex flex-row gap-2 items-center flex-wrap">
               {tags?.length > 0 && bundleProducts?.length > 0 && (
-                <div className="mb-4 flex flex-wrap gap-2 items-center">
+                <div className="mb-4 flex flex-row gap-2 items-center">
                   {tags.map((tag: string, index: number) => (
                     <div key={tag} className="flex items-center gap-1">
                       <span className="!text-sm text-[#4F4F4F] underline">
@@ -218,7 +218,7 @@ export default function Product() {
                 </div>
               )}
               {skinType.length > 0 && (
-                <div className="mb-4 flex flex-wrap gap-2 items-center">
+                <div className="mb-4 flex flex-row gap-2 items-center">
                   {skinType.map((tag: string, index: number) => (
                     <div key={tag} className="flex items-center gap-1">
                       <span className="!text-sm text-[#4F4F4F] underline">
@@ -235,7 +235,7 @@ export default function Product() {
                 <img src={bullet} alt="" className="w-[6px] h-[6px] mb-4" />
               )}
               {skinConcern.length > 0 && (
-                <div className="mb-4 flex flex-wrap gap-2 items-center">
+                <div className="mb-4 flex flex-row gap-2 items-center">
                   {skinConcern.map((tag: string, index: number) => (
                     <div key={tag} className="flex items-center gap-1">
                       <span className="!text-sm text-[#4F4F4F] underline">
@@ -252,12 +252,12 @@ export default function Product() {
                 <img src={bullet} alt="" className="w-[6px] h-[6px] mb-4" />
               )}
               {dayUse && (
-                <div className="mb-4 flex flex-wrap gap-2 items-center">
+                <div className="mb-4 flex flex-row gap-2 items-center">
                   <img src={dayUseSvg} alt="" />
                 </div>
               )}
               {nightUse && (
-                <div className="mb-4 flex flex-wrap gap-2 items-center">
+                <div className="mb-4 flex flex-row gap-2 items-center">
                   <img src={nightUseSvg} alt="" />
                 </div>
               )}
@@ -265,7 +265,7 @@ export default function Product() {
                 <img src={bullet} alt="" className="w-[6px] h-[6px] mb-4" />
               )}
               {fdaApproved && (
-                <div className="mb-4 flex flex-wrap gap-2 items-center">
+                <div className="mb-4 flex flex-row gap-2 items-center">
                   <p className="!text-sm text-[#4F4F4F]">FDA Approved</p>
                 </div>
               )}

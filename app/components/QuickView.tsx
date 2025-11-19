@@ -157,25 +157,27 @@ export function QuickView({
               </h3>
 
               {/* Tags, Skin Concerns, Day/Night Use, FDA */}
-              <div className="flex flex-wrap gap-2 items-center mb-4">
-                {product.tags && product.tags.length > 0 && product.bundle && (
-                  <>
-                    {product.tags.map((tag, index) => (
-                      <div key={tag} className="flex items-center gap-1">
-                        <span className="text-xs px-3 py-1 bg-[#F6F6F6] text-[#4F4F4F] rounded-full">
-                          {tag}
-                        </span>
-                        {index < product.tags!.length - 1 && (
-                          <span className="text-xs text-[#4F4F4F]">+</span>
-                        )}
-                      </div>
-                    ))}
-                  </>
-                )}
+              <div className="flex flex-row gap-2 items-center justify-start mb-4">
+                {product.tags &&
+                  product.tags.length > 0 &&
+                  product?.bundle?.value === 'true' && (
+                    <>
+                      {product.tags.map((tag, index) => (
+                        <div key={tag} className="flex items-center gap-1">
+                          <span className="text-xs px-3 py-1 bg-[#F6F6F6] text-[#4F4F4F] rounded-full">
+                            {tag}
+                          </span>
+                          {index < product.tags!.length - 1 && (
+                            <span className="text-xs text-[#4F4F4F]">+</span>
+                          )}
+                        </div>
+                      ))}
+                    </>
+                  )}
 
                 {skinConcern.length > 0 && (
-                  <>
-                    <img src={bullet} alt="" className="w-[6px] h-[6px]" />
+                  <div className="flex items-center gap-2 justify-center">
+                    {/* <img src={bullet} alt="" className="w-[6px] h-[6px]" /> */}
                     {skinConcern.map((concern, index) => (
                       <div
                         key={String(concern)}
@@ -189,11 +191,13 @@ export function QuickView({
                         )}
                       </div>
                     ))}
-                  </>
+                  </div>
                 )}
 
                 {(dayUse || nightUse) && (
-                  <img src={bullet} alt="" className="w-[6px] h-[6px]" />
+                  <div className="flex items-center gap-2 justify-center">
+                    <img src={bullet} alt="" className="w-[6px] h-[6px]" />
+                  </div>
                 )}
                 {dayUse && (
                   <div className="flex items-center">
@@ -208,7 +212,9 @@ export function QuickView({
 
                 {fdaApproved && (
                   <>
-                    <img src={bullet} alt="" className="w-[6px] h-[6px]" />
+                    <div className="flex items-center gap-2 justify-center">
+                      <img src={bullet} alt="" className="w-[6px] h-[6px]" />
+                    </div>
                     <span className="text-xs px-3 py-1 bg-[#F6F6F6] text-[#4F4F4F] rounded-full">
                       FDA Approved
                     </span>
