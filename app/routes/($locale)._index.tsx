@@ -49,9 +49,7 @@ function loadDeferredData({context}: LoaderFunctionArgs) {
     });
 
   const packProduct = context.storefront
-    .query(PRODUCT_WITH_PACK_TAG_QUERY, {
-      variables: {tag: 'tag:Pack'},
-    })
+    .query(PRODUCT_WITH_PACK_TAG_QUERY)
     .catch((error) => {
       console.error(error);
       return null;
@@ -95,7 +93,11 @@ export default function Homepage() {
       <Suspense fallback={<div>Loading Featured Pack...</div>}>
         <Await resolve={data.packProduct}>
           {(res) => {
-            const products = res?.products?.nodes || [];
+            const all = res?.products?.nodes || [];
+            const products = all
+              .filter((p: any) => p?.bundle?.value === 'true')
+              .slice(0, 2);
+
             return <PackProduct products={products} />;
           }}
         </Await>
@@ -270,6 +272,24 @@ const BEST_SELLERS_QUERY = `#graphql
       height
     }
     tags
+    bundle: metafield(namespace: "custom", key: "bundle") {
+      value
+    }
+   skinConcern: metafield(namespace: "custom", key: "concern") {
+      value
+    }
+    dayUse: metafield(namespace: "product", key: "dayuse") {
+      value
+    }
+    nightUse: metafield(namespace: "product", key: "nightuse") {
+      value
+    }
+    skinType: metafield(namespace: "custom", key: "skintype") {
+      value
+    }
+    fdaApproved: metafield(namespace: "custom", key: "fda_approved") {
+      value
+    }
   }
   query BestSellers ($country: CountryCode, $language: LanguageCode)
     @inContext(country: $country, language: $language) {
@@ -287,6 +307,7 @@ const PRODUCT_WITH_PACK_TAG_QUERY = `#graphql
     title
     handle
     tags
+    descriptionHtml
     featuredImage {
       id
       url
@@ -304,11 +325,29 @@ const PRODUCT_WITH_PACK_TAG_QUERY = `#graphql
         title
       }
     }
+    bundle: metafield(namespace: "custom", key: "bundle") {
+      value
+    }
+   skinConcern: metafield(namespace: "custom", key: "concern") {
+      value
+    }
+    dayUse: metafield(namespace: "product", key: "dayuse") {
+      value
+    }
+    nightUse: metafield(namespace: "product", key: "nightuse") {
+      value
+    }
+    skinType: metafield(namespace: "custom", key: "skintype") {
+      value
+    }
+    fdaApproved: metafield(namespace: "custom", key: "fda_approved") {
+      value
+    }
   }
 
-  query ProductsWithTag($tag: String!, $country: CountryCode, $language: LanguageCode)
+  query ProductsWithBundle($country: CountryCode, $language: LanguageCode)
     @inContext(country: $country, language: $language) {
-    products(first: 2, query: $tag) {
+    products(first: 12, sortKey: UPDATED_AT, reverse: true) {
       nodes {
         ...ProductWithTagFields
       }

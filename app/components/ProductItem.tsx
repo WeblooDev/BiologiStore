@@ -33,6 +33,19 @@ export function ProductItem({
   const firstVariantId = product?.variants?.nodes?.[0]?.id;
   const [showQuickView, setShowQuickView] = useState(false);
 
+  const parseSkinConcern = () => {
+    try {
+      const raw = product?.skinConcern?.value;
+      if (!raw) return [];
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (e) {
+      return [];
+    }
+  };
+
+  const skinConcern = parseSkinConcern();
+
   const getCartLines = (): OptimisticCartLineInput[] => {
     const variantId = product?.variants?.nodes?.[0]?.id;
     if (!variantId) return [];
@@ -52,7 +65,7 @@ export function ProductItem({
       <div className="relative w-full group">
         <Link to={variantUrl} className="block w-full bg-[#F6F6F6]">
           {product.metafield?.value === 'true' && (
-            <div className="absolute top-3 left-3 bg-white h-[80px] w-[80px] border border-[#2B8C57] text-[#2B8C57] rounded-full flex items-center justify-center z-5 text-lg">
+            <div className="absolute top-3 left-3 h-[60px] w-[60px] border border-[#2B8C57] text-[#2B8C57] rounded-full flex items-center justify-center z-5 text-base bg-white bg-blend-saturation">
               NEW
             </div>
           )}
@@ -62,7 +75,7 @@ export function ProductItem({
                 alt={image.altText || product.title}
                 data={image}
                 loading={loading}
-                className="h-[300px] md:h-[400px] lg:h-[560px] object-cover mb-6 transition-transform duration-300 ease-in-out group-hover:scale-105"
+                className="w-full h-auto object-cover aspect-[1/1]! transition-transform duration-300 ease-in-out group-hover:scale-105"
               />
             </div>
           )}
@@ -82,10 +95,12 @@ export function ProductItem({
         </button>
       </div>
 
-      <div className="flex flex-col items-center gap-2 mt-4 w-full">
-        <h4 className="font-poppins text-xl text-[#2B8C57]">{product.title}</h4>
+      <div className=" flex flex-col items-center gap-2 mt-4 w-full">
+        <h4 className="text-left font-poppins text-xl text-[#2B8C57]">
+          {product.title}
+        </h4>
 
-        {product.tags?.length > 0 && (
+        {product.tags?.length > 0 && product.bundle?.value === 'true' && (
           <div className="flex flex-wrap gap-2 items-center justify-center">
             {product.tags.map((tag, index) => (
               <div key={tag} className="flex items-center gap-1">
@@ -98,9 +113,25 @@ export function ProductItem({
           </div>
         )}
 
+        {skinConcern.length > 0 && (
+          <div className="flex items-center gap-2 justify-center">
+            {skinConcern.map((concern, index) => (
+              <div key={String(concern)} className="flex items-center gap-1">
+                <span className="text-xs px-1 py-1 text-[#4F4F4F]">
+                  {String(concern)}
+                </span>
+                {index < skinConcern.length - 1 && (
+                  <span className="text-xs text-[#4F4F4F]">+</span>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
         <small className="block text-sm">
           <Money data={product.priceRange.minVariantPrice} />
         </small>
+
         <div className="w-full">
           <CartForm
             route="/cart"

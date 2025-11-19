@@ -152,13 +152,13 @@ export function QuickView({
           {/* Right: Info */}
           <div className="w-full md:w-[55%] flex flex-col p-6 md:p-8 overflow-y-auto">
             <div className="flex-1">
-              <h3 className="font-poppins text-2xl md:text-3xl font-semibold text-[#2B8C57] mb-3">
+              <h3 className="text-left font-poppins text-2xl md:text-3xl font-semibold text-[#2B8C57] mb-3">
                 {product.title}
               </h3>
 
               {/* Tags, Skin Concerns, Day/Night Use, FDA */}
               <div className="flex flex-wrap gap-2 items-center mb-4">
-                {product.tags && product.tags.length > 0 && (
+                {product.tags && product.tags.length > 0 && product.bundle && (
                   <>
                     {product.tags.map((tag, index) => (
                       <div key={tag} className="flex items-center gap-1">
@@ -229,7 +229,7 @@ export function QuickView({
 
               {product.descriptionHtml && (
                 <div
-                  className="text-gray-600 text-sm leading-relaxed mb-6 prose prose-sm prose-p:text-sm max-w-none"
+                  className="text-left text-gray-600 text-sm leading-relaxed mb-6 prose prose-sm prose-p:text-sm max-w-none"
                   dangerouslySetInnerHTML={{__html: product.descriptionHtml}}
                 />
               )}

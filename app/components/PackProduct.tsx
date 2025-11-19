@@ -36,7 +36,7 @@ export function PackProduct({products}: {products: ProductNode[]}) {
           healthy skin with medical-grade care.
         </p>
       </div>
-      <div className="flex flex-col lg:flex-row justify-center gap-4 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
         {products.map((product) => (
           <ProductItem key={product.id} product={product} />
         ))}

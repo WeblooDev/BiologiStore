@@ -3,6 +3,7 @@ import {useRef, useState, useEffect} from 'react';
 import right from '~/assets/images/right-arrow.svg';
 import left from '~/assets/images/left-arrow.svg';
 import {QuickView} from './QuickView';
+import {ProductItem} from './ProductItem';
 
 type Product = {
   id: string;
@@ -122,61 +123,11 @@ export function ShopThePost({
           className="flex overflow-hidden scroll-smooth gap-6 no-scrollbar px-4 w-[85%] m-auto"
         >
           {products.map((product) => (
-            <div
+            <ProductItem
               key={product.id}
-              className="relative flex-shrink-0 w-full sm:w-[calc(100%/2-1rem)] lg:w-[calc(100%/3-1rem)]"
-            >
-              <div className="flex flex-col items-center gap-3 justify-between">
-                {product.featuredImage && (
-                  <div className="group relative bg-[#F6F6F6] w-full">
-                    <a href={`/products/${product.handle}`}>
-                      <Image
-                        data={product.featuredImage}
-                        sizes="(min-width: 768px) 33vw, 100vw"
-                        className="h-[300px] md:h-[400px] lg:h-[500px] object-cover mb-6 transition-transform duration-300 group-hover:scale-105"
-                      />
-                    </a>
-                    <div
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        setSelectedProduct(product);
-                      }}
-                      className="absolute bottom-[1px] w-full bg-[#2B8C57] text-white uppercase hover:underline flex items-center justify-center text-xs px-2 py-2 opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity duration-300 z-20"
-                    >
-                      Quick View
-                    </div>
-                  </div>
-                )}
-
-                <h3 className="font-poppins text-xl text-[#2B8C57]">
-                  {product.title}
-                </h3>
-
-                <p>{product.tags?.join(' · ')}</p>
-                <div className="!font-light">
-                  <Money
-                    data={product.priceRange.minVariantPrice}
-                    className="text-sm"
-                  />
-                </div>
-
-                <div className="w-full m-auto flex items-center justify-center">
-                  <button
-                    className="w-[90%] border border-[#2B8C57] uppercase
-                bg-white px-12 py-2 text-[#2B8C57] cursor-pointer hover:text-white
-                hover:bg-[#2B8C57] !text-xs md:!text-sm"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      addToCart(product);
-                    }}
-                  >
-                    Add to Bag
-                  </button>
-                </div>
-              </div>
-            </div>
+              product={product}
+              className="shrink-0 w-full sm:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)]"
+            />
           ))}
         </div>
       </div>
