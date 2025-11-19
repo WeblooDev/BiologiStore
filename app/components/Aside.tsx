@@ -71,7 +71,11 @@ export function Aside({
                 Go to cart
               </Link>
             )}
-            <button onClick={close} aria-label="Close">
+            <button
+              onClick={close}
+              aria-label="Close"
+              className="cursor-pointer!"
+            >
               <svg
                 className="w-7 h-7 transition-transform duration-300 cursor-pointer rotate-45"
                 fill="none"

@@ -6,7 +6,7 @@ export function CustomerServiceForm() {
   const [questionType, setQuestionType] = useState('general');
 
   return (
-    <div className="w-full lg:w-[50%] mx-auto p-6 pt-[220px] flex flex-col gap-4 mb-12">
+    <div className="w-full lg:w-[50%] mx-auto p-6 pt-[130px] lg:pt-[220px] flex flex-col gap-4 mb-12">
       <div className="flex items-center gap-4 mb-6 text-sm">
         <a className="!underline text-[#4F4F4F]" href="/">
           Home

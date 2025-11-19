@@ -42,7 +42,7 @@ export function HeroSection({
       {image.map((image) => (
         <SwiperSlide key={image.url}>
           <div
-            className="mt-[190px] relative w-full h-[600px] bg-cover bg-center flex items-center"
+            className="mt-[100px] lg:mt-[190px] relative w-full h-[600px] bg-cover bg-center flex items-center"
             style={{backgroundImage: `url(${image.url})`}}
             role="img"
             aria-label={image.altText ?? ''}

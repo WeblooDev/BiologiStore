@@ -92,7 +92,7 @@ export default function AboutPage() {
         ]}
         reverse={false}
         buttonText="Visit Our Clinic"
-        buttonLink="/contact"
+        buttonLink="https://biologimd.com/"
       />
 
       <ImageTextSection

@@ -24,6 +24,61 @@ export function CartLineItem({
   const {product, title, image, selectedOptions} = merchandise;
   const lineItemUrl = useVariantUrl(product.handle, selectedOptions);
 
+  if (layout === 'page') {
+    return (
+      <li
+        key={id}
+        className="cart-line grid! grid-cols-[auto_1fr_auto_auto_auto] gap-6 items-center py-6 border-b last:border-b-0 border-[#E5E5E5]"
+      >
+        {/* Product Image */}
+        <div className="bg-[#F6F6F6] shrink-0 w-24 h-32 flex items-center justify-center">
+          {image && (
+            <Image
+              alt={title}
+              aspectRatio="1/1.5"
+              data={image}
+              height={128}
+              loading="lazy"
+              width={96}
+            />
+          )}
+        </div>
+
+        {/* Product Details */}
+        <div className="flex flex-col gap-2 relative">
+          <Link prefetch="intent" to={lineItemUrl}>
+            <p className="text-base font-medium">{product.title}</p>
+          </Link>
+          <p className="text-sm text-gray-600">
+            <ProductPrice price={line?.cost?.totalAmount} />
+          </p>
+          {selectedOptions.find((opt) => opt.name.toLowerCase() === 'size') && (
+            <div className="flex items-center gap-2">
+              <input type="radio" checked readOnly className="w-4 h-4" />
+              <span className="text-sm">Deliver one-time only</span>
+            </div>
+          )}
+          <CartLineRemoveButton lineIds={[id]} disabled={!!line.isOptimistic} />
+        </div>
+
+        {/* Quantity Label */}
+        <div className="text-center h-full flex flex-col justify-between">
+          <p className="text-sm text-gray-600 mb-2">Quantity</p>
+          <CartLineQuantity line={line} />
+        </div>
+
+        {/* Subtotal Amount */}
+        <div className="text-center h-full flex flex-col justify-between">
+          <p className="text-sm text-gray-600">Subtotal</p>
+          <p className="text-base font-semibold">
+            <ProductPrice price={line?.cost?.totalAmount} />
+          </p>
+        </div>
+      </li>
+    );
+  }
+
+  // Drawer layout - original styling
   return (
     <li
       key={id}
@@ -48,8 +103,8 @@ export function CartLineItem({
             prefetch="intent"
             to={lineItemUrl}
             onClick={() => {
-              if (layout === 'aside') {
-                close();
+              if (layout === 'drawer') {
+                // close drawer
               }
             }}
           >
@@ -66,7 +121,7 @@ export function CartLineItem({
           </p>
         </div>
 
-        <CartLineQuantity line={line} />
+        <CartLineQuantityDrawer line={line} />
       </div>
     </li>
   );
@@ -78,6 +133,48 @@ export function CartLineItem({
  * hasn't yet responded that it was successfully added to the cart.
  */
 function CartLineQuantity({line}: {line: CartLine}) {
+  if (!line || typeof line?.quantity === 'undefined') return null;
+  const {id: lineId, quantity, isOptimistic} = line;
+  const prevQuantity = Number(Math.max(0, quantity - 1).toFixed(0));
+  const nextQuantity = Number((quantity + 1).toFixed(0));
+
+  return (
+    <div className="cart-line-quantity flex items-center justify-center gap-2 text-sm">
+      <CartLineUpdateButton lines={[{id: lineId, quantity: prevQuantity}]}>
+        <button
+          type="submit"
+          className="w-8 h-8 border-b border-gray-300 flex items-center justify-center cursor-pointer transition-all hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
+          aria-label="Decrease quantity"
+          disabled={quantity <= 1 || !!isOptimistic}
+          name="decrease-quantity"
+          value={prevQuantity}
+        >
+          <span>&#8722;</span>
+        </button>
+      </CartLineUpdateButton>
+      <input
+        type="text"
+        value={quantity}
+        readOnly
+        className="w-12 h-8 text-center"
+      />
+      <CartLineUpdateButton lines={[{id: lineId, quantity: nextQuantity}]}>
+        <button
+          type="submit"
+          className="w-8 h-8 border-b border-gray-300 flex items-center justify-center cursor-pointer transition-all hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
+          aria-label="Increase quantity"
+          name="increase-quantity"
+          value={nextQuantity}
+          disabled={!!isOptimistic}
+        >
+          <span>&#43;</span>
+        </button>
+      </CartLineUpdateButton>
+    </div>
+  );
+}
+
+function CartLineQuantityDrawer({line}: {line: CartLine}) {
   if (!line || typeof line?.quantity === 'undefined') return null;
   const {id: lineId, quantity, isOptimistic} = line;
   const prevQuantity = Number(Math.max(0, quantity - 1).toFixed(0));
@@ -113,7 +210,10 @@ function CartLineQuantity({line}: {line: CartLine}) {
         </CartLineUpdateButton>
       </div>
       <div className="ml-auto">
-        <CartLineRemoveButton lineIds={[lineId]} disabled={!!isOptimistic} />
+        <CartLineRemoveButtonDrawer
+          lineIds={[lineId]}
+          disabled={!!isOptimistic}
+        />
       </div>
     </div>
   );
@@ -125,6 +225,42 @@ function CartLineQuantity({line}: {line: CartLine}) {
  * that it was successfully added to the cart.
  */
 function CartLineRemoveButton({
+  lineIds,
+  disabled,
+}: {
+  lineIds: string[];
+  disabled: boolean;
+}) {
+  return (
+    <CartForm
+      route="/cart"
+      action={CartForm.ACTIONS.LinesRemove}
+      inputs={{lineIds}}
+    >
+      <button
+        disabled={disabled}
+        type="submit"
+        className="text-gray-400 hover:text-gray-600 cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        <svg
+          className="w-5 h-5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={1.5}
+            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+          />
+        </svg>
+      </button>
+    </CartForm>
+  );
+}
+
+function CartLineRemoveButtonDrawer({
   lineIds,
   disabled,
 }: {

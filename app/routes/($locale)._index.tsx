@@ -77,7 +77,7 @@ export default function Homepage() {
         title="Upgrade Your Daily Skincare Routine"
         text="Discover advanced medical grade formulas trusted for long term skin health."
         buttonText="SHOP ALL"
-        buttonLink="/collections"
+        buttonLink="/collections/all"
       />
 
       <AllCollections collections={data.allCollections} />
@@ -107,7 +107,7 @@ export default function Homepage() {
         <Await resolve={data.latestBlogs}>
           {(blogsData) => (
             <section className="container mx-auto px-4 py-12 mb-12">
-              <div className="flex justify-between gap-4 my-6 items-end px-4 ">
+              <div className="flex md:flex-row flex-col justify-between gap-4 my-6 items-end px-4 ">
                 <div className="flex flex-col gap-3">
                   <h2 className="font-poppins text-3xl font-bold !m-0">
                     The BiologiMD® Blogs

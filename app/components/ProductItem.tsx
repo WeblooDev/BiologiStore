@@ -96,9 +96,7 @@ export function ProductItem({
       </div>
 
       <div className=" flex flex-col items-center gap-2 mt-4 w-full">
-        <h4 className="text-left font-poppins text-xl text-[#2B8C57]">
-          {product.title}
-        </h4>
+        <h4 className="font-poppins text-xl text-[#2B8C57]">{product.title}</h4>
 
         {product.tags?.length > 0 && product.bundle?.value === 'true' && (
           <div className="flex flex-wrap gap-2 items-center justify-center">

@@ -1,9 +1,16 @@
 import {Suspense, useState} from 'react';
-import {Await, NavLink, useFetcher} from 'react-router';
+import {
+  Await,
+  NavLink,
+  useFetcher,
+  useLocation,
+  useNavigate,
+} from 'react-router';
 import type {FooterQuery, HeaderQuery} from 'storefrontapi.generated';
 import facebook from '~/assets/images/facebook.svg';
 import instagram from '~/assets/images/instagram.svg';
 import tiktok from '~/assets/images/tiktok.svg';
+import {useLocalePath} from '~/lib/useLocale';
 
 interface CollectionsQueryResult {
   collections: {
@@ -28,11 +35,13 @@ export function Footer({
   header,
   publicStoreDomain,
 }: FooterProps) {
+  const getLocalePath = useLocalePath();
+
   return (
     <footer className="">
       {/* Middle Section */}
       <div className="py-12 px-6 bg-[#F6F6F6] justify-between items-start gap-8 border-b border-gray-300">
-        <div className="container m-auto flex flex-col md:flex-row gap-6">
+        <div className="container p-0! md:p-6 md:m-auto flex flex-col md:flex-row gap-6">
           {/* Left: Newsletter + Social */}
           <div className="flex flex-col gap-6">
             <div className="flex flex-col gap-2">
@@ -73,7 +82,7 @@ export function Footer({
               <p className="!text-sm">Enhance your natural beauty™</p>
               <div className="flex items-center gap-6 mt-2">
                 <a
-                  href="https://www.tiktok.com/@biologimdclinic"
+                  href="https://www.tiktok.com/@biologimd"
                   className="cursor-pointer"
                 >
                   <img
@@ -83,7 +92,7 @@ export function Footer({
                   />
                 </a>
                 <a
-                  href="https://www.facebook.com/thebiologimd"
+                  href="https://www.facebook.com/thebiologimd/"
                   className="cursor-pointer"
                 >
                   <img
@@ -120,7 +129,9 @@ export function Footer({
                             <NavLink
                               key={collection.id}
                               className="font-poppins text-sm text-gray-800 font-light hover:underline cursor-pointer transition-all duration-300 hover:text-[#2B8C57] hover:translate-x-1"
-                              to={`/collections/all?category=${collection.handle}`}
+                              to={getLocalePath(
+                                `/collections/all?category=${collection.handle}`,
+                              )}
                               prefetch="intent"
                             >
                               {collection.title}
@@ -137,14 +148,14 @@ export function Footer({
               <h1 className="font-poppins !m-0 !text-[16px]">Learn More</h1>
               <NavLink
                 className="font-poppins text-sm text-gray-800 font-light hover:underline cursor-pointer transition-all duration-300 hover:text-[#2B8C57] hover:translate-x-1"
-                to="/about"
+                to={getLocalePath('/about')}
                 prefetch="intent"
               >
                 The BiologiMD Story
               </NavLink>
               <NavLink
                 className="font-poppins text-sm text-gray-800 font-light hover:underline cursor-pointer transition-all duration-300 hover:text-[#2B8C57] hover:translate-x-1"
-                to="/blogs"
+                to={getLocalePath('/blogs')}
                 prefetch="intent"
               >
                 Blog
@@ -155,7 +166,7 @@ export function Footer({
               <h1 className="font-poppins !m-0 !text-[16px]">Support</h1>
               <NavLink
                 className="font-poppins text-sm text-gray-800 font-light hover:underline cursor-pointer transition-all duration-300 hover:text-[#2B8C57] hover:translate-x-1"
-                to="/contact"
+                to={getLocalePath('/contact')}
                 prefetch="intent"
               >
                 Contact Us
@@ -166,8 +177,30 @@ export function Footer({
       </div>
 
       {/* Bottom Copyright */}
-      <div className="text-center text-sm bg-[#E7E7E7] py-6">
-        © 2025 BiologiMD. All Rights Reserved.
+      <div className="flex flex-col md:flex-row gap-y-5 items-center justify-between px-6 text-sm bg-[#E7E7E7] py-6">
+        <div className="flex flex-col md:flex-row items-center gap-4">
+          <LanguageSwitcher />
+          <span className="text-gray-600">
+            © 2025 BiologiMD. All Rights Reserved.
+          </span>
+        </div>
+        <div className="flex items-center gap-4">
+          <NavLink
+            to={getLocalePath('/policies/privacy-policy')}
+            className="text-gray-800 hover:underline cursor-pointer"
+            prefetch="intent"
+          >
+            Privacy Policy
+          </NavLink>
+          <span className="text-gray-400">|</span>
+          <NavLink
+            to={getLocalePath('/policies/terms-of-service')}
+            className="text-gray-800 hover:underline cursor-pointer"
+            prefetch="intent"
+          >
+            Terms and Conditions
+          </NavLink>
+        </div>
       </div>
     </footer>
   );
@@ -269,6 +302,128 @@ function activeLinkStyle({
   };
 }
 
+function LanguageSwitcher() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [isOpen, setIsOpen] = useState(false);
+
+  // Available languages - add more as needed
+  const languages = [
+    {code: 'en-us', label: 'English', flag: 'US'},
+    {code: 'es-us', label: 'Español', flag: 'US'},
+  ];
+
+  // Get current language from URL
+  const getCurrentLanguage = () => {
+    const pathParts = location.pathname.split('/');
+    const localeParam = pathParts[1];
+
+    if (localeParam && /^[a-z]{2}-[a-z]{2}$/i.test(localeParam)) {
+      return localeParam.toLowerCase();
+    }
+    return 'en-us'; // default
+  };
+
+  const currentLang = getCurrentLanguage();
+  const currentLanguage =
+    languages.find((lang) => lang.code === currentLang) || languages[0];
+
+  const handleLanguageChange = (langCode: string) => {
+    const pathParts = location.pathname.split('/');
+    const currentLocale = pathParts[1];
+
+    let newPath;
+    if (currentLocale && /^[a-z]{2}-[a-z]{2}$/i.test(currentLocale)) {
+      // Replace existing locale
+      pathParts[1] = langCode;
+      newPath = pathParts.join('/');
+    } else {
+      // Add locale prefix
+      if (langCode === 'en-us') {
+        // English is default, no prefix needed
+        newPath = location.pathname;
+      } else {
+        newPath = `/${langCode}${location.pathname}`;
+      }
+    }
+
+    // If switching to English (default), remove the locale prefix
+    if (
+      langCode === 'en-us' &&
+      pathParts[1] &&
+      /^[a-z]{2}-[a-z]{2}$/i.test(pathParts[1])
+    ) {
+      pathParts.splice(1, 1);
+      newPath = pathParts.join('/') || '/';
+    }
+
+    navigate(newPath + location.search);
+    setIsOpen(false);
+  };
+
+  return (
+    <div className="relative">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center gap-2 text-gray-800 hover:text-[#2B8C57] transition-colors cursor-pointer"
+        aria-label="Select language"
+      >
+        <svg
+          className="w-4 h-4"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"
+          />
+        </svg>
+        <span className="text-sm font-medium">
+          {currentLanguage.flag} / {currentLanguage.label}
+        </span>
+        <svg
+          className={`w-3 h-3 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M19 9l-7 7-7-7"
+          />
+        </svg>
+      </button>
+
+      {isOpen && (
+        <>
+          <div
+            className="fixed inset-0 z-10"
+            onClick={() => setIsOpen(false)}
+          />
+          <div className="absolute bottom-full left-0 mb-2 bg-white border border-gray-200 rounded shadow-lg z-20 min-w-[150px]">
+            {languages.map((lang) => (
+              <button
+                key={lang.code}
+                onClick={() => handleLanguageChange(lang.code)}
+                className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 transition-colors ${
+                  currentLang === lang.code ? 'bg-gray-50 font-semibold' : ''
+                }`}
+              >
+                {lang.flag} / {lang.label}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 function NewsletterForm() {
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
@@ -314,7 +469,7 @@ function NewsletterForm() {
 
   return (
     <div className="flex flex-col gap-2">
-      <form className="flex items-center gap-6" onSubmit={handleSubmit}>
+      <form className="flex items-center md:gap-6" onSubmit={handleSubmit}>
         <input
           type="email"
           placeholder="Enter your email"

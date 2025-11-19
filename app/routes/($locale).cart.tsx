@@ -107,15 +107,15 @@ export async function loader({context}: LoaderFunctionArgs) {
 
 export default function Cart() {
   const cart = useLoaderData<typeof loader>();
+  const itemCount = cart?.totalQuantity || 0;
 
   return (
-    <div className="cart">
-      <header className="flex items-center justify-between pt-[160px] p-20">
-        <h2 className="text-xl font-semibold">Your bag</h2>
-        <Link to="/cart" prefetch="viewport" className="text-sm underline">
-          Go to cart
-        </Link>
-      </header>
+    <div className="cart container mx-auto px-4 pt-[190px] pb-12 max-w-7xl">
+      <div className="mb-8">
+        <p className="text-sm text-gray-600">
+          {itemCount} item{itemCount !== 1 ? 's' : ''}
+        </p>
+      </div>
       <CartMain layout="page" cart={cart} />
     </div>
   );

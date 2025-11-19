@@ -102,7 +102,7 @@ export function BestSellers({
 
         <div
           ref={containerRef}
-          className="flex overflow-hidden scroll-smooth gap-6 no-scrollbar px-4 w-[85%] m-auto"
+          className="flex overflow-hidden scroll-smooth gap-6 no-scrollbar md:px-4 md:w-[85%] m-auto"
         >
           {productList.map((product) => (
             <ProductItem

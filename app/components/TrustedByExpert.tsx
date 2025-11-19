@@ -32,7 +32,7 @@ export function TrustedByExpertSection({
         <p className="text-lg mb-6">{text}</p>
       </div>
 
-      <div className="flex gap-8">
+      <div className="flex flex-col md:flex-row justify-start md:items-center gap-2 md:gap-8">
         <a
           href={buttonLink}
           className="inline-block bg-[#2B8C57] text-white px-6 py-2 uppercase text-sm"

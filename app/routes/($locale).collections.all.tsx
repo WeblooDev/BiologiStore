@@ -21,11 +21,16 @@ export async function loader(args: LoaderFunctionArgs) {
 
 async function loadCriticalData({context, request}: LoaderFunctionArgs) {
   const {storefront} = context;
+  const url = new URL(request.url);
+  const tag = url.searchParams.get('tag');
   const paginationVariables = getPaginationVariables(request, {pageBy: 24}); // 24/48/96 as you like
 
   const [{products}, {collections}] = await Promise.all([
     storefront.query(CATALOG_QUERY, {
-      variables: {...paginationVariables},
+      variables: {
+        ...paginationVariables,
+        ...(tag && {query: `tag:${tag}`}),
+      },
     }),
     storefront.query(ALL_COLLECTIONS_QUERY),
   ]);
@@ -340,8 +345,9 @@ export default function Collection() {
             </p>
           </div>
         ) : (
-          <div className="container products-grid grid grid-cols-2 md:grid-cols-4 gap-8 p-4">
+          <div className="container products-grid grid !grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 p-4">
             {filteredProducts
+              .filter((product: any) => product?.bundle?.value !== 'true')
               .slice(0, visibleCount)
               .map((product: any, index: any) => (
                 <ProductItem
@@ -410,6 +416,9 @@ const COLLECTION_ITEM_FRAGMENT = `#graphql
       width
       height
     }
+    bundle: metafield(namespace: "custom", key: "bundle") {
+      value
+    }
     metafield(namespace: "custom", key: "new") {
       value
     }
@@ -458,6 +467,7 @@ const CATALOG_QUERY = `#graphql
     $last: Int
     $startCursor: String
     $endCursor: String
+    $query: String
   ) @inContext(country: $country, language: $language) {
    products(
      first: $first
@@ -466,6 +476,7 @@ const CATALOG_QUERY = `#graphql
      after: $endCursor
      sortKey: UPDATED_AT
      reverse: true
+     query: $query
    ) {
       nodes {
         ...CollectionItem

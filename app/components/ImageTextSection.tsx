@@ -23,7 +23,7 @@ export function ImageTextSection({
     <section
       className={`container m-auto flex flex-col ${
         reverse ? 'md:flex-row-reverse' : 'md:flex-row'
-      } items-center gap-10 px-6 md:px-16 !p-0`}
+      } items-center gap-10 px-6 md:px-16 mb-12 md:mb-0`}
     >
       <div className="flex-shrink-0 w-full md:w-1/2">
         <img
@@ -37,7 +37,7 @@ export function ImageTextSection({
         {content.map((item, index) => (
           <div
             key={index}
-            className="w-[80%] flex flex-col items-start mb-4 gap-4"
+            className="md:w-[80%] w-full flex flex-col items-start mb-4 gap-4"
           >
             <h2 className="!text-2xl text-[#2B8C57] font-poppins">
               {item.title}

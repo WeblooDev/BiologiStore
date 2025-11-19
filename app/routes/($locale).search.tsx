@@ -11,6 +11,7 @@ import {
   type PredictiveSearchReturn,
   getEmptyPredictiveSearchResult,
 } from '~/lib/search';
+import search from '~/assets/images/search.svg';
 
 export const meta: MetaFunction = () => {
   return [{title: `Hydrogen | Search`}];
@@ -40,36 +41,61 @@ export default function SearchPage() {
   if (type === 'predictive') return null;
 
   return (
-    <div className="search">
-      <h1>Search</h1>
-      <SearchForm>
-        {({inputRef}) => (
-          <>
-            <input
-              defaultValue={term}
-              name="q"
-              placeholder="Search…"
-              ref={inputRef}
-              type="search"
-            />
-            &nbsp;
-            <button type="submit">Search</button>
-          </>
-        )}
-      </SearchForm>
-      {error && <p style={{color: 'red'}}>{error}</p>}
+    <div className="container mx-auto px-4 py-8 pt-[190px] max-w-7xl">
+      <div className="mb-8">
+        <h1 className="text-3xl md:text-4xl font-bold text-[#2B8C57] mb-6">
+          Search
+        </h1>
+        <SearchForm>
+          {({inputRef}) => (
+            <div className="relative max-w-2xl">
+              <input
+                defaultValue={term}
+                name="q"
+                placeholder="Search products, articles, pages..."
+                ref={inputRef}
+                type="search"
+                className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2B8C57] focus:border-transparent"
+              />
+              <button
+                type="submit"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-[#2B8C57] transition"
+                aria-label="Search"
+              >
+                <img src={search} alt="Search" className="w-5 h-5" />
+              </button>
+            </div>
+          )}
+        </SearchForm>
+      </div>
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+          {error}
+        </div>
+      )}
       {!term || !result?.total ? (
         <SearchResults.Empty />
       ) : (
-        <SearchResults result={result} term={term}>
-          {({articles, pages, products, term}) => (
-            <div>
-              <SearchResults.Products products={products} term={term} />
-              <SearchResults.Pages pages={pages} term={term} />
-              <SearchResults.Articles articles={articles} term={term} />
-            </div>
-          )}
-        </SearchResults>
+        <>
+          <div className="mb-6">
+            <p className="text-gray-600">
+              Found{' '}
+              <span className="font-semibold text-gray-900">
+                {result.total}
+              </span>{' '}
+              result{result.total !== 1 ? 's' : ''} for &quot;{term}&quot;
+            </p>
+          </div>
+          <SearchResults result={result} term={term}>
+            {({articles, pages, products, term}) => (
+              <div className="space-y-12">
+                <SearchResults.Products products={products} term={term} />
+                <SearchResults.Articles articles={articles} term={term} />
+                <SearchResults.Pages pages={pages} term={term} />
+              </div>
+            )}
+          </SearchResults>
+        </>
       )}
       <Analytics.SearchView data={{searchTerm: term, searchResults: result}} />
     </div>
@@ -89,6 +115,7 @@ const SEARCH_PRODUCT_FRAGMENT = `#graphql
     title
     trackingParameters
     vendor
+    tags
     selectedOrFirstAvailableVariant(
       selectedOptions: []
       ignoreUnknownOptions: true

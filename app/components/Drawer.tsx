@@ -1,4 +1,5 @@
 import {useState, useEffect, useRef} from 'react';
+import {Link} from 'react-router';
 
 /**
  * Simple drawer component without external dependencies
@@ -72,27 +73,32 @@ export function Drawer({
         {/* Header */}
         {heading && (
           <div className="flex items-center justify-between px-6 py-4 border-b">
-            <h2 className="text-lg font-semibold">{heading}</h2>
-            <button
-              type="button"
-              onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-full transition"
-              aria-label="Close"
-            >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+            <h2 className="text-lg font-semibold text-[#2B8C57]">{heading}</h2>
+            <div className="flex flex-row items-center justify-end gap-2">
+              <Link to="/cart" className="text-black underline! text-base">
+                Go to cart
+              </Link>
+              <button
+                type="button"
+                onClick={onClose}
+                className="p-2 hover:bg-gray-100 rounded-full transition"
+                aria-label="Close"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
           </div>
         )}
 

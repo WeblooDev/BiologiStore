@@ -35,12 +35,15 @@ export function CartMain({
 
   return (
     <div
-      className={`${className} flex flex-col h-full gap-6 ${layout === 'drawer' ? 'p-6' : ''}`}
+      className={`${className} ${layout === 'drawer' ? 'flex flex-col h-full gap-6 p-6' : 'grid grid-cols-1 lg:grid-cols-3 gap-8 w-full'}`}
     >
       <CartEmpty hidden={linesCount} layout={layout} />
 
-      <div className="cart-details flex flex-col justify-between flex-1 gap-6">
-        <div aria-labelledby="cart-lines" className="overflow-y-auto">
+      {/* Products List - Left Side (2 columns on large screens) */}
+      <div
+        className={`cart-details ${layout === 'page' ? 'lg:col-span-2' : 'flex flex-col justify-between flex-1'} gap-6`}
+      >
+        <div aria-labelledby="cart-lines">
           <ul className="space-y-6">
             {(cart?.lines?.nodes ?? []).map((line) => (
               <CartLineItem key={line.id} line={line} layout={layout} />
@@ -51,9 +54,19 @@ export function CartMain({
         {recommendedProducts && (
           <CartRecommendations products={recommendedProducts} />
         )}
-
-        {cartHasItems && <CartSummary cart={cart} layout={layout} />}
       </div>
+
+      {/* Order Summary - Right Side (1 column on large screens) */}
+      {cartHasItems && layout === 'page' && (
+        <div className="lg:col-span-1">
+          <CartSummary cart={cart} layout={layout} />
+        </div>
+      )}
+
+      {/* For drawer layout, keep summary at bottom */}
+      {cartHasItems && layout === 'drawer' && (
+        <CartSummary cart={cart} layout={layout} />
+      )}
     </div>
   );
 }
