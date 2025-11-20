@@ -620,7 +620,7 @@ const BEST_SELLERS_QUERY = `#graphql
   }
   query BestSellers ($country: CountryCode, $language: LanguageCode)
     @inContext(country: $country, language: $language) {
-    products(first: 6, query: "tag:best-sellers", sortKey: UPDATED_AT, reverse: true) {
+    products(first: 20, query: "tag:best-sellers", sortKey: UPDATED_AT, reverse: true) {
       nodes {
         ...BestSellerProduct
       }

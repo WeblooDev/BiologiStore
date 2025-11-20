@@ -130,6 +130,7 @@ export default function Homepage() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 px-4 ">
                 {blogsData?.blogs?.nodes.map((blog) => {
                   const article = blog.articles?.nodes?.[0];
+                  if (!article?.title) return null;
                   return (
                     <div
                       key={blog.handle}
@@ -259,7 +260,7 @@ const BEST_SELLERS_QUERY = `#graphql
   }
   query BestSellers ($country: CountryCode, $language: LanguageCode)
     @inContext(country: $country, language: $language) {
-    products(first: 6, query: "tag:best-sellers", sortKey: UPDATED_AT, reverse: true) {
+    products(first: 20, query: "tag:best-sellers", sortKey: UPDATED_AT, reverse: true) {
       nodes {
         ...BestSellerProduct
       }
