@@ -21,44 +21,80 @@ export function BestSellers({
   if (!products) return null;
 
   const productList: ProductNode[] = products.products.nodes;
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const [visibleIndex, setVisibleIndex] = useState(0);
+  const mobileContainerRef = useRef<HTMLDivElement | null>(null);
+  const desktopContainerRef = useRef<HTMLDivElement | null>(null);
+  const [mobileIndex, setMobileIndex] = useState(0);
+  const [desktopIndex, setDesktopIndex] = useState(0);
   const [selectedProduct, setSelectedProduct] = useState<ProductNode | null>(
     null,
   );
-  const maxVisible = 3;
 
-  const scrollByProduct = () => {
-    if (containerRef.current) {
-      const child = containerRef.current.querySelector('div');
+  // Mobile scroll functions (1 product at a time)
+  const scrollMobileNext = () => {
+    if (mobileContainerRef.current) {
+      const child = mobileContainerRef.current.querySelector('div');
       if (child) {
-        const productWidth = child.clientWidth + 24;
-        containerRef.current.scrollBy({left: productWidth, behavior: 'smooth'});
-        setVisibleIndex((prev) =>
-          Math.min(prev + 1, productList.length - maxVisible),
-        );
+        const scrollAmount = child.clientWidth + 24;
+        mobileContainerRef.current.scrollBy({
+          left: scrollAmount,
+          behavior: 'smooth',
+        });
+        setMobileIndex((prev) => Math.min(prev + 1, productList.length - 1));
       }
     }
   };
 
-  const scrollBack = () => {
-    if (containerRef.current) {
-      const child = containerRef.current.querySelector('div');
+  const scrollMobileBack = () => {
+    if (mobileContainerRef.current) {
+      const child = mobileContainerRef.current.querySelector('div');
       if (child) {
-        const productWidth = child.clientWidth + 24;
-        containerRef.current.scrollBy({
-          left: -productWidth,
+        const scrollAmount = child.clientWidth + 24;
+        mobileContainerRef.current.scrollBy({
+          left: -scrollAmount,
           behavior: 'smooth',
         });
-        setVisibleIndex((prev) => Math.max(prev - 1, 0));
+        setMobileIndex((prev) => Math.max(prev - 1, 0));
+      }
+    }
+  };
+
+  // Desktop scroll functions (3 products at a time)
+  const scrollDesktopNext = () => {
+    if (desktopContainerRef.current) {
+      const child = desktopContainerRef.current.querySelector('div');
+      if (child) {
+        const scrollAmount = (child.clientWidth + 24) * 3;
+        desktopContainerRef.current.scrollBy({
+          left: scrollAmount,
+          behavior: 'smooth',
+        });
+        setDesktopIndex((prev) => Math.min(prev + 3, productList.length - 3));
+      }
+    }
+  };
+
+  const scrollDesktopBack = () => {
+    if (desktopContainerRef.current) {
+      const child = desktopContainerRef.current.querySelector('div');
+      if (child) {
+        const scrollAmount = (child.clientWidth + 24) * 3;
+        desktopContainerRef.current.scrollBy({
+          left: -scrollAmount,
+          behavior: 'smooth',
+        });
+        setDesktopIndex((prev) => Math.max(prev - 3, 0));
       }
     }
   };
 
   useEffect(() => {
     const handleResize = () => {
-      setVisibleIndex(0);
-      if (containerRef.current) containerRef.current.scrollTo({left: 0});
+      setMobileIndex(0);
+      setDesktopIndex(0);
+      if (mobileContainerRef.current)
+        mobileContainerRef.current.scrollTo({left: 0});
+      if (desktopContainerRef.current)
+        desktopContainerRef.current.scrollTo({left: 0});
     };
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
@@ -82,18 +118,19 @@ export function BestSellers({
         <h2 className="font-poppins !text-2xl !font-bold">{title}</h2>
       </div>
 
-      <div className="relative">
-        {visibleIndex > 0 && (
+      {/* Mobile Slider (< 640px) */}
+      <div className="relative sm:hidden">
+        {mobileIndex > 0 && (
           <button
-            onClick={scrollBack}
+            onClick={scrollMobileBack}
             className="absolute -left-0 top-[40%] -translate-y-1/2 z-10 px-3 py-2 cursor-pointer"
           >
             <img src={left} alt="Scroll left" className="h-[30px]" />
           </button>
         )}
-        {visibleIndex < productList.length - maxVisible && (
+        {mobileIndex < productList.length - 1 && (
           <button
-            onClick={scrollByProduct}
+            onClick={scrollMobileNext}
             className="absolute -right-0 top-[40%] -translate-y-1/2 z-10 px-3 py-2 cursor-pointer"
           >
             <img src={right} alt="Scroll right" className="h-[30px]" />
@@ -101,7 +138,40 @@ export function BestSellers({
         )}
 
         <div
-          ref={containerRef}
+          ref={mobileContainerRef}
+          className="flex overflow-hidden scroll-smooth gap-6 no-scrollbar"
+        >
+          {productList.map((product) => (
+            <ProductItem
+              key={product.id}
+              product={product}
+              className="shrink-0 w-full"
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Desktop Slider (>= 640px) */}
+      <div className="relative hidden sm:block">
+        {desktopIndex > 0 && (
+          <button
+            onClick={scrollDesktopBack}
+            className="absolute -left-0 top-[40%] -translate-y-1/2 z-10 px-3 py-2 cursor-pointer"
+          >
+            <img src={left} alt="Scroll left" className="h-[30px]" />
+          </button>
+        )}
+        {desktopIndex < productList.length - 3 && (
+          <button
+            onClick={scrollDesktopNext}
+            className="absolute -right-0 top-[40%] -translate-y-1/2 z-10 px-3 py-2 cursor-pointer"
+          >
+            <img src={right} alt="Scroll right" className="h-[30px]" />
+          </button>
+        )}
+
+        <div
+          ref={desktopContainerRef}
           className="flex overflow-hidden scroll-smooth gap-6 no-scrollbar md:px-4 md:w-[85%] m-auto"
         >
           {productList.map((product) => (
