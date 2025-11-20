@@ -15,7 +15,7 @@ export async function loader({context}: LoaderFunctionArgs) {
   // Fetch all products that have bundle_products metafield
   const {products} = await storefront.query(BUNDLES_QUERY);
   const recommendedProducts = context.storefront
-    .query(RECOMMENDED_PRODUCTS_QUERY)
+    .query(BEST_SELLERS_QUERY)
     .catch((error) => {
       console.error(error);
       return null;
@@ -29,9 +29,6 @@ export async function loader({context}: LoaderFunctionArgs) {
 
 export default function Bundles() {
   const {bundles, recommendedProducts} = useLoaderData<typeof loader>();
-
-  // Get first 4 bundles for hero display
-  const heroBundles = bundles.nodes.slice(0, 4);
 
   return (
     <div className="bundles-page">
@@ -75,9 +72,11 @@ export default function Bundles() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
-          {bundles.nodes.map((bundle: any) => (
-            <BundleCard key={bundle.id} bundle={bundle} />
-          ))}
+          {bundles.nodes
+            .filter((bundle: any) => bundle.bundle?.value === 'true')
+            .map((bundle: any) => (
+              <BundleCard key={bundle.id} bundle={bundle} />
+            ))}
         </div>
       </div>
 
@@ -144,7 +143,7 @@ const BUNDLES_QUERY = `#graphql
     $country: CountryCode
     $language: LanguageCode
   ) @inContext(country: $country, language: $language) {
-    products(first: 50, query: "tag:bundle") {
+    products(first: 50) {
       nodes {
         id
         title
@@ -179,13 +178,16 @@ const BUNDLES_QUERY = `#graphql
             }
           }
         }
+        bundle: metafield(namespace: "custom", key: "bundle") {
+          value
+        }
       }
     }
   }
 ` as const;
 
-const RECOMMENDED_PRODUCTS_QUERY = `#graphql
-  fragment RecommendedProductBundles on Product {
+const BEST_SELLERS_QUERY = `#graphql
+  fragment BestSellerProduct on Product {
     id
     title
     handle
@@ -196,11 +198,12 @@ const RECOMMENDED_PRODUCTS_QUERY = `#graphql
         currencyCode
       }
     }
-      variants(first: 1) {
-    nodes {
-      title
+    variants(first: 1) {
+      nodes {
+        id
+        title
+      }
     }
-  }
     featuredImage {
       id
       url
@@ -209,12 +212,30 @@ const RECOMMENDED_PRODUCTS_QUERY = `#graphql
       height
     }
     tags
+    bundle: metafield(namespace: "custom", key: "bundle") {
+      value
+    }
+   skinConcern: metafield(namespace: "custom", key: "concern") {
+      value
+    }
+    dayUse: metafield(namespace: "product", key: "dayuse") {
+      value
+    }
+    nightUse: metafield(namespace: "product", key: "nightuse") {
+      value
+    }
+    skinType: metafield(namespace: "custom", key: "skintype") {
+      value
+    }
+    fdaApproved: metafield(namespace: "custom", key: "fda_approved") {
+      value
+    }
   }
-  query RecommendedProductsBundles ($country: CountryCode, $language: LanguageCode)
+  query BestSellers ($country: CountryCode, $language: LanguageCode)
     @inContext(country: $country, language: $language) {
-    products(first: 6, sortKey: UPDATED_AT, reverse: true) {
+    products(first: 6, query: "tag:best-sellers", sortKey: UPDATED_AT, reverse: true) {
       nodes {
-        ...RecommendedProductBundles
+        ...BestSellerProduct
       }
     }
   }
