@@ -23,7 +23,7 @@ async function loadCriticalData({context, request}: LoaderFunctionArgs) {
   const {storefront} = context;
   const url = new URL(request.url);
   const tag = url.searchParams.get('tag');
-  const paginationVariables = getPaginationVariables(request, {pageBy: 24}); // 24/48/96 as you like
+  const paginationVariables = getPaginationVariables(request, {pageBy: 96}); // 24/48/96 as you like
 
   const [{products}, {collections}] = await Promise.all([
     storefront.query(CATALOG_QUERY, {
@@ -54,20 +54,28 @@ async function loadCriticalData({context, request}: LoaderFunctionArgs) {
     // Count skin types from metafield (JSON array)
     if (product.skinType?.value) {
       try {
-        const types = JSON.parse(product.skinType.value);
-        types.forEach((type: string) => {
-          if (type) {
-            skinTypeSet.add(type);
-            skinTypeCounts[type] = (skinTypeCounts[type] || 0) + 1;
+        const value = product.skinType.value.trim();
+        // Skip if value looks like HTML
+        if (value.startsWith('<') || value.startsWith('<!')) {
+          console.warn('Skipping HTML content in skinType metafield');
+        } else {
+          const types = JSON.parse(value) as unknown;
+          if (Array.isArray(types)) {
+            (types as string[]).forEach((type: string) => {
+              if (type) {
+                skinTypeSet.add(type);
+                skinTypeCounts[type] = (skinTypeCounts[type] || 0) + 1;
+              }
+            });
           }
-        });
+        }
       } catch (e) {
         // Fallback to comma-separated
         const types = product.skinType.value
           .split(',')
           .map((t: string) => t.trim());
         types.forEach((type: string) => {
-          if (type) {
+          if (type && !type.startsWith('<')) {
             skinTypeSet.add(type);
             skinTypeCounts[type] = (skinTypeCounts[type] || 0) + 1;
           }
@@ -78,20 +86,29 @@ async function loadCriticalData({context, request}: LoaderFunctionArgs) {
     // Count skin concerns from metafield (JSON array)
     if (product.skinConcern?.value) {
       try {
-        const concerns = JSON.parse(product.skinConcern.value);
-        concerns.forEach((concern: string) => {
-          if (concern) {
-            skinConcernSet.add(concern);
-            skinConcernCounts[concern] = (skinConcernCounts[concern] || 0) + 1;
+        const value = product.skinConcern.value.trim();
+        // Skip if value looks like HTML
+        if (value.startsWith('<') || value.startsWith('<!')) {
+          console.warn('Skipping HTML content in skinConcern metafield');
+        } else {
+          const concerns = JSON.parse(value) as unknown;
+          if (Array.isArray(concerns)) {
+            (concerns as string[]).forEach((concern: string) => {
+              if (concern) {
+                skinConcernSet.add(concern);
+                skinConcernCounts[concern] =
+                  (skinConcernCounts[concern] || 0) + 1;
+              }
+            });
           }
-        });
+        }
       } catch (e) {
         // Fallback to comma-separated
         const concerns = product.skinConcern.value
           .split(',')
           .map((c: string) => c.trim());
         concerns.forEach((concern: string) => {
-          if (concern) {
+          if (concern && !concern.startsWith('<')) {
             skinConcernSet.add(concern);
             skinConcernCounts[concern] = (skinConcernCounts[concern] || 0) + 1;
           }
@@ -102,21 +119,29 @@ async function loadCriticalData({context, request}: LoaderFunctionArgs) {
     // Count ingredients from metafield (JSON array)
     if (product.ingredient?.value) {
       try {
-        const ingredients = JSON.parse(product.ingredient.value);
-        ingredients.forEach((ingredient: string) => {
-          if (ingredient) {
-            ingredientSet.add(ingredient);
-            ingredientsCounts[ingredient] =
-              (ingredientsCounts[ingredient] || 0) + 1;
+        const value = product.ingredient.value.trim();
+        // Skip if value looks like HTML
+        if (value.startsWith('<') || value.startsWith('<!')) {
+          console.warn('Skipping HTML content in ingredient metafield');
+        } else {
+          const ingredients = JSON.parse(value) as unknown;
+          if (Array.isArray(ingredients)) {
+            (ingredients as string[]).forEach((ingredient: string) => {
+              if (ingredient) {
+                ingredientSet.add(ingredient);
+                ingredientsCounts[ingredient] =
+                  (ingredientsCounts[ingredient] || 0) + 1;
+              }
+            });
           }
-        });
+        }
       } catch (e) {
         // Fallback to comma-separated
         const ingredients = product.ingredient.value
           .split(',')
           .map((i: string) => i.trim());
         ingredients.forEach((ingredient: string) => {
-          if (ingredient) {
+          if (ingredient && !ingredient.startsWith('<')) {
             ingredientSet.add(ingredient);
             ingredientsCounts[ingredient] =
               (ingredientsCounts[ingredient] || 0) + 1;
@@ -145,7 +170,7 @@ async function loadCriticalData({context, request}: LoaderFunctionArgs) {
 
 function loadDeferredData({context}: LoaderFunctionArgs) {
   const recommendedProducts = context.storefront
-    .query(RECOMMENDED_PRODUCTS_QUERY)
+    .query(BEST_SELLERS_QUERY)
     .catch((error) => {
       console.error(error);
       return null;
@@ -210,14 +235,16 @@ export default function Collection() {
           (() => {
             if (!product.skinType?.value) return false;
             try {
-              const types = JSON.parse(product.skinType.value);
+              const value = product.skinType.value.trim();
+              if (value.startsWith('<') || value.startsWith('<!')) return false;
+              const types = JSON.parse(value) as string[];
               return types.some(
                 (t: string) => normalizeValue(t) === normalizeValue(skinType),
               );
             } catch (e) {
-              return normalizeValue(product.skinType.value).includes(
-                normalizeValue(skinType),
-              );
+              const value = product.skinType.value;
+              if (value.startsWith('<') || value.startsWith('<!')) return false;
+              return normalizeValue(value).includes(normalizeValue(skinType));
             }
           })();
 
@@ -226,13 +253,17 @@ export default function Collection() {
           (() => {
             if (!product.skinConcern?.value) return false;
             try {
-              const concerns = JSON.parse(product.skinConcern.value);
+              const value = product.skinConcern.value.trim();
+              if (value.startsWith('<') || value.startsWith('<!')) return false;
+              const concerns = JSON.parse(value) as string[];
               return concerns.some(
                 (c: string) =>
                   normalizeValue(c) === normalizeValue(skinConcern),
               );
             } catch (e) {
-              return normalizeValue(product.skinConcern.value).includes(
+              const value = product.skinConcern.value;
+              if (value.startsWith('<') || value.startsWith('<!')) return false;
+              return normalizeValue(value).includes(
                 normalizeValue(skinConcern),
               );
             }
@@ -243,14 +274,16 @@ export default function Collection() {
           (() => {
             if (!product.ingredient?.value) return false;
             try {
-              const ingredients = JSON.parse(product.ingredient.value);
+              const value = product.ingredient.value.trim();
+              if (value.startsWith('<') || value.startsWith('<!')) return false;
+              const ingredients = JSON.parse(value) as string[];
               return ingredients.some(
                 (i: string) => normalizeValue(i) === normalizeValue(ingredient),
               );
             } catch (e) {
-              return normalizeValue(product.ingredient.value).includes(
-                normalizeValue(ingredient),
-              );
+              const value = product.ingredient.value;
+              if (value.startsWith('<') || value.startsWith('<!')) return false;
+              return normalizeValue(value).includes(normalizeValue(ingredient));
             }
           })();
 
@@ -540,8 +573,8 @@ const PRODUCT_TYPES_WITH_SAMPLE_PRODUCTS_QUERY = `#graphql
   }
 ` as const;
 
-const RECOMMENDED_PRODUCTS_QUERY = `#graphql
-  fragment RecommendedProductAll on Product {
+const BEST_SELLERS_QUERY = `#graphql
+  fragment BestSellerProduct on Product {
     id
     title
     handle
@@ -552,11 +585,12 @@ const RECOMMENDED_PRODUCTS_QUERY = `#graphql
         currencyCode
       }
     }
-      variants(first: 1) {
-    nodes {
-      title
+    variants(first: 1) {
+      nodes {
+        id
+        title
+      }
     }
-  }
     featuredImage {
       id
       url
@@ -565,12 +599,30 @@ const RECOMMENDED_PRODUCTS_QUERY = `#graphql
       height
     }
     tags
+    bundle: metafield(namespace: "custom", key: "bundle") {
+      value
+    }
+   skinConcern: metafield(namespace: "custom", key: "concern") {
+      value
+    }
+    dayUse: metafield(namespace: "product", key: "dayuse") {
+      value
+    }
+    nightUse: metafield(namespace: "product", key: "nightuse") {
+      value
+    }
+    skinType: metafield(namespace: "custom", key: "skintype") {
+      value
+    }
+    fdaApproved: metafield(namespace: "custom", key: "fda_approved") {
+      value
+    }
   }
-  query RecommendedProductsAll ($country: CountryCode, $language: LanguageCode)
+  query BestSellers ($country: CountryCode, $language: LanguageCode)
     @inContext(country: $country, language: $language) {
-    products(first: 6, sortKey: UPDATED_AT, reverse: true) {
+    products(first: 6, query: "tag:best-sellers", sortKey: UPDATED_AT, reverse: true) {
       nodes {
-        ...RecommendedProductAll
+        ...BestSellerProduct
       }
     }
   }
