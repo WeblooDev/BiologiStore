@@ -23,6 +23,7 @@ type ProductNode = {
 };
 
 export function PackProduct({products}: {products: ProductNode[]}) {
+  console.log(products);
   if (!products || products.length === 0) return null;
 
   return (

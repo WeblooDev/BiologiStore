@@ -101,6 +101,9 @@ export default function Homepage() {
               .filter((p: any) => p?.bundle?.value === 'true')
               .slice(0, 2);
 
+            console.log('products', products);
+            console.log('all', all);
+
             return <PackProduct products={products} />;
           }}
         </Await>
@@ -314,7 +317,7 @@ const PRODUCT_WITH_PACK_TAG_QUERY = `#graphql
 
   query ProductsWithBundle($country: CountryCode, $language: LanguageCode)
     @inContext(country: $country, language: $language) {
-    products(first: 12, sortKey: UPDATED_AT, reverse: true) {
+    products(first: 50, sortKey: UPDATED_AT, reverse: true) {
       nodes {
         ...ProductWithTagFields
       }

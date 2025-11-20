@@ -65,7 +65,7 @@ export function AllCollections({collections}: AllCollectionsProps) {
         <h2 className="font-poppins text-2xl! font-bold!">Shop By Category</h2>
 
         {/* Desktop: Grid Layout */}
-        <ul className="hidden lg:flex flex-wrap gap-6 justify-center">
+        <ul className="hidden xl:flex gap-6 justify-center">
           {sortedCollections.map((collection) => (
             <li key={collection.id} className="w-[170px] max-w-[194px]">
               <a
@@ -92,7 +92,7 @@ export function AllCollections({collections}: AllCollectionsProps) {
         </ul>
 
         {/* Mobile & Tablet: Slider */}
-        <div className="lg:hidden w-full relative">
+        <div className="xl:hidden w-full relative">
           {/* Left Arrow */}
           <button
             onClick={() => scroll('left')}
