@@ -6,7 +6,7 @@ import {Suspense} from 'react';
 import {BestSellers} from '~/components/BestSellers';
 
 export const meta: MetaFunction = () => {
-  return [{title: 'Shop Bundles | BiologiMd'}];
+  return [{title: 'BIOLOGIMD | BIOLOGI MD SHOP'}];
 };
 
 export async function loader({context}: LoaderFunctionArgs) {

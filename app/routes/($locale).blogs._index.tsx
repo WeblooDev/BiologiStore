@@ -6,7 +6,7 @@ import {HeroBlogSection} from '~/components/HeroBlog';
 import bloghero from '~/assets/images/bloghero.webp';
 
 export const meta: MetaFunction = () => {
-  return [{title: `Hydrogen | Blogs`}];
+  return [{title: `BIOLOGIMD | BIOLOGI MD SHOP`}];
 };
 
 type BlogNode = {

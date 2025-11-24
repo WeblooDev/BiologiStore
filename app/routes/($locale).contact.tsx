@@ -4,7 +4,7 @@ import type {MetaFunction} from '@shopify/remix-oxygen';
 import {CustomerServiceForm} from '~/components/CustomerServiceForm';
 
 export const meta: MetaFunction = () => {
-  return [{title: 'Contact Us | Customer Service'}];
+  return [{title: 'BIOLOGIMD | BIOLOGI MD SHOP'}];
 };
 
 export default function ContactPage() {

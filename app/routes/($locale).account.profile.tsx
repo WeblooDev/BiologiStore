@@ -20,7 +20,7 @@ export type ActionResponse = {
 };
 
 export const meta: MetaFunction = () => {
-  return [{title: 'Profile'}];
+  return [{title: 'BIOLOGIMD | BIOLOGI MD SHOP'}];
 };
 
 export async function loader({context}: LoaderFunctionArgs) {
