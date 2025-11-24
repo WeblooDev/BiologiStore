@@ -14,7 +14,7 @@ import homepage from '~/assets/images/homepage.webp';
 import discoverImage from '~/assets/images/discover.png';
 
 export const meta: MetaFunction = () => {
-  return [{title: 'Hydrogen | Home'}];
+  return [{title: 'BIOLOGIMD | BIOLOGI MD SHOP'}];
 };
 
 export async function loader(args: LoaderFunctionArgs) {

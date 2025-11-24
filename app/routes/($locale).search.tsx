@@ -14,7 +14,7 @@ import {
 import search from '~/assets/images/search.svg';
 
 export const meta: MetaFunction = () => {
-  return [{title: `Hydrogen | Search`}];
+  return [{title: `BIOLOGIMD | BIOLOGI MD SHOP`}];
 };
 
 export async function loader({request, context}: LoaderFunctionArgs) {

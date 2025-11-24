@@ -12,7 +12,7 @@ import trustedbyexpert from '~/assets/images/chosen-by-you.webp';
 import {TrustedByExpertSection} from '~/components/TrustedByExpert';
 
 export const meta: MetaFunction = () => {
-  return [{title: 'About Us | Hydrogen'}];
+  return [{title: 'BIOLOGIMD | BIOLOGI MD SHOP'}];
 };
 
 export async function loader({context}: LoaderFunctionArgs) {

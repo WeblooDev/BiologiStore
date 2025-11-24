@@ -13,7 +13,7 @@ import type {
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 
 export const meta: MetaFunction = () => {
-  return [{title: 'Orders'}];
+  return [{title: 'BIOLOGIMD | BIOLOGI MD SHOP'}];
 };
 
 export async function loader({request, context}: LoaderFunctionArgs) {

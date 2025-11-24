@@ -32,7 +32,7 @@ export type ActionResponse = {
 };
 
 export const meta: MetaFunction = () => {
-  return [{title: 'Addresses'}];
+  return [{title: 'BIOLOGIMD | BIOLOGI MD SHOP'}];
 };
 
 export async function loader({context}: LoaderFunctionArgs) {
