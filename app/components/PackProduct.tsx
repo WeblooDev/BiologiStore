@@ -23,19 +23,24 @@ type ProductNode = {
 };
 
 export function PackProduct({products}: {products: ProductNode[]}) {
-  console.log(products);
   if (!products || products.length === 0) return null;
 
   return (
     <section className="container mx-auto my-12">
       <div className="flex flex-col justify-center items-center p-8 gap-4">
-        <h2 className="font-poppins !text-2xl !font-bold">
+        <Link
+          to={'/products/bundles'}
+          className="font-poppins text-2xl! font-bold!"
+        >
           Best-Selling Bundles
-        </h2>
-        <p className="font-poppins !text-base !font-normal text-center">
+        </Link>
+        <Link
+          to={'/products/bundles'}
+          className="font-poppins text-base! font-normal! text-center"
+        >
           Discover our complete routines designed by skin experts to support
           healthy skin with medical-grade care.
-        </p>
+        </Link>
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
         {products.map((product) => (

@@ -28,7 +28,7 @@ const PREDICTIVE_SEARCH_PRODUCT_FRAGMENT = `#graphql
 ` as const;
 
 const PREDICTIVE_SEARCH_QUERY = `#graphql
-  query PredictiveSearch(
+  query ApiPredictiveSearch(
     $country: CountryCode
     $language: LanguageCode
     $limit: Int!

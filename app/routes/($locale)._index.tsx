@@ -100,10 +100,6 @@ export default function Homepage() {
             const products = all
               .filter((p: any) => p?.bundle?.value === 'true')
               .slice(0, 2);
-
-            console.log('products', products);
-            console.log('all', all);
-
             return <PackProduct products={products} />;
           }}
         </Await>
