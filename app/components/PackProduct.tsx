@@ -28,14 +28,11 @@ export function PackProduct({products}: {products: ProductNode[]}) {
   return (
     <section className="container mx-auto my-12">
       <div className="flex flex-col justify-center items-center p-8 gap-4">
-        <Link
-          to={'/products/bundles'}
-          className="font-poppins text-2xl! font-bold!"
-        >
+        <Link to={'/bundles'} className="font-poppins text-2xl! font-bold!">
           Best-Selling Bundles
         </Link>
         <Link
-          to={'/products/bundles'}
+          to={'/bundles'}
           className="font-poppins text-base! font-normal! text-center"
         >
           Discover our complete routines designed by skin experts to support
