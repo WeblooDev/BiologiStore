@@ -87,9 +87,9 @@ export function ProductFilter({
       <div>
         <p className="font-semibold font-poppins !text-xl">Filter By:</p>
       </div>
-      <div className="flex justify-between gap-4 mb-6">
+      <div className="flex flex-col lg:flex-row justify-between gap-4 mb-6">
         {/* Category & Skin Type */}
-        <div className="flex gap-4 items-center">
+        <div className="flex flex-col lg:flex-row gap-4 lg:items-center">
           <CustomDropdown
             value={filters.category}
             onChange={(value) => handleChange('category', value)}
@@ -98,7 +98,7 @@ export function ProductFilter({
               label: collection.title,
             }))}
             placeholder="Category"
-            className="w-[200px]"
+            className="w-full lg:w-[200px]"
           />
 
           <CustomDropdown
@@ -109,7 +109,7 @@ export function ProductFilter({
               label: type,
             }))}
             placeholder="Skin Type"
-            className="w-[200px]"
+            className="w-full lg:w-[200px]"
           />
 
           <CustomDropdown
@@ -120,7 +120,7 @@ export function ProductFilter({
               label: concern,
             }))}
             placeholder="Skin Concern"
-            className="w-[200px]"
+            className="w-full lg:w-[200px]"
           />
 
           <CustomDropdown
@@ -131,12 +131,12 @@ export function ProductFilter({
               label: ingredient,
             }))}
             placeholder="Ingredient"
-            className="w-[200px]"
+            className="w-full lg:w-[200px]"
           />
         </div>
 
         {/* Sort Option */}
-        <div className="flex gap-2 items-center">
+        <div className="flex flex-col lg:flex-row gap-2 lg:items-center">
           <p>Sort by:</p>
           <CustomDropdown
             value={filters.sort}
@@ -148,7 +148,7 @@ export function ProductFilter({
               {value: 'UPDATED_AT', label: 'Newest'},
             ]}
             placeholder="Sort by"
-            className="w-[200px]"
+            className="w-full lg:w-[200px]"
           />
         </div>
       </div>

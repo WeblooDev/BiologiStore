@@ -422,7 +422,7 @@ function RenderMenuItems({
         >
           {activeItem?.items?.length > 0 && (
             <div className="container mx-auto p-12 flex justify-center gap-16">
-              {activeItem.items.map((subItem) => (
+              {activeItem.items.map((subItem, index) => (
                 <div
                   key={subItem.id}
                   className="flex flex-col gap-3 overflow-y-auto pr-4"
@@ -434,6 +434,14 @@ function RenderMenuItems({
                     items={subItem.items}
                     localePrefix={localePrefix}
                   />
+                  {index === 0 && subItem.title === 'Categories' && (
+                    <a
+                      href="/collections/all"
+                      className="no-underline! inline-block bg-white border border-[#2B8C57] px-8 py-2 uppercase text-sm cursor-pointer transition-all duration-300 text-[#2B8C57] hover:bg-[#2B8C57] hover:text-white! hover:border-[#2B8C57] w-fit lg:mt-16"
+                    >
+                      shop all categories
+                    </a>
+                  )}
                 </div>
               ))}
             </div>
@@ -605,6 +613,14 @@ function MobileMenuItem({
                       ))}
                     </div>
                   </div>
+                  {item.title === 'Shop' && subItem.title === 'By Concern' && (
+                    <a
+                      href="/collections/all"
+                      className="no-underline! inline-block bg-white border border-[#2B8C57] px-8 py-2 uppercase text-sm cursor-pointer transition-all duration-300 text-[#2B8C57] hover:bg-[#2B8C57] hover:text-white! hover:border-[#2B8C57] w-fit mt-4 ms-8"
+                    >
+                      shop all categories
+                    </a>
+                  )}
                 </>
               ) : (
                 // Direct link if no children

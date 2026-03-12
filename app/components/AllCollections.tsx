@@ -123,7 +123,7 @@ export function AllCollections({collections}: AllCollectionsProps) {
             {sortedCollections.map((collection) => (
               <div
                 key={collection.id}
-                className="flex-shrink-0 w-[150px] snap-center"
+                className="flex-shrink-0 w-[33.33%] snap-center"
               >
                 <a
                   href={getLocalePath(
@@ -135,7 +135,7 @@ export function AllCollections({collections}: AllCollectionsProps) {
                     <img
                       src={collection.image?.url || '/placeholder.png'}
                       alt={collection.image?.altText || collection.title}
-                      className="w-full h-[194px] object-cover !rounded-none"
+                      className="w-full h-[154px] object-cover !rounded-none"
                     />
                     <div className="py-2 border border-[#2B8C57]">
                       <p className="font-poppins uppercase text-center p-2 text-[#2B8C57] transition-colors duration-300 group-hover:text-white text-sm">
