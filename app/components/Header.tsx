@@ -616,7 +616,7 @@ function MobileMenuItem({
                   {item.title === 'Shop' && subItem.title === 'By Concern' && (
                     <a
                       href="/collections/all"
-                      className="no-underline! inline-block bg-white border border-[#2B8C57] px-8 py-2 uppercase text-sm cursor-pointer transition-all duration-400 text-[#2B8C57] hover:bg-[#2B8C57] hover:text-white! hover:border-[#2B8C57] w-fit mt-4 ms-8"
+                      className="no-underline! inline-block bg-white border border-[#2B8C57] px-8 py-2 uppercase text-sm cursor-pointer transition-all duration-300 text-[#2B8C57] hover:bg-[#2B8C57] hover:text-white! hover:border-[#2B8C57] w-fit mt-4 ms-8"
                     >
                       shop all categories
                     </a>
