@@ -256,6 +256,12 @@ export function Layout({children}: {children?: React.ReactNode}) {
 
         <ScrollRestoration nonce={nonce} />
         <Scripts nonce={nonce} />
+        <script
+          src="https://widgets.leadconnectorhq.com/loader.js"
+          data-resources-url="https://widgets.leadconnectorhq.com/chat-widget/loader.js"
+          data-widget-id="6a7a5b3fae5432b1ab769f41"
+          data-source="WEB_USER"
+        />
       </body>
     </html>
   );
